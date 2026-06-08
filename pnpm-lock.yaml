@@ -23,6 +23,9 @@ importers:
       puppeteer:
         specifier: ^23.11.1
         version: 23.11.1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
       sharp:
         specifier: ^0.33.5
         version: 0.33.5
@@ -980,6 +983,10 @@ packages:
 
   rc9@2.1.2:
     resolution: {integrity: sha512-btXCnMmRIBINM2LDZoEmOogIZU7Qe7zn4BpomSKZ/ykbLObuBdvG+mFq11DL6fjH1DRwHhrlgtYWG96bJiC7Cg==}
+
+  react@19.2.7:
+    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
+    engines: {node: '>=0.10.0'}
 
   readdirp@4.1.2:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
@@ -2012,6 +2019,8 @@ snapshots:
     dependencies:
       defu: 6.1.4
       destr: 2.0.5
+
+  react@19.2.7: {}
 
   readdirp@4.1.2: {}
 
