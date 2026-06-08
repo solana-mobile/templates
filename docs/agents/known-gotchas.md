@@ -25,7 +25,3 @@ Generated files and the root `pnpm-lock.yaml` are intentionally ignored by root 
 ## Package Manager Matrix
 
 CI can expose issues that only appear with one package manager. Engine constraints in dependencies can break a package manager/Node combination even when local installs work.
-
-## Community Templates
-
-Community templates may use different frameworks and package managers. Preserve their local conventions unless a repository rule or maintainer request requires a change.

@@ -9,8 +9,6 @@ Each template directory scanned by `repokit.groups` must include:
 - `package.json`
 - `og-image.png`
 
-Community templates belong under `community/<template-name>/` unless a maintainer asks for another root.
-
 ## Package Metadata
 
 Template `package.json` files should include these listing fields:

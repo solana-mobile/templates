@@ -11,16 +11,16 @@
 
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
-import { readPackageJson, readDirs, writeJsonFile, writeFile, hasPackageJson, joinPath } from './shared/fs-utils.js'
+import { hasPackageJson, readDirs, readPackageJson, writeFile, writeJsonFile } from './shared/fs-utils.js'
 import {
-  type TemplateMetadata,
-  type TemplateJson,
-  type TemplateGroup,
   type GroupConfig,
-  type RootConfig,
   isTemplatePackageJson,
+  type RootConfig,
+  type TemplateGroup,
+  type TemplateJson,
+  type TemplateMetadata,
 } from './shared/types.js'
-import { ok, err, type Result, unwrap } from './shared/result.js'
+import { err, ok, type Result } from './shared/result.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = join(__dirname, '..')
@@ -32,7 +32,7 @@ const WORKFLOW_TEMPLATES_JSON_PATH = join(ROOT_DIR, '.github', 'workflows', 'tem
 const CONFIG_KEY = 'repokit' as const
 const OG_IMAGE_FILENAME = 'og-image.png' as const
 const GIGET_PREFIX = 'gh:' as const
-const DEFAULT_REPO = 'solana-foundation/templates' as const
+const DEFAULT_REPO = 'solana-mobile/templates' as const
 
 /**
  * Read configuration from root package.json

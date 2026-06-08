@@ -3,19 +3,13 @@ name: Generate Template Metadata
 on:
   pull_request:
     paths:
-      - 'community/**/package.json'
-      - 'kit/**/package.json'
       - 'mobile/**/package.json'
-      - 'web3js/**/package.json'
       - 'package.json'
       - 'scripts/**'
   push:
     branches: [main]
     paths:
-      - 'community/**/package.json'
-      - 'kit/**/package.json'
       - 'mobile/**/package.json'
-      - 'web3js/**/package.json'
       - 'package.json'
       - 'scripts/**'
   workflow_dispatch:
