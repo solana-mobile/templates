@@ -1,0 +1,18 @@
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - next
+  - '@next/*'
+  - react
+  - react-dom
+  - '@solana/client'
+  - '@solana/react-hooks'
+  - '@solana/kit'
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@tailwindcss/oxide'
+  - bigint-buffer
+  - bufferutil
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - utf-8-validate

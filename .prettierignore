@@ -1,0 +1,13 @@
+# Add files here to ignore them from prettier formatting
+/dist
+/coverage
+/tmp
+pnpm-lock.yaml
+.next
+
+# Generated files
+templates.json
+TEMPLATES.md
+uniwind-types.d.ts
+
+# Ignore any dist, tmp, or node_modules directories

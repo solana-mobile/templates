@@ -1,0 +1,27 @@
+/tmp
+node_modules
+.DS_Store
+.pnpm-store/
+
+# We only want a top-level `pnpm-lock.yaml` file.
+mobile/**/package-lock.json
+mobile/**/pnpm-lock.yaml
+mobile/**/yarn.lock
+
+# Ignore any dist, tmp, or node_modules directories
+mobile/**/.next
+mobile/**/.env
+mobile/**/.env.local
+mobile/**/anchor/target/debug
+mobile/**/anchor/target/deploy
+mobile/**/anchor/target/release
+mobile/**/anchor/target/sbf-solana-solana
+mobile/**/anchor/target/sbpf-solana-solana
+mobile/**/anchor/target/test-ledger
+mobile/**/anchor/target/.rustc_info.json
+mobile/**/dist
+mobile/**/node_modules
+mobile/**/tmp
+
+# AI
+**/.claude/
