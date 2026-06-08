@@ -9,28 +9,25 @@ Browse the public template gallery at https://solana.com/developers/templates.
 Create a new Solana project using the interactive CLI:
 
 ```sh
-# npm
-npm create solana-dapp@latest
+# bun
+bun x create-solana-dapp@latest
 
 # pnpm
 pnpm create solana-dapp@latest
 
-# yarn
-yarn create solana-dapp
+# npm
+npm create solana-dapp@latest
 ```
 
 Or specify a template directly:
 
 ```sh
-npm create solana-dapp@latest -t gh:solana-foundation/templates/kit/nextjs
+npm create solana-dapp@latest -t gh:solana-mobile/templates/mobile/kit-expo-uniwind
 ```
 
 ## Template Categories
 
-- **Kit** - Modern templates using @solana/kit
-- **Web3.js** - Templates using @solana/web3.js (legacy)
-- **Mobile** - React Native templates for Solana Mobile
-- **Community** - Templates maintained by the community
+- **Mobile** - Templates for Solana Mobile
 
 See [TEMPLATES.md](TEMPLATES.md) for the complete list.
 
@@ -38,23 +35,17 @@ See [TEMPLATES.md](TEMPLATES.md) for the complete list.
 
 We welcome contributions!
 
-**Adding a new community template:**
-
-See the [Community Template Contributor Guide](COMMUNITY_TEMPLATE_GUIDE.md) for comprehensive instructions on contributing templates to the community/ directory.
-
-**Adding a new template:**
-
-1. Create community templates under `community/`.
-2. Add required metadata to package.json (see existing templates for examples)
-3. Include displayName, usecase, and og-image.png
-4. Run `pnpm generate` to update templates.json
-5. Open a PR with your changes
-
 **Improving existing templates:**
 
 - Report issues or suggest improvements
 - Submit PRs for bug fixes or enhancements
 - Update documentation
+
+**Adding a new template:**
+
+External contributors must create an [issue](https://github.com/solana-mobile/templates/issues) before adding a new
+template. Describe the template you want to add and wait for a confirmation before sending a PR. This prevents you doing
+work that won't get merged into this repo.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
@@ -71,13 +62,13 @@ AI coding agents should start with [AGENTS.md](AGENTS.md), which links to the fo
 
 ## Contributors
 
-<!-- automd:contributors github="solana-foundation/templates" license="MIT" -->
+<!-- automd:contributors github="solana-mobile/templates" license="MIT" -->
 
-Published under the [MIT](https://github.com/solana-foundation/templates/blob/main/LICENSE) license.
-Made by [community](https://github.com/solana-foundation/templates/graphs/contributors) 💛
+Published under the [MIT](https://github.com/solana-mobile/templates/blob/main/LICENSE) license.
+Made by [community](https://github.com/solana-mobile/templates/graphs/contributors) 💛
 <br><br>
-<a href="https://github.com/solana-foundation/templates/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=solana-foundation/templates" />
+<a href="https://github.com/solana-mobile/templates/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=solana-mobile/templates" />
 </a>
 
 <!-- /automd -->

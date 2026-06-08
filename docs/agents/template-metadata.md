@@ -6,8 +6,6 @@ Template metadata is generated from template `package.json` files.
 
 The source of truth is each template directory's `package.json`. The generator reads template roots from root `package.json` under `repokit.groups`; do not maintain a separate hard-coded group list in docs.
 
-Community templates belong under `community/` unless a maintainer asks for another root.
-
 Generated outputs are:
 
 - `templates.json`
@@ -54,7 +52,7 @@ These fields are also used when present and are expected by the contributor guid
 `scripts/generate.ts` creates IDs in this format:
 
 ```text
-gh:solana-foundation/templates/<group>/<template-directory>
+gh:solana-mobile/templates/<group>/<template-directory>
 ```
 
 Do not hand-write these IDs in generated files.

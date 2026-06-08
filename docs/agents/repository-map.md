@@ -6,7 +6,6 @@ This repository is the template source consumed directly by `create-solana-dapp`
 
 - `README.md` explains user-facing template usage and the high-level contribution flow.
 - `CONTRIBUTING.md` explains the general GitHub workflow and local commands.
-- `COMMUNITY_TEMPLATE_GUIDE.md` is the main guide for new community templates.
 - `package.json` defines root scripts and the `repokit.groups` template groups scanned by the generator and linter.
 - `templates.json` is generated metadata consumed by downstream tooling.
 - `TEMPLATES.md` is generated human-readable template metadata.
@@ -15,14 +14,11 @@ This repository is the template source consumed directly by `create-solana-dapp`
 
 Template roots are configured in root `package.json` under `repokit.groups`. Use that file as the source of truth instead of hard-coding group names in docs or scripts.
 
-Most new externally maintained templates belong under `community/` unless a maintainer asks for a different root.
-
 ## Reference Flow
 
 - Use root `package.json` `repokit.groups` to find the current template roots.
 - Use `TEMPLATES.md` for the generated catalog of current templates.
 - Use nearby templates in the same root as examples for scripts, README structure, metadata, and assets.
-- Use `COMMUNITY_TEMPLATE_GUIDE.md` for community submission requirements.
 
 ## Agent Docs
 

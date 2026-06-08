@@ -3,10 +3,7 @@ name: Validate Templates
 on:
   pull_request:
     paths:
-      - 'community/**/package.json'
-      - 'kit/**/package.json'
       - 'mobile/**/package.json'
-      - 'web3js/**/package.json'
       - 'scripts/**'
       - 'package.json'
       - '.github/workflows/validate-templates.yml'

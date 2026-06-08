@@ -4,7 +4,7 @@ Solana Mobile Templates
 
 ### [kit-expo-minimal](mobile/kit-expo-minimal)
 
-`gh:solana-foundation/templates/mobile/kit-expo-minimal`
+`gh:solana-mobile/templates/mobile/kit-expo-minimal`
 
 > A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.
 
@@ -12,7 +12,7 @@ Solana Mobile Templates
 
 ### [kit-expo-privy](mobile/kit-expo-privy)
 
-`gh:solana-foundation/templates/mobile/kit-expo-privy`
+`gh:solana-mobile/templates/mobile/kit-expo-privy`
 
 > A Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.
 
@@ -20,7 +20,7 @@ Solana Mobile Templates
 
 ### [kit-expo-uniwind](mobile/kit-expo-uniwind)
 
-`gh:solana-foundation/templates/mobile/kit-expo-uniwind`
+`gh:solana-mobile/templates/mobile/kit-expo-uniwind`
 
 > A template for building a Solana mobile app with Expo, React Native, Solana Kit, and Uniwind.
 
@@ -28,7 +28,7 @@ Solana Mobile Templates
 
 ### [web3js-expo](mobile/web3js-expo)
 
-`gh:solana-foundation/templates/mobile/web3js-expo`
+`gh:solana-mobile/templates/mobile/web3js-expo`
 
 > A template for building a Solana mobile app with Expo and React Native.
 
@@ -36,7 +36,7 @@ Solana Mobile Templates
 
 ### [web3js-expo-minimal](mobile/web3js-expo-minimal)
 
-`gh:solana-foundation/templates/mobile/web3js-expo-minimal`
+`gh:solana-mobile/templates/mobile/web3js-expo-minimal`
 
 > A minimal template for building a Solana mobile app with Expo and React Native.
 
@@ -44,7 +44,7 @@ Solana Mobile Templates
 
 ### [web3js-expo-paper](mobile/web3js-expo-paper)
 
-`gh:solana-foundation/templates/mobile/web3js-expo-paper`
+`gh:solana-mobile/templates/mobile/web3js-expo-paper`
 
 > A template for building a Solana mobile app with Expo and React Native Paper.
 

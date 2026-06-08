@@ -4,7 +4,7 @@ This file gives AI coding agents the minimum context needed to work safely in th
 
 ## Start Here
 
-- Read `README.md`, `CONTRIBUTING.md`, and `COMMUNITY_TEMPLATE_GUIDE.md` before changing template behavior.
+- Read `README.md` and `CONTRIBUTING.md` before changing template behavior.
 - Use the focused notes in `docs/agents/` for repo map, template metadata, validation, and review checks.
 - Keep changes small and local to the affected template or script.
 - Do not overwrite user work or generated files by hand.

@@ -6,7 +6,7 @@
     "templates": [
       {
         "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
-        "id": "gh:solana-foundation/templates/mobile/kit-expo-minimal",
+        "id": "gh:solana-mobile/templates/mobile/kit-expo-minimal",
         "image": "mobile/kit-expo-minimal/og-image.png",
         "keywords": [
           "expo",
@@ -21,7 +21,7 @@
       },
       {
         "description": "A Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.",
-        "id": "gh:solana-foundation/templates/mobile/kit-expo-privy",
+        "id": "gh:solana-mobile/templates/mobile/kit-expo-privy",
         "image": "mobile/kit-expo-privy/og-image.png",
         "keywords": [
           "expo",
@@ -38,7 +38,7 @@
       },
       {
         "description": "A template for building a Solana mobile app with Expo, React Native, Solana Kit, and Uniwind.",
-        "id": "gh:solana-foundation/templates/mobile/kit-expo-uniwind",
+        "id": "gh:solana-mobile/templates/mobile/kit-expo-uniwind",
         "image": "mobile/kit-expo-uniwind/og-image.png",
         "keywords": [
           "expo",
@@ -55,7 +55,7 @@
       },
       {
         "description": "A template for building a Solana mobile app with Expo and React Native.",
-        "id": "gh:solana-foundation/templates/mobile/web3js-expo",
+        "id": "gh:solana-mobile/templates/mobile/web3js-expo",
         "image": "mobile/web3js-expo/og-image.png",
         "keywords": [
           "expo",
@@ -70,7 +70,7 @@
       },
       {
         "description": "A minimal template for building a Solana mobile app with Expo and React Native.",
-        "id": "gh:solana-foundation/templates/mobile/web3js-expo-minimal",
+        "id": "gh:solana-mobile/templates/mobile/web3js-expo-minimal",
         "image": "mobile/web3js-expo-minimal/og-image.png",
         "keywords": [
           "expo",
@@ -85,7 +85,7 @@
       },
       {
         "description": "A template for building a Solana mobile app with Expo and React Native Paper.",
-        "id": "gh:solana-foundation/templates/mobile/web3js-expo-paper",
+        "id": "gh:solana-mobile/templates/mobile/web3js-expo-paper",
         "image": "mobile/web3js-expo-paper/og-image.png",
         "keywords": [
           "expo",
