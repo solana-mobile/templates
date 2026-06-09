@@ -54,6 +54,25 @@
         "usecase": "Mobile"
       },
       {
+        "description": "A Solana mobile app template with Expo, React Native, Solana Kit, Mobile Wallet Adapter actions, and Uniwind.",
+        "id": "gh:solana-mobile/templates/mobile/kit-expo-wallet",
+        "image": "mobile/kit-expo-wallet/og-image.png",
+        "keywords": [
+          "expo",
+          "mobile-wallet-adapter",
+          "react-native",
+          "solana-kit",
+          "tailwind",
+          "uniwind",
+          "wallet",
+          "wallet-ui"
+        ],
+        "name": "kit-expo-wallet",
+        "path": "mobile/kit-expo-wallet",
+        "displayName": "Wallet Mobile Kit Expo example",
+        "usecase": "Mobile"
+      },
+      {
         "description": "A template for building a Solana mobile app with Expo and React Native.",
         "id": "gh:solana-mobile/templates/mobile/web3js-expo",
         "image": "mobile/web3js-expo/og-image.png",
