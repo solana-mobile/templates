@@ -69,7 +69,7 @@
         ],
         "name": "kit-expo-wallet",
         "path": "mobile/kit-expo-wallet",
-        "displayName": "Wallet Mobile Kit Expo example",
+        "displayName": "Kit Expo Wallet example",
         "usecase": "Mobile"
       },
       {
