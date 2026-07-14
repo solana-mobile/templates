@@ -7,4 +7,5 @@
 /tmp
 pnpm-lock.yaml
 .agents
+agent
 src/uniwind-types.d.ts
