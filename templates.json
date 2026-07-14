@@ -6,23 +6,23 @@
     "templates": [
       {
         "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
-        "id": "gh:solana-mobile/templates/mobile/kit-expo-minimal",
-        "image": "mobile/kit-expo-minimal/og-image.png",
+        "id": "gh:solana-mobile/templates/mobile/expo-kit-minimal",
+        "image": "mobile/expo-kit-minimal/og-image.png",
         "keywords": [
           "expo",
           "mobile-wallet-adapter",
           "react-native",
           "solana-kit"
         ],
-        "name": "kit-expo-minimal",
-        "path": "mobile/kit-expo-minimal",
-        "displayName": "Minimal Mobile Kit Expo example",
+        "name": "expo-kit-minimal",
+        "path": "mobile/expo-kit-minimal",
+        "displayName": "Expo Kit Minimal example",
         "usecase": "Mobile"
       },
       {
         "description": "A Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.",
-        "id": "gh:solana-mobile/templates/mobile/kit-expo-privy",
-        "image": "mobile/kit-expo-privy/og-image.png",
+        "id": "gh:solana-mobile/templates/mobile/expo-kit-privy",
+        "image": "mobile/expo-kit-privy/og-image.png",
         "keywords": [
           "expo",
           "privy",
@@ -31,32 +31,32 @@
           "tailwind",
           "uniwind"
         ],
-        "name": "kit-expo-privy",
-        "path": "mobile/kit-expo-privy",
-        "displayName": "Privy Mobile Kit Expo example",
+        "name": "expo-kit-privy",
+        "path": "mobile/expo-kit-privy",
+        "displayName": "Expo Kit Privy example",
         "usecase": "Mobile"
       },
       {
         "description": "A template for building a Solana mobile app with Expo, React Native, Solana Kit, and Uniwind.",
-        "id": "gh:solana-mobile/templates/mobile/kit-expo-uniwind",
-        "image": "mobile/kit-expo-uniwind/og-image.png",
+        "id": "gh:solana-mobile/templates/mobile/expo-kit-uniwind",
+        "image": "mobile/expo-kit-uniwind/og-image.png",
         "keywords": [
           "expo",
           "mobile-wallet-adapter",
           "react-native",
           "solana-kit",
-          "uniwind",
-          "tailwind"
+          "tailwind",
+          "uniwind"
         ],
-        "name": "kit-expo-uniwind",
-        "path": "mobile/kit-expo-uniwind",
-        "displayName": "Uniwind Mobile Kit Expo example",
+        "name": "expo-kit-uniwind",
+        "path": "mobile/expo-kit-uniwind",
+        "displayName": "Expo Kit Uniwind example",
         "usecase": "Mobile"
       },
       {
         "description": "A Solana mobile app template with Expo, React Native, Solana Kit, Mobile Wallet Adapter actions, and Uniwind.",
-        "id": "gh:solana-mobile/templates/mobile/kit-expo-wallet",
-        "image": "mobile/kit-expo-wallet/og-image.png",
+        "id": "gh:solana-mobile/templates/mobile/expo-kit-wallet",
+        "image": "mobile/expo-kit-wallet/og-image.png",
         "keywords": [
           "expo",
           "mobile-wallet-adapter",
@@ -67,45 +67,30 @@
           "wallet",
           "wallet-ui"
         ],
-        "name": "kit-expo-wallet",
-        "path": "mobile/kit-expo-wallet",
-        "displayName": "Kit Expo Wallet example",
-        "usecase": "Mobile"
-      },
-      {
-        "description": "A template for building a Solana mobile app with Expo and React Native.",
-        "id": "gh:solana-mobile/templates/mobile/web3js-expo",
-        "image": "mobile/web3js-expo/og-image.png",
-        "keywords": [
-          "expo",
-          "mobile-wallet-adapter",
-          "react-native",
-          "solana-web3js"
-        ],
-        "name": "web3js-expo",
-        "path": "mobile/web3js-expo",
-        "displayName": "Mobile Expo Boilerplate",
+        "name": "expo-kit-wallet",
+        "path": "mobile/expo-kit-wallet",
+        "displayName": "Expo Kit Wallet example",
         "usecase": "Mobile"
       },
       {
         "description": "A minimal template for building a Solana mobile app with Expo and React Native.",
-        "id": "gh:solana-mobile/templates/mobile/web3js-expo-minimal",
-        "image": "mobile/web3js-expo-minimal/og-image.png",
+        "id": "gh:solana-mobile/templates/mobile/expo-web3js-minimal",
+        "image": "mobile/expo-web3js-minimal/og-image.png",
         "keywords": [
           "expo",
           "mobile-wallet-adapter",
           "react-native",
           "solana-web3js"
         ],
-        "name": "web3js-expo-minimal",
-        "path": "mobile/web3js-expo-minimal",
-        "displayName": "Minimal Mobile Expo example",
+        "name": "expo-web3js-minimal",
+        "path": "mobile/expo-web3js-minimal",
+        "displayName": "Expo Web3.js Minimal example",
         "usecase": "Mobile"
       },
       {
         "description": "A template for building a Solana mobile app with Expo and React Native Paper.",
-        "id": "gh:solana-mobile/templates/mobile/web3js-expo-paper",
-        "image": "mobile/web3js-expo-paper/og-image.png",
+        "id": "gh:solana-mobile/templates/mobile/expo-web3js-paper",
+        "image": "mobile/expo-web3js-paper/og-image.png",
         "keywords": [
           "expo",
           "mobile-wallet-adapter",
@@ -113,9 +98,26 @@
           "react-native-paper",
           "solana-web3js"
         ],
-        "name": "web3js-expo-paper",
-        "path": "mobile/web3js-expo-paper",
-        "displayName": "Paper Boilerplate",
+        "name": "expo-web3js-paper",
+        "path": "mobile/expo-web3js-paper",
+        "displayName": "Expo Web3.js Paper example",
+        "usecase": "Mobile"
+      },
+      {
+        "description": "A wallet template for building a Solana mobile app with Expo, React Native, and Web3.js.",
+        "id": "gh:solana-mobile/templates/mobile/expo-web3js-wallet",
+        "image": "mobile/expo-web3js-wallet/og-image.png",
+        "keywords": [
+          "expo",
+          "mobile-wallet-adapter",
+          "react-native",
+          "solana-web3js",
+          "wallet",
+          "wallet-ui"
+        ],
+        "name": "expo-web3js-wallet",
+        "path": "mobile/expo-web3js-wallet",
+        "displayName": "Expo Web3.js Wallet example",
         "usecase": "Mobile"
       }
     ]

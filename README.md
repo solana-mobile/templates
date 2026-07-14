@@ -22,7 +22,7 @@ npm create solana-dapp@latest
 Or specify a template directly:
 
 ```sh
-npm create solana-dapp@latest -t gh:solana-mobile/templates/mobile/kit-expo-uniwind
+npm create solana-dapp@latest -t gh:solana-mobile/templates/mobile/expo-kit-uniwind
 ```
 
 ## Template Categories
