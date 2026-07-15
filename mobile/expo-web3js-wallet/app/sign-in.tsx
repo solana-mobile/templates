@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { AppButton } from '@/components/app-button'
 import { useAuth } from '@/components/auth/auth-provider'
 import { AppText } from '@/components/app-text'
 import { AppView } from '@/components/app-view'
@@ -6,7 +7,6 @@ import { AppConfig } from '@/constants/app-config'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 import { Image } from 'expo-image'
-import { Button } from '@react-navigation/elements'
 
 export default function SignIn() {
   const { signIn } = useAuth()
@@ -31,7 +31,7 @@ export default function SignIn() {
           <Image source={require('../assets/images/icon.png')} style={{ width: 128, height: 128 }} />
         </View>
         <View style={{ marginBottom: 16 }}>
-          <Button
+          <AppButton
             variant="filled"
             style={{ marginHorizontal: 16 }}
             onPress={async () => {
@@ -42,7 +42,7 @@ export default function SignIn() {
             }}
           >
             Connect
-          </Button>
+          </AppButton>
         </View>
       </SafeAreaView>
     </AppView>

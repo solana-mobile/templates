@@ -1,10 +1,10 @@
+import { AppButton } from '@/components/app-button'
 import { AppView } from '@/components/app-view'
 import { AppText } from '@/components/app-text'
 import { PublicKey } from '@solana/web3.js'
 import Snackbar from 'react-native-snackbar'
 import { ActivityIndicator, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
-import { Button } from '@react-navigation/elements'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMutation } from '@tanstack/react-query'
 import { useMobileWallet } from '@wallet-ui/react-native-web3js'
@@ -45,7 +45,7 @@ export function DemoFeatureSignMessage({ address }: { address: PublicKey }) {
         {signMessagesMutation.isPending ? (
           <ActivityIndicator />
         ) : (
-          <Button
+          <AppButton
             disabled={signMessagesMutation.isPending || message?.trim() === ''}
             onPress={() => {
               signMessagesMutation
@@ -62,7 +62,7 @@ export function DemoFeatureSignMessage({ address }: { address: PublicKey }) {
             variant="filled"
           >
             Sign Message
-          </Button>
+          </AppButton>
         )}
       </View>
       {signMessagesMutation.isError ? (

@@ -1,8 +1,8 @@
+import { AppButton } from '@/components/app-button'
 import { AppView } from '@/components/app-view'
 import { AppText } from '@/components/app-text'
 import { PublicKey } from '@solana/web3.js'
 import { AppQrCode } from '@/components/app-qr-code'
-import { Button } from '@react-navigation/elements'
 import Clipboard from '@react-native-clipboard/clipboard'
 
 export function AccountFeatureReceive({ address }: { address: PublicKey }) {
@@ -13,7 +13,7 @@ export function AccountFeatureReceive({ address }: { address: PublicKey }) {
         <AppText type="defaultSemiBold" style={{ textAlign: 'center' }}>
           {address.toString()}
         </AppText>
-        <Button onPressIn={() => Clipboard.setString(address.toString())}>Copy Address</Button>
+        <AppButton onPressIn={() => Clipboard.setString(address.toString())}>Copy Address</AppButton>
         <AppQrCode value={address.toString()} />
       </AppView>
     </AppView>

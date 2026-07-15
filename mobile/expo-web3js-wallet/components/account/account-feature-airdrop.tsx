@@ -1,8 +1,8 @@
+import { AppButton } from '@/components/app-button'
 import { AppView } from '@/components/app-view'
 import { AppText } from '@/components/app-text'
 import { PublicKey } from '@solana/web3.js'
 import { useMobileWallet } from '@wallet-ui/react-native-web3js'
-import { Button } from '@react-navigation/elements'
 import React from 'react'
 import { ActivityIndicator } from 'react-native'
 import { useRequestAirdrop } from '@/components/account/use-request-airdrop'
@@ -18,7 +18,7 @@ export function AccountFeatureAirdrop({ back }: { back: () => void }) {
       {requestAirdrop.isPending ? (
         <ActivityIndicator />
       ) : (
-        <Button
+        <AppButton
           disabled={requestAirdrop.isPending}
           onPress={() => {
             requestAirdrop
@@ -32,7 +32,7 @@ export function AccountFeatureAirdrop({ back }: { back: () => void }) {
           variant="filled"
         >
           Request Airdrop
-        </Button>
+        </AppButton>
       )}
       {requestAirdrop.isError ? (
         <AppText style={{ color: 'red', fontSize: 12 }}>{`${requestAirdrop.error.message}`}</AppText>

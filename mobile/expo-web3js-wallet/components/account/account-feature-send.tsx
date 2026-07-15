@@ -1,9 +1,9 @@
+import { AppButton } from '@/components/app-button'
 import { AppView } from '@/components/app-view'
 import { AppText } from '@/components/app-text'
 import { PublicKey } from '@solana/web3.js'
 import { ActivityIndicator, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
-import { Button } from '@react-navigation/elements'
 import { useTransferSol } from '@/components/account/use-transfer-sol'
 import { useThemeColor } from '@/hooks/use-theme-color'
 
@@ -47,7 +47,7 @@ export function AccountFeatureSend({ address }: { address: PublicKey }) {
             onChangeText={setDestinationAddress}
           />
 
-          <Button
+          <AppButton
             disabled={transferSol.isPending}
             onPress={() => {
               transferSol
@@ -60,7 +60,7 @@ export function AccountFeatureSend({ address }: { address: PublicKey }) {
             variant="filled"
           >
             Send SOL
-          </Button>
+          </AppButton>
         </View>
       )}
       {transferSol.isError ? (
