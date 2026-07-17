@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "extends": "@repo/config/tsconfig.base.json"
+}
