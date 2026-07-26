@@ -58,6 +58,14 @@ Solana Mobile Templates
 
 `expo` `mobile-wallet-adapter` `react-native` `solana-web3js` `wallet` `wallet-ui`
 
+### [kotlin-compose-minimal](mobile/kotlin-compose-minimal)
+
+`gh:solana-mobile/templates/mobile/kotlin-compose-minimal`
+
+> A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Mobile Wallet Adapter.
+
+`android` `jetpack-compose` `kotlin` `mobile-wallet-adapter` `solana`
+
 ### [react-kit-shadcn](mobile/react-kit-shadcn)
 
 `gh:solana-mobile/templates/mobile/react-kit-shadcn`
