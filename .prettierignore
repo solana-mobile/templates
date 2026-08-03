@@ -11,3 +11,4 @@ TEMPLATES.md
 uniwind-types.d.ts
 
 # Ignore any dist, tmp, or node_modules directories
+mobile/**/coverage
