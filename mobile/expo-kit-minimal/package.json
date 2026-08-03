@@ -11,8 +11,11 @@
   ],
   "create-solana-dapp": {
     "instructions": [
-      "To buld the Android app locally, run this:",
-      "+{pm} run android"
+      "Build the Android app locally:",
+      "+{pm} run android",
+      "",
+      "Remove the example code and start from a blank app:",
+      "+{pm} run reset-project"
     ],
     "versions:": {
       "adb": "33.0.0"
@@ -32,6 +35,7 @@
     "ios": "expo run:ios",
     "lint": "expo lint --fix",
     "lint:check": "expo lint",
+    "reset-project": "node ./scripts/reset-project.js",
     "start": "expo start",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
