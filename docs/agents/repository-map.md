@@ -41,5 +41,5 @@ Template roots are configured in root `package.json` under `repokit.groups`. Use
 
 - `.github/workflows/validate-templates.yml` validates generated metadata.
 - `.github/workflows/test-templates.yml` runs template creation and install checks across package managers.
-- `.github/actions/create-solana-dapp/action.yml` defines the per-template create/install/CI flow.
+- `.github/actions/solana-mobile-create/action.yml` defines the per-template create/install/CI flow.
 - `.github/actions/setup/action.yml` installs runtime tooling used by workflows.

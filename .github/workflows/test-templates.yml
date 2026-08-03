@@ -98,10 +98,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Create and Build using create-solana-dapp
-        uses: ./.github/actions/create-solana-dapp
+      - name: Create and Build using solana-mobile create
+        uses: ./.github/actions/solana-mobile-create
         with:
-          cmd: 'bun x create-solana-dapp@latest'
+          cmd: 'bun x solana-mobile@latest'
           node-version: ${{ matrix.node }}
           package-manager: 'bun'
           template: ${{ matrix.template }}
@@ -119,10 +119,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Create and Build using create-solana-dapp
-        uses: ./.github/actions/create-solana-dapp
+      - name: Create and Build using solana-mobile create
+        uses: ./.github/actions/solana-mobile-create
         with:
-          cmd: 'npx -y create-solana-dapp@latest'
+          cmd: 'npx -y solana-mobile@latest'
           node-version: ${{ matrix.node }}
           package-manager: 'npm'
           template: ${{ matrix.template }}
@@ -140,10 +140,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Create and Build using create-solana-dapp
-        uses: ./.github/actions/create-solana-dapp
+      - name: Create and Build using solana-mobile create
+        uses: ./.github/actions/solana-mobile-create
         with:
-          cmd: 'pnpm create solana-dapp@latest'
+          cmd: 'pnpm dlx solana-mobile@latest'
           node-version: ${{ matrix.node }}
           package-manager: 'pnpm'
           template: ${{ matrix.template }}
@@ -161,10 +161,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Create and Build using create-solana-dapp
-        uses: ./.github/actions/create-solana-dapp
+      - name: Create and Build using solana-mobile create
+        uses: ./.github/actions/solana-mobile-create
+        # Yarn Classic has no `dlx`, so launch the CLI with npx and let
+        # `--package-manager yarn` drive the install inside the template.
         with:
-          cmd: 'yarn create solana-dapp'
+          cmd: 'npx -y solana-mobile@latest'
           node-version: ${{ matrix.node }}
           package-manager: 'yarn'
           template: ${{ matrix.template }}
