@@ -1,5 +1,5 @@
-name: 'Run create-solana-dapp'
-description: 'Run create-solana-dapp with the given command and template'
+name: 'Run solana-mobile create'
+description: 'Run solana-mobile create with the given command and template'
 inputs:
   cmd:
     description: 'The command to run'
@@ -23,13 +23,15 @@ runs:
         node-version: ${{ inputs.node-version }}
         package-manager: ${{ inputs.package-manager }}
 
-    - name: Create and Build using create-solana-dapp
+    - name: Create and Build using solana-mobile create
       run: |
         cd $(mktemp -d)
         BRANCH="${{ github.head_ref || github.ref_name }}"
         REPO="${{ github.event.pull_request.head.repo.full_name || github.repository }}"
         echo "Installing from repo: $REPO, branch: $BRANCH"
-        ${{ inputs.cmd }} --template gh:${REPO}/${{ inputs.template }}#${BRANCH} sandbox
+        ${{ inputs.cmd }} create sandbox \
+          --package-manager ${{ inputs.package-manager }} \
+          --template gh:${REPO}/${{ inputs.template }}#${BRANCH}
         cd sandbox
         ${{ inputs.package-manager }} install
         npm run ci

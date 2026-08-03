@@ -11,7 +11,7 @@ Use the smallest validation that proves the change, then run broader checks when
 
 ## Template Checks
 
-For a changed template, prefer validating from a fresh install path when practical. CI uses `create-solana-dapp` to instantiate templates, install dependencies, and run `npm run ci`.
+For a changed template, prefer validating from a fresh install path when practical. CI uses `solana-mobile create` (the Solana Mobile wrapper around `create-solana-dapp`) to instantiate templates, install dependencies, and run `npm run ci`.
 
 Templates tested by CI need a `ci` script.
 
@@ -19,7 +19,7 @@ Templates tested by CI need a `ci` script.
 
 - `.github/workflows/validate-templates.yml` checks metadata generation and validation.
 - `.github/workflows/test-templates.yml` runs template tests across package managers and template paths.
-- `.github/actions/create-solana-dapp/action.yml` contains the shared template creation and install flow.
+- `.github/actions/solana-mobile-create/action.yml` contains the shared template creation and install flow.
 - `.github/actions/setup/action.yml` controls Node, package manager, Solana, Anchor, Rust, and other tool setup.
 
 ## Interpreting Failures

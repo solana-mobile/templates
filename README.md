@@ -1,29 +1,32 @@
 # Solana Templates
 
-Official templates for [create-solana-dapp](https://github.com/solana-developers/create-solana-dapp).
+Official templates for the [Solana Mobile CLI](https://github.com/solana-mobile/solana-mobile-cli), built on
+[create-solana-dapp](https://github.com/solana-foundation/create-solana-dapp).
 
 Browse the public template gallery at https://solana.com/developers/templates.
 
 ## Usage
 
-Create a new Solana project using the interactive CLI:
+Create a new Solana Mobile project using the interactive CLI:
 
 ```sh
 # bun
-bun x create-solana-dapp@latest
-
-# pnpm
-pnpm create solana-dapp@latest
+bun x solana-mobile@latest create
 
 # npm
-npm create solana-dapp@latest
+npx solana-mobile@latest create
+
+# pnpm
+pnpm dlx solana-mobile@latest create
 ```
 
 Or specify a template directly:
 
 ```sh
-npm create solana-dapp@latest -t gh:solana-mobile/templates/mobile/expo-kit-uniwind
+npx solana-mobile@latest create -t expo-kit-uniwind
 ```
+
+Run `npx solana-mobile@latest create --list-templates` to see every available template.
 
 ## Template Categories
 
