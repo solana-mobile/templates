@@ -57,7 +57,10 @@ describe('NetworkFeatureIndex', () => {
     wallet.current = createMobileWalletMock({ failRpcAfter: 1 })
 
     const screen = await renderNetworkFeature()
+    // Both reads have to settle before the refetch, or the one still in flight never gets a second
+    // call and only one value ends up stale.
     expect(await screen.findByText(/Version: 2\.1\.0 \(1234567890\)/)).toBeTruthy()
+    expect(await screen.findByText(/Genesis Hash: EtWTRABZ\.\.6VU2xqa1/)).toBeTruthy()
 
     await act(async () => {
       await screen.queryClient.refetchQueries()
