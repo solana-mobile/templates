@@ -34,9 +34,14 @@ const root = path.join(__dirname, '..')
  * `features` goes entirely: the account screens are a demo, and so is the network switcher, because
  * `MobileWalletProvider` takes a single cluster and the app config holds one after the reset.
  *
+ * `components` goes the same way and is rebuilt from `writtenPaths` below, rather than naming the
+ * demo's own components here. Everything in it exists to serve the demo screens except the providers,
+ * which the reset writes anyway — so deleting the directory keeps this list correct as the demo grows
+ * instead of leaving a new component behind importing something that is gone.
+ *
  * `scripts` holds this file, so it goes last.
  */
-const deletedPaths = ['features', 'test', 'utils', 'scripts']
+const deletedPaths = ['components', 'features', 'test', 'utils', 'scripts']
 
 /**
  * Files the reset writes, overwriting the demo versions where they exist.
@@ -233,7 +238,11 @@ async function main() {
 }
 
 async function write(target, contents) {
-  await fs.writeFile(path.join(root, target), contents)
+  const file = path.join(root, target)
+
+  // `components` is deleted above, so its directory has to come back before anything lands in it.
+  await fs.mkdir(path.dirname(file), { recursive: true })
+  await fs.writeFile(file, contents)
   console.log(`📄 ${target} written.`)
 }
 
