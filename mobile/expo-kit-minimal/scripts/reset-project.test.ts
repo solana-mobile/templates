@@ -109,7 +109,14 @@ describe('reset-project', () => {
 
       await reset(project)
 
-      const gone = ['features', 'scripts', 'test', 'utils']
+      const gone = [
+        'components/app-action-button.tsx',
+        'components/app-status.tsx',
+        'features',
+        'scripts',
+        'test',
+        'utils',
+      ]
       for (const target of gone) {
         expect(await exists(path.join(project, target)), `${target} should be gone`).toBe(false)
       }
@@ -200,6 +207,25 @@ describe('reset-project', () => {
       expect(after.dependencies['@wallet-ui/react-native-kit']).toBe(before.dependencies['@wallet-ui/react-native-kit'])
       expect(Object.keys(after.scripts)).toEqual(Object.keys(before.scripts).filter((key) => key !== 'reset-project'))
     })
+
+    /**
+     * A demo helper that lives outside `features` is the easy one to forget: it survives the reset and
+     * keeps importing something that no longer exists. `components` is deleted whole for that reason,
+     * so a file added there tomorrow cannot reintroduce it.
+     */
+    it('takes demo support files outside features with it', async () => {
+      const project = await copyProject()
+      await fs.writeFile(
+        path.join(project, 'components/app-demo-helper.tsx'),
+        "import { ellipsify } from '@/utils/ellipsify'\n\nexport const helper = ellipsify\n",
+      )
+
+      await reset(project)
+
+      expect(await exists(path.join(project, 'components/app-demo-helper.tsx'))).toBe(false)
+      expect(await exists(path.join(project, 'components/app-providers.tsx'))).toBe(true)
+      await runTool(project, 'tsc', ['--noEmit'])
+    }, 180_000)
 
     it('leaves no import pointing at a file it deleted', async () => {
       const project = await copyProject()
