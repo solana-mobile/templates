@@ -17,5 +17,14 @@ export function ClusterUiVersion({ selectedCluster }: { selectedCluster: Cluster
       }),
   })
 
-  return <AppText>Version: {query.isLoading ? 'Loading...' : `${query.data?.core} (${query.data?.features})`}</AppText>
+  if (!query.data) {
+    return <AppText>Version: {query.isError ? 'Unable to load' : 'Loading...'}</AppText>
+  }
+
+  // A failed refetch keeps the last known value, so label it instead of passing it off as current.
+  return (
+    <AppText>
+      Version: {query.data.core} ({query.data.features}){query.isError ? ' (refresh failed)' : ''}
+    </AppText>
+  )
 }

@@ -7,9 +7,30 @@ import { AppConfig } from '@/constants/app-config'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 import { Image } from 'expo-image'
+import { useState } from 'react'
+import { showError } from '@/utils/show-error'
 
 export default function SignIn() {
   const { signIn } = useAuth()
+  const [isSigningIn, setIsSigningIn] = useState(false)
+
+  // Sign-in goes through the wallet, which can decline or fail the request.
+  async function handleSignIn() {
+    if (isSigningIn) {
+      return
+    }
+    setIsSigningIn(true)
+    try {
+      await signIn()
+      // We only get here when sign-in succeeded, so it is safe to navigate.
+      router.replace('/')
+    } catch (error) {
+      showError('Could not sign in', error)
+    } finally {
+      setIsSigningIn(false)
+    }
+  }
+
   return (
     <AppView
       style={{
@@ -34,14 +55,10 @@ export default function SignIn() {
           <AppButton
             variant="filled"
             style={{ marginHorizontal: 16 }}
-            onPress={async () => {
-              await signIn()
-              // Navigate after signing in. You may want to tweak this to ensure sign-in is
-              // successful before navigating.
-              router.replace('/')
-            }}
+            disabled={isSigningIn}
+            onPress={() => void handleSignIn()}
           >
-            Connect
+            {isSigningIn ? 'Connecting...' : 'Connect'}
           </AppButton>
         </View>
       </SafeAreaView>

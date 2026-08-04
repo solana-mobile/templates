@@ -15,12 +15,16 @@ export const TEST_ADDRESS = 'GsbwXfJraMomNxBcjK9jJ3YuPBQTd7pTvbwEfJvvZoP1' as Ad
  *
  * `render` is async in React Native Testing Library v14 — always await this helper.
  */
-export function renderWithProviders(ui: ReactElement) {
+export async function renderWithProviders(ui: ReactElement) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { gcTime: 0, retry: false, staleTime: 0 } },
   })
 
-  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+  // The client is returned so a test can force a refetch and exercise the
+  // success-then-failure path, where React Query keeps the last value and still reports an error.
+  const screen = await render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+
+  return Object.assign(screen, { queryClient })
 }
 
 export interface MobileWalletMockOptions {
@@ -28,6 +32,11 @@ export interface MobileWalletMockOptions {
   balance?: bigint
   /** Pass `null` to simulate a disconnected wallet. */
   account?: { address: Address; label: string } | null
+  /**
+   * Reject RPC reads once this many sends have succeeded. `0` fails the first read, `1` lets the
+   * first read succeed and fails every refetch after it.
+   */
+  failRpcAfter?: number
 }
 
 /**
@@ -37,16 +46,33 @@ export interface MobileWalletMockOptions {
  * no RPC calls are involved, so the tests stay fast and deterministic while still driving the real
  * components.
  */
-export function createMobileWalletMock({ account, balance = 1_500_000_000n }: MobileWalletMockOptions = {}) {
+export function createMobileWalletMock({
+  account,
+  balance = 1_500_000_000n,
+  failRpcAfter,
+}: MobileWalletMockOptions = {}) {
+  const sends: Record<string, number> = {}
+
+  /** Resolve with `value`, unless this read is past the configured failure point. */
+  function send<T>(method: string, value: T) {
+    return () => {
+      const attempt = (sends[method] = (sends[method] ?? 0) + 1)
+      if (failRpcAfter !== undefined && attempt > failRpcAfter) {
+        return Promise.reject(new Error(`RPC ${method} unavailable`))
+      }
+      return Promise.resolve(value)
+    }
+  }
+
   return {
     account: account === undefined ? { address: TEST_ADDRESS, label: 'Test Wallet' } : account,
     chain: 'solana:devnet',
     client: {
       rpc: {
-        getBalance: vi.fn((_address: Address) => ({ send: () => Promise.resolve({ value: balance }) })),
-        getGenesisHash: vi.fn(() => ({ send: () => Promise.resolve('EtWTRABZaYq6iMfeYKouRu166VU2xqa1') })),
+        getBalance: vi.fn((_address: Address) => ({ send: send('getBalance', { value: balance }) })),
+        getGenesisHash: vi.fn(() => ({ send: send('getGenesisHash', 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1') })),
         getVersion: vi.fn(() => ({
-          send: () => Promise.resolve({ 'feature-set': 1234567890, 'solana-core': '2.1.0' }),
+          send: send('getVersion', { 'feature-set': 1234567890, 'solana-core': '2.1.0' }),
         })),
       },
     },

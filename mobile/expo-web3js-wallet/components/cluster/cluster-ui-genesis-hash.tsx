@@ -12,5 +12,15 @@ export function ClusterUiGenesisHash({ selectedCluster }: { selectedCluster: Clu
     queryFn: () => connection.getGenesisHash(),
   })
 
-  return <AppText>Genesis Hash: {query.isLoading ? 'Loading...' : `${ellipsify(query.data, 8)}`}</AppText>
+  if (!query.data) {
+    return <AppText>Genesis Hash: {query.isError ? 'Unable to load' : 'Loading...'}</AppText>
+  }
+
+  // A failed refetch keeps the last known value, so label it instead of passing it off as current.
+  return (
+    <AppText>
+      Genesis Hash: {ellipsify(query.data, 8)}
+      {query.isError ? ' (refresh failed)' : ''}
+    </AppText>
+  )
 }

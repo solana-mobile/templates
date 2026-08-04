@@ -9,6 +9,7 @@ import { AppText } from '@/components/app-text'
 import * as Dropdown from '@rn-primitives/dropdown-menu'
 import { WalletUiButtonConnect } from './wallet-ui-button-connect'
 import { useWalletUiTheme } from '@/components/solana/use-wallet-ui-theme'
+import { showError } from '@/utils/show-error'
 
 function useDropdownItems() {
   const { getExplorerUrl } = useCluster()
@@ -16,6 +17,8 @@ function useDropdownItems() {
   if (!account) {
     return []
   }
+  // Dropdown.Item takes a sync handler, so every async action is caught here
+  // instead of floating away as an unhandled rejection.
   return [
     {
       label: 'Copy Address',
@@ -23,11 +26,17 @@ function useDropdownItems() {
     },
     {
       label: 'View in Explorer',
-      onPress: async () => await Linking.openURL(getExplorerUrl(`account/${account.address.toString()}`)),
+      onPress: () => {
+        Linking.openURL(getExplorerUrl(`account/${account.address.toString()}`)).catch((error: unknown) =>
+          showError('Could not open explorer', error),
+        )
+      },
     },
     {
       label: 'Disconnect',
-      onPress: async () => await disconnect(),
+      onPress: () => {
+        disconnect().catch((error: unknown) => showError('Could not disconnect wallet', error))
+      },
     },
   ]
 }

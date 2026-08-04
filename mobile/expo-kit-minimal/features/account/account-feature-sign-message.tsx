@@ -1,25 +1,17 @@
-import { useState } from 'react'
-import { Button, View } from 'react-native'
-import { appStyles } from '@/constants/app-styles'
 import { useMobileWallet } from '@wallet-ui/react-native-kit'
 import { Address } from '@solana/kit'
+import { AppActionButton } from '@/components/app-action-button'
 
 export function AccountFeatureSignMessage({ address }: { address: Address }) {
   const { signMessages } = useMobileWallet()
-  const [title, setTitle] = useState('Sign Message')
-  async function submit() {
-    try {
-      await signMessages(new TextEncoder().encode(`Signing a message with ${address}`))
-      setTitle('Message Signed!')
-      console.log('Message signed!')
-    } catch (e) {
-      setTitle('Sign Message Failed')
-      console.log(`Error signing message: ${e}`)
-    }
-  }
+
   return (
-    <View style={appStyles.stack}>
-      <Button onPress={submit} title={title} />
-    </View>
+    <AppActionButton
+      onPress={async () => {
+        await signMessages(new TextEncoder().encode(`Signing a message with ${address}`))
+        return { description: `Signed a message with ${address}`, status: 'success', title: 'Sign Message' } as const
+      }}
+      title="Sign Message"
+    />
   )
 }
