@@ -1,4 +1,4 @@
-import { act, fireEvent } from '@testing-library/react-native'
+import { act, fireEvent, waitFor } from '@testing-library/react-native'
 import { createSolanaDevnet, createSolanaTestnet } from '@wallet-ui/react-native-kit'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { NetworkFeatureIndex } from '@/features/network/network-feature-index'
@@ -66,7 +66,9 @@ describe('NetworkFeatureIndex', () => {
       await screen.queryClient.refetchQueries()
     })
 
-    expect(await screen.findAllByText(/refresh failed/i)).toHaveLength(2)
+    // `findAllByText` resolves on its first match, so it would settle for one stale value while the
+    // second is still a tick behind. Waiting for the count is what makes this deterministic.
+    await waitFor(() => expect(screen.getAllByText(/refresh failed/i)).toHaveLength(2))
   })
 
   it('only offers the networks that are not currently selected', async () => {
