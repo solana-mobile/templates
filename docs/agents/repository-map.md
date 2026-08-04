@@ -6,7 +6,7 @@ This repository is the template source consumed directly by `create-solana-dapp`
 
 - `README.md` explains user-facing template usage and the high-level contribution flow.
 - `CONTRIBUTING.md` explains the general GitHub workflow and local commands.
-- `package.json` defines root scripts and the `repokit.groups` template groups scanned by the generator and linter.
+- `package.json` defines root scripts, the `repokit.groups` template groups scanned by the generator and the check, and the pinned `solana-mobile` version that provides both.
 - `templates.json` is generated metadata consumed by downstream tooling.
 - `TEMPLATES.md` is generated human-readable template metadata.
 
@@ -31,9 +31,8 @@ Template roots are configured in root `package.json` under `repokit.groups`. Use
 
 ## Tooling
 
-- `scripts/generate.ts` scans template groups and writes `templates.json`, `TEMPLATES.md`, and `.github/workflows/templates.json`.
-- `scripts/lint.ts` validates template package metadata, duplicate names, and `og-image.png` requirements.
-- `scripts/validate.ts` validates generated metadata shape.
+- `solana-mobile templates check` validates template package metadata, duplicate names, and `og-image.png` requirements, then compares the generated artifacts without writing them. This is the whole of `pnpm lint` apart from Prettier.
+- `scripts/generate.ts` writes `templates.json`, `TEMPLATES.md`, and `.github/workflows/templates.json` using `renderTemplateRepository` from `solana-mobile/templates` — the same renderer the check compares against, so the two cannot disagree.
 - `scripts/create-image.ts` creates template `og-image.png` assets.
 - `scripts/clean.ts` removes `templates.json` and `TEMPLATES.md`.
 

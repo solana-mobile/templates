@@ -47,8 +47,8 @@ jobs:
       - name: Generate metadata
         run: pnpm generate
 
-      - name: Validate generated output
-        run: pnpm validate
+      - name: Check template repository
+        run: pnpm exec solana-mobile templates check
 
       - name: Check for changes
         id: changes

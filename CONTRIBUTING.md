@@ -75,7 +75,7 @@ pnpm run
 
 - `pnpm clean` - Clean generated files and artifacts
 - `pnpm format` - Format code using prettier
-- `pnpm lint` - Lint code for style and quality issues
+- `pnpm lint` - Check template metadata, generated artifacts, and formatting
 - `pnpm update-deps` - Update all dependencies to latest versions
 
 ### Code Quality

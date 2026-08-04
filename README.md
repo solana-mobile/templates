@@ -57,7 +57,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 ```sh
 pnpm install
 pnpm generate    # Generate templates.json and TEMPLATES.md
-pnpm lint        # Validate templates
+pnpm lint        # Check templates and formatting
 pnpm format      # Format code
 ```
 

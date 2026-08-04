@@ -13,7 +13,7 @@ This file gives AI coding agents the minimum context needed to work safely in th
 
 - `pnpm install` installs root tooling.
 - `pnpm generate` regenerates template metadata and docs.
-- `pnpm lint` validates template structure, metadata, Open Graph images, and formatting.
+- `pnpm lint` runs `solana-mobile templates check` (template structure, metadata, Open Graph images, and generated artifacts) plus formatting.
 - `pnpm format` formats repo files.
 
 ## Editing Rules

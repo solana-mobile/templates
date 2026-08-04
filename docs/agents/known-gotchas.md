@@ -6,7 +6,7 @@
 
 ## Template Group Scanning
 
-The generator and linter scan direct children of each root `repokit.groups` path. A directory inside a scanned group without `package.json` can fail lint.
+The generator and the check scan direct children of each root `repokit.groups` path. A directory inside a scanned group without a valid `package.json` fails both. The generator no longer skips invalid templates with a warning — it refuses to write anything until every template is valid, so `pnpm generate` and `pnpm lint` fail on the same input.
 
 ## Open Graph Images
 

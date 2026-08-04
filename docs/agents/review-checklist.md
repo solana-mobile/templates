@@ -7,7 +7,7 @@ Use this checklist for PR review or self-review before submitting a template cha
 - New templates have `package.json` and `og-image.png`.
 - Contributor-required metadata fields are present and accurate.
 - Template names are unique.
-- Generated files were updated with `pnpm generate` when needed.
+- Generated files were updated with `pnpm generate` when needed, and `pnpm lint` reports the artifacts as up to date.
 
 ## User Experience
 

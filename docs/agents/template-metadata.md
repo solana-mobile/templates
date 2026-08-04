@@ -16,11 +16,13 @@ Generated outputs are:
 
 `pnpm generate` runs `tsx scripts/generate.ts && automd`.
 
-The generator:
+The artifacts are rendered by `renderTemplateRepository` from `solana-mobile/templates`; `scripts/generate.ts` only writes what it returns. `solana-mobile templates check` compares against the same renderer, so generation and validation cannot drift apart. The `solana-mobile` version is pinned in root `package.json` because the rendered output has to stay byte-identical with what is checked in.
+
+The renderer:
 
 - Reads root `package.json` for configured `repokit.groups` and `repository.name`.
 - Scans direct child directories in each configured group.
-- Treats a child directory as a template only when it has a `package.json`.
+- Requires every child directory to have a valid `package.json`, and fails instead of skipping one that is missing or invalid.
 - Reads template metadata from that `package.json`.
 - Builds each template path as `<group>/<template-directory>`.
 - Builds each template ID from root `repository.name` and the template path.
@@ -36,11 +38,11 @@ CI also runs generation. Pull requests get a generated metadata preview, and pus
 
 ## Metadata Fields
 
-The generator requires these fields before including a template:
+These fields are required, and a template missing any of them fails both generation and the check:
 
 - `name`: unique template package name.
 - `description`: short summary for listings.
-- `keywords`: searchable tags.
+- `keywords`: searchable tags, at least one.
 
 These fields are also used when present and are expected by the contributor guide for template listings:
 
@@ -49,7 +51,7 @@ These fields are also used when present and are expected by the contributor guid
 
 ## Template IDs
 
-`scripts/generate.ts` creates IDs in this format:
+The renderer creates IDs in this format:
 
 ```text
 gh:solana-mobile/templates/<group>/<template-directory>
@@ -64,6 +66,6 @@ Run `pnpm generate` when changing:
 - Template directory names.
 - Template metadata fields.
 - Root `repokit.groups`.
-- Generator logic.
+- The pinned `solana-mobile` version.
 
 Then review generated output for accidental unrelated changes.
