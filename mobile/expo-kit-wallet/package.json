@@ -41,7 +41,7 @@
         "to": "{{name}}"
       }
     },
-    "versions:": {
+    "versions": {
       "adb": "33.0.0"
     }
   },
