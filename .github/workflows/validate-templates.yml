@@ -1,13 +1,11 @@
 name: Validate Templates
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
-    paths:
-      - 'mobile/**/package.json'
-      - 'scripts/**'
-      - 'package.json'
-      - '.github/workflows/validate-templates.yml'
-      - '.github/workflows/templates.json'
   push:
     branches:
       - main
@@ -37,12 +35,31 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Generated files (templates.json, TEMPLATES.md, .github/workflows/templates.json)
-      # are auto-committed by the generate-metadata.yml workflow on merge to main, so
-      # contributors do not need to commit them. Regenerating before the check keeps a
-      # PR from failing purely because those files are stale on the branch.
-      - name: Generate metadata
+      - name: Regenerate metadata
         run: pnpm generate
+
+      - name: Check generated files are up to date
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'Generated files are up to date.'
+            exit 0
+          fi
+
+          echo '::error::Generated files are out of date. Run "pnpm generate" and commit the result.'
+          git diff --stat
+
+          {
+            echo '## Generated files are out of date'
+            echo
+            echo 'Run `pnpm generate` locally and commit the changes:'
+            echo
+            echo '```diff'
+            git diff
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit 1
 
       - name: Check template repository
         run: pnpm lint
