@@ -115,7 +115,10 @@ function WalletFeatureActivityList({ account }: { account: Account }) {
   const { cluster } = useAppCluster()
   const { tintColor } = useTheme()
   const activity = useGetTransactionSignatures(account.address)
-  const groups = groupTransactionsByDate(activity.data ?? [])
+  const transactions = activity.data
+  const groups = groupTransactionsByDate(transactions ?? [])
+  // A failed refetch keeps the last list, so say so rather than passing it off as current.
+  const isStale = transactions !== undefined && activity.isError
 
   return (
     <View className="gap-5">
@@ -150,60 +153,69 @@ function WalletFeatureActivityList({ account }: { account: Account }) {
 
       {activity.isLoading ? (
         <Text className="text-sm text-neutral-600 dark:text-neutral-300">Loading activity...</Text>
+      ) : transactions === undefined ? (
+        // Without this branch a failed read falls through to the empty state and claims there is
+        // no activity, which is indistinguishable from a genuinely empty history.
+        <Text className="text-sm text-neutral-600 dark:text-neutral-300">Unable to load activity.</Text>
       ) : groups.length ? (
-        groups.map((group) => (
-          <View className="gap-3" key={group.dateKey}>
-            <Text className="text-sm font-semibold uppercase text-neutral-500 dark:text-neutral-400">
-              {group.title}
-            </Text>
-            <Card className="w-full gap-3 p-4">
-              <Card.Body className="gap-4">
-                {group.transactions.map((transaction) => {
-                  const explorerUrl = getExplorerUrl({
-                    network: {
-                      id: cluster.id,
-                      url: cluster.url,
-                    },
-                    path: `/tx/${transaction.signature}`,
-                    provider: 'solana',
-                  })
-                  const transactionStatus = getTransactionStatus(transaction)
+        <View className="gap-5">
+          {isStale ? (
+            <Text className="text-sm text-neutral-500 dark:text-neutral-400">Last known activity; refresh failed</Text>
+          ) : null}
+          {groups.map((group) => (
+            <View className="gap-3" key={group.dateKey}>
+              <Text className="text-sm font-semibold uppercase text-neutral-500 dark:text-neutral-400">
+                {group.title}
+              </Text>
+              <Card className="w-full gap-3 p-4">
+                <Card.Body className="gap-4">
+                  {group.transactions.map((transaction) => {
+                    const explorerUrl = getExplorerUrl({
+                      network: {
+                        id: cluster.id,
+                        url: cluster.url,
+                      },
+                      path: `/tx/${transaction.signature}`,
+                      provider: 'solana',
+                    })
+                    const transactionStatus = getTransactionStatus(transaction)
 
-                  return (
-                    <View className="gap-2" key={transaction.signature}>
-                      <View className="flex-row items-start justify-between gap-3">
-                        <View className="flex-1 flex-row items-center gap-2">
-                          <Pressable
-                            accessibilityHint="Opens this transaction in Solana Explorer."
-                            accessibilityLabel={`Open transaction ${transaction.signature}`}
-                            accessibilityRole="link"
-                            onPress={() => void Linking.openURL(explorerUrl)}
-                          >
-                            <Text className="font-mono text-base font-semibold text-blue-600 underline dark:text-blue-400">
-                              {ellipsify(transaction.signature)}
-                            </Text>
-                          </Pressable>
-                          <Ionicons color={tintColor} name="open-outline" size={16} />
+                    return (
+                      <View className="gap-2" key={transaction.signature}>
+                        <View className="flex-row items-start justify-between gap-3">
+                          <View className="flex-1 flex-row items-center gap-2">
+                            <Pressable
+                              accessibilityHint="Opens this transaction in Solana Explorer."
+                              accessibilityLabel={`Open transaction ${transaction.signature}`}
+                              accessibilityRole="link"
+                              onPress={() => void Linking.openURL(explorerUrl)}
+                            >
+                              <Text className="font-mono text-base font-semibold text-blue-600 underline dark:text-blue-400">
+                                {ellipsify(transaction.signature)}
+                              </Text>
+                            </Pressable>
+                            <Ionicons color={tintColor} name="open-outline" size={16} />
+                          </View>
+                          <Chip color={transactionStatus.color} size="sm" variant="soft">
+                            {transactionStatus.label}
+                          </Chip>
                         </View>
-                        <Chip color={transactionStatus.color} size="sm" variant="soft">
-                          {transactionStatus.label}
-                        </Chip>
+                        <View className="flex-row items-center justify-between gap-3">
+                          <Text className="flex-1 text-sm text-neutral-600 dark:text-neutral-300">
+                            Slot {transaction.slot.toLocaleString()}
+                          </Text>
+                          <Text className="text-right text-sm text-neutral-600 dark:text-neutral-300">
+                            {formatTime(transaction.blockTime)}
+                          </Text>
+                        </View>
                       </View>
-                      <View className="flex-row items-center justify-between gap-3">
-                        <Text className="flex-1 text-sm text-neutral-600 dark:text-neutral-300">
-                          Slot {transaction.slot.toLocaleString()}
-                        </Text>
-                        <Text className="text-right text-sm text-neutral-600 dark:text-neutral-300">
-                          {formatTime(transaction.blockTime)}
-                        </Text>
-                      </View>
-                    </View>
-                  )
-                })}
-              </Card.Body>
-            </Card>
-          </View>
-        ))
+                    )
+                  })}
+                </Card.Body>
+              </Card>
+            </View>
+          ))}
+        </View>
       ) : (
         <Text className="text-sm text-neutral-600 dark:text-neutral-300">No recent activity found.</Text>
       )}
