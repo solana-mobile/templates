@@ -37,14 +37,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint template structure
-        run: pnpm lint
-
+      # Generated files (templates.json, TEMPLATES.md, .github/workflows/templates.json)
+      # are auto-committed by the generate-metadata.yml workflow on merge to main, so
+      # contributors do not need to commit them. Regenerating before the check keeps a
+      # PR from failing purely because those files are stale on the branch.
       - name: Generate metadata
         run: pnpm generate
 
-      - name: Validate generated output
-        run: pnpm validate
-        # Note: Generated files (templates.json, TEMPLATES.md, .github/workflows/templates.json)
-        # are auto-committed by the generate-metadata.yml workflow on merge to main.
-        # Contributors do not need to commit these files.
+      - name: Check template repository
+        run: pnpm lint

@@ -17,9 +17,6 @@ importers:
       automd:
         specifier: ^0.4.2
         version: 0.4.2
-      create-solana-dapp:
-        specifier: 0.0.0-canary-20260804122652
-        version: 0.0.0-canary-20260804122652
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -32,6 +29,9 @@ importers:
       sharp:
         specifier: ^0.33.5
         version: 0.33.5
+      solana-mobile:
+        specifier: 0.2.0-canary-20260804183815
+        version: 0.2.0-canary-20260804183815
       tsx:
         specifier: ^4.19.2
         version: 4.20.6
@@ -50,8 +50,16 @@ packages:
     resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
     engines: {node: '>=6.9.0'}
 
+  '@clack/core@1.4.2':
+    resolution: {integrity: sha512-0Ty/1Gfm+Kb07sXcuESjyKfwEhSy4Ns1AgeEisHb/bDY5fWme0tTeTkU14T1Gmcs17YIjB/teiDe4uaCghbYqQ==}
+    engines: {node: '>= 20.12.0'}
+
   '@clack/core@1.4.3':
     resolution: {integrity: sha512-/kr3UWNtdJfxZtPgDqUOmG2pvwlmcLGheex5yiZKdwbzZJxhV+HMNR9QNmyY5cGwTNV6LrR7Jtp+KjhUAP1qBQ==}
+    engines: {node: '>= 20.12.0'}
+
+  '@clack/prompts@1.6.0':
+    resolution: {integrity: sha512-EYlRokl8szrP9Z25qT5aepMdBjzBvHF9ZEhzIiUBc9guz/T31EqRgvD0QSgZcpE93xiwrr+OkB4nz0BZyF6fSA==}
     engines: {node: '>= 20.12.0'}
 
   '@clack/prompts@1.7.0':
@@ -646,6 +654,10 @@ packages:
     resolution: {integrity: sha512-2uM9rYjPvyq39NwLRqaiLtWHyDC1FvryJDa2ATTVims5YAS4PupsEQsDvP14FqhFr0P49CYDugi59xaxJlTXRA==}
     engines: {node: '>=20'}
 
+  commander@14.0.3:
+    resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
+    engines: {node: '>=20'}
+
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
 
@@ -672,10 +684,15 @@ packages:
       typescript:
         optional: true
 
-  create-solana-dapp@0.0.0-canary-20260804122652:
-    resolution: {integrity: sha512-VqEMti1BMs9ex3qb+W4V0ad40RnE01aVA4zNFENxmaiVV/QiAU9Mgyf87g3Ncf/DNG6g9gQInZ3f9M63KjaTFw==}
+  create-solana-dapp@0.0.0-canary-20260804175003:
+    resolution: {integrity: sha512-w2q9pxHGqsfascjsAbgqLoyGFpoSlDK4q5P2ppmsvN+TJx2Ca8lylE1tD69xKtD/73+0RR4wyGzw44iYFpQ4Kg==}
     engines: {node: '>=20.12.0'}
     hasBin: true
+    peerDependencies:
+      zod: ^4
+    peerDependenciesMeta:
+      zod:
+        optional: true
 
   css-background-parser@0.1.0:
     resolution: {integrity: sha512-2EZLisiZQ+7m4wwur/qiYJRniHX4K5Tc9w93MT3AS0WS1u5kaZ4FKXlOTBhOjc+CgEgPiGY+fX1yWD8UwpEqUA==}
@@ -1217,6 +1234,10 @@ packages:
     resolution: {integrity: sha512-HLpt+uLy/pxB+bum/9DzAgiKS8CX1EvbWxI4zlmgGCExImLdiad2iCwXT5Z4c9c3Eq8rP2318mPW2c+QbtjK8A==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
+  solana-mobile@0.2.0-canary-20260804183815:
+    resolution: {integrity: sha512-lyI2+XOgWPKu2arGE7Xmx9iuDxaPUoV1Pa5+HafztwKdeDdium55l01dJxaGmuL1yjBQjsQi7vQkCpnSd2eD9A==}
+    hasBin: true
+
   source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
@@ -1396,8 +1417,20 @@ snapshots:
 
   '@babel/runtime@7.28.4': {}
 
+  '@clack/core@1.4.2':
+    dependencies:
+      fast-wrap-ansi: 0.2.2
+      sisteransi: 1.0.5
+
   '@clack/core@1.4.3':
     dependencies:
+      fast-wrap-ansi: 0.2.2
+      sisteransi: 1.0.5
+
+  '@clack/prompts@1.6.0':
+    dependencies:
+      '@clack/core': 1.4.2
+      fast-string-width: 3.0.2
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
@@ -1871,6 +1904,8 @@ snapshots:
 
   commander@14.0.0: {}
 
+  commander@14.0.3: {}
+
   confbox@0.1.8: {}
 
   confbox@0.2.2: {}
@@ -1898,7 +1933,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  create-solana-dapp@0.0.0-canary-20260804122652:
+  create-solana-dapp@0.0.0-canary-20260804175003(zod@4.4.3):
     dependencies:
       '@clack/prompts': 1.7.0
       commander: 14.0.0
@@ -1907,6 +1942,7 @@ snapshots:
       picocolors: 1.1.1
       semver: 7.8.5
       update-notifier: 7.3.1
+    optionalDependencies:
       zod: 4.4.3
 
   css-background-parser@0.1.0: {}
@@ -2482,6 +2518,13 @@ snapshots:
     dependencies:
       ip-address: 10.0.1
       smart-buffer: 4.2.0
+
+  solana-mobile@0.2.0-canary-20260804183815:
+    dependencies:
+      '@clack/prompts': 1.6.0
+      commander: 14.0.3
+      create-solana-dapp: 0.0.0-canary-20260804175003(zod@4.4.3)
+      zod: 4.4.3
 
   source-map@0.6.1:
     optional: true

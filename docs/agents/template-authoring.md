@@ -34,7 +34,7 @@ The generator and linter currently enforce `name`, `description`, and non-empty 
 
 Run `pnpm generate` after adding, removing, renaming, or changing metadata for a template.
 
-Do not manually patch `templates.json`, `TEMPLATES.md`, or `.github/workflows/templates.json` unless the generator itself is being changed and you are checking expected output.
+Do not manually patch `templates.json`, `TEMPLATES.md`, or `.github/workflows/templates.json`. They are rendered by the pinned `solana-mobile` release, and `solana-mobile templates check` compares them byte for byte, so a hand edit shows up as a `differs` failure.
 
 ## Agent And MCP Templates
 

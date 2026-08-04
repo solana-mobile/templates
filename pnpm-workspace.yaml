@@ -1,13 +1,14 @@
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
+  - '@next/*'
+  - '@solana/client'
+  - '@solana/kit'
+  - '@solana/react-hooks'
   - create-solana-dapp
   - next
-  - '@next/*'
   - react
   - react-dom
-  - '@solana/client'
-  - '@solana/react-hooks'
-  - '@solana/kit'
+  - solana-mobile
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - '@tailwindcss/oxide'
