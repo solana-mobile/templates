@@ -1,21 +1,21 @@
 import { PublicKey } from '@solana/web3.js'
-import { Button, View } from 'react-native'
-import { appStyles } from '@/constants/app-styles'
 import { toUint8Array, useMobileWallet } from '@wallet-ui/react-native-web3js'
+import { AppActionButton } from '@/components/app-action-button'
 
 export function AccountFeatureSignMessage({ address }: { address: PublicKey }) {
   const { signMessages } = useMobileWallet()
-  async function submit() {
-    try {
-      await signMessages(toUint8Array(`Signing a message with ${address.toString()}`))
-      console.log('Message signed!')
-    } catch (e) {
-      console.log(`Error signing message: ${e}`)
-    }
-  }
+
   return (
-    <View style={appStyles.stack}>
-      <Button onPress={submit} title="Sign Message" />
-    </View>
+    <AppActionButton
+      onPress={async () => {
+        await signMessages(toUint8Array(`Signing a message with ${address.toString()}`))
+        return {
+          description: `Signed a message with ${address.toString()}`,
+          status: 'success',
+          title: 'Sign Message',
+        } as const
+      }}
+      title="Sign Message"
+    />
   )
 }

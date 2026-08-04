@@ -4,11 +4,16 @@ import { StyleSheet, TouchableOpacity } from 'react-native'
 import { UiIconSymbol } from '@/components/ui/ui-icon-symbol'
 import { useWalletUiTheme } from '@/components/solana/use-wallet-ui-theme'
 
-export function BaseButton({ label, onPress }: { label: string; onPress?: () => void }) {
+export function BaseButton({ disabled, label, onPress }: { disabled?: boolean; label: string; onPress?: () => void }) {
   const { backgroundColor, borderColor, textColor } = useWalletUiTheme()
   return (
     <TouchableOpacity
-      style={[styles.trigger, { backgroundColor, borderColor, flexDirection: 'row', alignItems: 'center', gap: 8 }]}
+      disabled={disabled}
+      style={[
+        styles.trigger,
+        { backgroundColor, borderColor, flexDirection: 'row', alignItems: 'center', gap: 8 },
+        disabled ? styles.disabled : null,
+      ]}
       onPress={onPress}
     >
       <UiIconSymbol name="wallet.pass.fill" color={textColor} />
@@ -18,6 +23,9 @@ export function BaseButton({ label, onPress }: { label: string; onPress?: () => 
 }
 
 const styles = StyleSheet.create({
+  disabled: {
+    opacity: 0.5,
+  },
   trigger: {
     borderWidth: 1,
     paddingHorizontal: 16,

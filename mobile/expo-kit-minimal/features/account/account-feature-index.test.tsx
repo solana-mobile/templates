@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/react-native'
+import { act, fireEvent } from '@testing-library/react-native'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AccountFeatureIndex } from '@/features/account/account-feature-index'
 import { createMobileWalletMock, renderWithProviders, TEST_ADDRESS } from '@/test/test-utils'
@@ -33,10 +33,35 @@ describe('AccountFeatureIndex', () => {
       expect(wallet.current.client.rpc.getBalance).toHaveBeenCalledWith(TEST_ADDRESS)
     })
 
-    it('sends a memo instruction through the wallet when signing a transaction', async () => {
+    it('reports a failed balance read instead of rendering it as zero', async () => {
+      wallet.current = createMobileWalletMock({ failRpcAfter: 0 })
+
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
-      await fireEvent.press(screen.getByRole('button', { name: /sign transaction/i }))
+      expect(await screen.findByText(/Balance: Unable to load/)).toBeTruthy()
+      expect(screen.queryByText(/Balance: 0 SOL/)).toBeNull()
+    })
+
+    it('flags the balance as stale when a refetch fails', async () => {
+      wallet.current = createMobileWalletMock({ balance: 2_250_000_000n, failRpcAfter: 1 })
+
+      const screen = await renderWithProviders(<AccountFeatureIndex />)
+      expect(await screen.findByText(/Balance: 2\.25 SOL/)).toBeTruthy()
+
+      // React Query keeps the last value on a failed refetch, so the error must not be swallowed
+      // just because `data` is still present.
+      await act(async () => {
+        await screen.queryClient.refetchQueries()
+      })
+
+      expect(await screen.findByText(/refresh failed/i)).toBeTruthy()
+      expect(screen.getByText(/2\.25 SOL/)).toBeTruthy()
+    })
+
+    it('sends a memo instruction through the wallet when sending a transaction', async () => {
+      const screen = await renderWithProviders(<AccountFeatureIndex />)
+
+      await fireEvent.press(screen.getByRole('button', { name: /send transaction/i }))
 
       expect(wallet.current!.sendTransactions).toHaveBeenCalledOnce()
       const [instructions] = wallet.current!.sendTransactions.mock.calls[0]
@@ -55,14 +80,17 @@ describe('AccountFeatureIndex', () => {
       expect(new TextDecoder().decode(message)).toBe(`Signing a message with ${TEST_ADDRESS}`)
     })
 
-    it('reports failure on the button when signing a message is rejected', async () => {
+    it('reports the reason when signing a message is rejected', async () => {
       wallet.current = createMobileWalletMock()
       wallet.current.signMessages.mockRejectedValueOnce(new Error('User rejected the request'))
 
       const screen = await renderWithProviders(<AccountFeatureIndex />)
       await fireEvent.press(screen.getByRole('button', { name: /sign message/i }))
 
-      expect(await screen.findByRole('button', { name: /sign message failed/i })).toBeTruthy()
+      expect(await screen.findByText(/Sign Message failed/)).toBeTruthy()
+      expect(screen.getByText(/User rejected the request/)).toBeTruthy()
+      // The status is reported next to the button, so the label stays actionable.
+      expect(screen.getByRole('button', { name: /^sign message$/i })).toBeTruthy()
     })
 
     it('disconnects the wallet', async () => {
@@ -83,7 +111,7 @@ describe('AccountFeatureIndex', () => {
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
       expect(screen.getByRole('button', { name: /^connect$/i })).toBeTruthy()
-      expect(screen.queryByRole('button', { name: /sign transaction/i })).toBeNull()
+      expect(screen.queryByRole('button', { name: /send transaction/i })).toBeNull()
       expect(screen.queryByText(/Connected to/)).toBeNull()
     })
 

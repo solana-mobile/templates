@@ -17,6 +17,12 @@ export const appStyles = StyleSheet.create({
   stack: {
     gap: 8,
   },
+  textDanger: {
+    color: '#b3261e',
+  },
+  textSuccess: {
+    color: '#1b6b30',
+  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',

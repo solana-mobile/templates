@@ -1,4 +1,4 @@
-import { PublicKey, TransactionSignature } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { useMutation } from '@tanstack/react-query'
 import { useMobileWallet } from '@wallet-ui/react-native-web3js'
 import { createTransaction } from './create-transaction'
@@ -10,36 +10,26 @@ export function useTransferSol({ address }: { address: PublicKey }) {
 
   return useMutation({
     mutationKey: ['transfer-sol', { endpoint: connection.rpcEndpoint, address }],
+    // Let failures reject so the mutation lands in its error state and the UI can
+    // show it. Swallowing here made a failed transfer look like a successful one.
     mutationFn: async (input: { destination: PublicKey; amount: number }) => {
-      let signature: TransactionSignature = ''
-      try {
-        const { transaction, latestBlockhash, minContextSlot } = await createTransaction({
-          address,
-          destination: input.destination,
-          amount: input.amount,
-          connection,
-        })
+      const { transaction, latestBlockhash, minContextSlot } = await createTransaction({
+        address,
+        destination: input.destination,
+        amount: input.amount,
+        connection,
+      })
 
-        // Send transaction and await for signature
-        signature = await signAndSendTransactions(transaction, minContextSlot)
+      // Send transaction and await for signature
+      const signature = await signAndSendTransactions(transaction, minContextSlot)
 
-        // Send transaction and await for signature
-        await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed')
+      // Await for the transaction to be confirmed
+      await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed')
 
-        console.log(signature)
-        return signature
-      } catch (error: unknown) {
-        console.log('error', `Transaction failed! ${error}`, signature)
-
-        return
-      }
+      return signature
     },
-    onSuccess: async (signature) => {
-      console.log(signature)
+    onSuccess: async () => {
       await invalidateBalance()
-    },
-    onError: (error) => {
-      console.error(`Transaction failed! ${error}`)
     },
   })
 }

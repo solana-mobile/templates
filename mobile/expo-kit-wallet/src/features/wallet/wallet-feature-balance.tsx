@@ -25,12 +25,10 @@ function formatLamports(lamports: Lamports) {
 export function WalletFeatureBalance({ account }: { account: Account }) {
   const balance = useGetBalance(account.address)
   const { tintColor } = useTheme()
-  const balanceText =
-    balance.data?.value !== undefined
-      ? formatLamports(balance.data.value)
-      : balance.isError
-        ? 'Unable to load'
-        : 'Loading...'
+  const value = balance.data?.value
+  const balanceText = value !== undefined ? formatLamports(value) : balance.isError ? 'Unable to load' : 'Loading...'
+  // A failed refetch keeps the last value, so say so rather than passing it off as current.
+  const isStale = value !== undefined && balance.isError
 
   return (
     <Card className="w-full gap-3 p-4">
@@ -50,6 +48,11 @@ export function WalletFeatureBalance({ account }: { account: Account }) {
         </View>
         <View className="gap-1">
           <Text className="text-2xl font-bold text-neutral-900 text-right dark:text-white">{balanceText}</Text>
+          {isStale ? (
+            <Text className="text-right text-sm text-neutral-500 dark:text-neutral-400">
+              Last known value; refresh failed
+            </Text>
+          ) : null}
         </View>
         {balance.isError ? (
           <WalletUiStatusAlert description={formatError(balance.error)} status="danger" title="Balance error" />

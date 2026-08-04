@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/react-native'
+import { act, fireEvent } from '@testing-library/react-native'
 import { createSolanaDevnet, createSolanaTestnet } from '@wallet-ui/react-native-kit'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { NetworkFeatureIndex } from '@/features/network/network-feature-index'
@@ -41,6 +41,29 @@ describe('NetworkFeatureIndex', () => {
     const screen = await renderNetworkFeature()
 
     expect(await screen.findByText(/Genesis Hash: EtWTRABZ\.\.6VU2xqa1/)).toBeTruthy()
+  })
+
+  it('reports failed cluster reads instead of rendering undefined', async () => {
+    wallet.current = createMobileWalletMock({ failRpcAfter: 0 })
+
+    const screen = await renderNetworkFeature()
+
+    expect(await screen.findByText(/Version: Unable to load/)).toBeTruthy()
+    expect(await screen.findByText(/Genesis Hash: Unable to load/)).toBeTruthy()
+    expect(screen.queryByText(/undefined/)).toBeNull()
+  })
+
+  it('flags cluster values as stale when a refetch fails', async () => {
+    wallet.current = createMobileWalletMock({ failRpcAfter: 1 })
+
+    const screen = await renderNetworkFeature()
+    expect(await screen.findByText(/Version: 2\.1\.0 \(1234567890\)/)).toBeTruthy()
+
+    await act(async () => {
+      await screen.queryClient.refetchQueries()
+    })
+
+    expect(await screen.findAllByText(/refresh failed/i)).toHaveLength(2)
   })
 
   it('only offers the networks that are not currently selected', async () => {
