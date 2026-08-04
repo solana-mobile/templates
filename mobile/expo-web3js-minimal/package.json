@@ -11,7 +11,7 @@
   ],
   "create-solana-dapp": {
     "instructions": [
-      "To buld the Android app locally, run this:",
+      "Build the Android app locally:",
       "+{pm} run android"
     ],
     "rename": {
@@ -22,7 +22,7 @@
         "to": "{{name}}"
       }
     },
-    "versions:": {
+    "versions": {
       "adb": "33.0.0"
     }
   },
