@@ -2,6 +2,32 @@
 
 This is an example of how to use [`@wallet-ui/react-native-kit`](https://www.npmjs.com/package/@wallet-ui/react-native-kit) with Expo.
 
+## Reset the project
+
+The account and network screens are here to demonstrate the SDK, not to be built on. When you are ready to start your own app, strip them out:
+
+```bash
+npm run reset-project
+pnpm run reset-project
+bun run reset-project
+yarn reset-project
+```
+
+Run it with the package manager you created the app with. The script writes the instructions it leaves behind for whichever one invoked it, so reaching for `npm` here in a pnpm app leaves you with a README telling you to run `npm`.
+
+It lists what it is about to delete and asks before touching anything. What it keeps is the wiring — the crypto polyfill, the providers and the app config. What it deletes is everything built on top: the account screens, the network switcher and its read queries, the formatting helpers and the tests covering them.
+
+The switcher goes because [`MobileWalletProvider`](https://www.npmjs.com/package/@wallet-ui/react-native-kit) takes a single cluster, so a blank app has no use for a list to pick from. `constants/app-config.ts` is rewritten to hold one cluster — carried over from whichever network was configured first, so a project already pointed at mainnet stays there — and `components/app-providers.tsx` passes it straight to the provider.
+
+`app/index.tsx` becomes an empty screen, `components/app-providers.test.tsx` is left behind so the suite still covers the wiring, the demo-only dependency is dropped from `package.json`, and the README is replaced with one describing what is left.
+
+Pass `--yes` to skip the prompt. npm needs a `--` separator to forward the flag; the others do not:
+
+```bash
+npm run reset-project -- --yes
+pnpm run reset-project --yes
+```
+
 ## Testing
 
 Tests run on [Vitest](https://vitest.dev) with [React Native Testing Library](https://callstack.github.io/react-native-testing-library/). No emulator, device or wallet app is needed, so the whole suite runs in a couple of seconds and works in CI.
