@@ -1,8 +1,10 @@
 /**
  * Core type definitions for template generation
  *
- * These types represent the domain model for templates and must match
- * the output format consumed by create-solana-dapp and templates-site.
+ * These types cover the inputs to generation. The templates.json output types
+ * (TemplateJsonGroup, TemplateJsonTemplate) and their schemas come from
+ * create-solana-dapp itself, so this repo cannot drift from the format the CLI
+ * consumes -- import them from 'create-solana-dapp' instead of redeclaring.
  */
 
 /**
@@ -43,32 +45,6 @@ export type TemplateMetadata = {
   readonly usecase?: string
   readonly keywords: readonly string[]
   readonly path: string
-}
-
-/**
- * Template as it appears in templates.json output
- * MUST match format consumed by create-solana-dapp
- */
-export type TemplateJson = {
-  readonly description: string
-  readonly displayName?: string
-  readonly id: string
-  readonly image: string
-  readonly keywords: readonly string[]
-  readonly name: string
-  readonly path: string
-  readonly usecase?: string
-}
-
-/**
- * A group of templates as it appears in templates.json
- * MUST match format consumed by create-solana-dapp
- */
-export type TemplateGroup = {
-  readonly description: string
-  readonly name: string
-  readonly path: string
-  readonly templates: readonly TemplateJson[]
 }
 
 /**

@@ -2,16 +2,17 @@
 /**
  * Validate generated output matches expected format
  *
- * Compares generated templates.json with expected structure
- * to ensure compatibility with create-solana-dapp and templates-site
+ * Structure is checked with the schema create-solana-dapp itself consumes, so
+ * this repo cannot drift from the CLI. Everything after that is a repo-specific
+ * rule the shared schema does not cover.
  *
  * Usage: tsx scripts/validate.ts
  */
 
+import { parseTemplateJson, type TemplateJsonGroup } from 'create-solana-dapp'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
-import { readJsonFile, fileExists } from './shared/fs-utils.js'
-import type { TemplateGroup } from './shared/types.js'
+import { readFile, fileExists } from './shared/fs-utils.js'
 import { type Result, ok, err } from './shared/result.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -48,129 +49,51 @@ const checkFilesExist = (): ValidationIssue[] => {
   return issues
 }
 
-// Validate templates.json structure
-const validateTemplatesJson = (): ValidationIssue[] => {
-  const issues: ValidationIssue[] = []
-
-  const jsonResult = readJsonFile<TemplateGroup[]>(TEMPLATES_JSON_PATH)
-  if (!jsonResult.ok) {
-    issues.push({
-      severity: 'error',
-      message: `Failed to parse templates.json: ${jsonResult.error}`,
-    })
-    return issues
+// Parse templates.json with the schema create-solana-dapp consumes
+const parseTemplatesJson = (): Result<readonly TemplateJsonGroup[]> => {
+  const contentResult = readFile(TEMPLATES_JSON_PATH)
+  if (!contentResult.ok) {
+    return err(`Failed to read templates.json: ${contentResult.error}`)
   }
 
-  const groups = jsonResult.value
-
-  if (!Array.isArray(groups)) {
-    issues.push({
-      severity: 'error',
-      message: 'templates.json must be an array',
-    })
-    return issues
+  const parsed = parseTemplateJson(contentResult.value)
+  if (!parsed.success) {
+    const details = parsed.error.issues
+      .map((issue) => `\n      - ${issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''}${issue.message}`)
+      .join('')
+    return err(`templates.json does not match the create-solana-dapp schema:${details}`)
   }
 
-  if (groups.length === 0) {
-    issues.push({
-      severity: 'warning',
-      message: 'templates.json contains no groups',
-    })
-  }
+  return ok(parsed.data)
+}
 
-  // Validate each group
-  groups.forEach((group, groupIndex) => {
-    if (!group.name) {
-      issues.push({
-        severity: 'error',
-        message: `Group at index ${groupIndex} is missing name`,
-      })
-    }
+// Check template IDs use the giget prefix
+const checkTemplateIds = (groups: readonly TemplateJsonGroup[]): ValidationIssue[] => {
+  return groups.flatMap((group) =>
+    group.templates
+      .filter((template) => !template.id.startsWith(GIGET_PREFIX))
+      .map((template) => ({
+        severity: 'error' as const,
+        message: `Template "${template.name}" id must start with "${GIGET_PREFIX}"`,
+      })),
+  )
+}
 
-    if (!group.description) {
-      issues.push({
-        severity: 'error',
-        message: `Group "${group.name}" is missing description`,
-      })
-    }
-
-    if (!group.path) {
-      issues.push({
-        severity: 'error',
-        message: `Group "${group.name}" is missing path`,
-      })
-    }
-
-    if (!Array.isArray(group.templates)) {
-      issues.push({
-        severity: 'error',
-        message: `Group "${group.name}" templates is not an array`,
-      })
-      return
-    }
-
-    // Validate each template in the group
-    group.templates.forEach((template, templateIndex) => {
-      const templateId = template.name || `index ${templateIndex}`
-
-      if (!template.name) {
-        issues.push({
-          severity: 'error',
-          message: `Template at ${group.name}[${templateIndex}] is missing name`,
-        })
-      }
-
-      if (!template.description) {
-        issues.push({
-          severity: 'error',
-          message: `Template "${templateId}" is missing description`,
-        })
-      }
-
-      if (!template.id) {
-        issues.push({
-          severity: 'error',
-          message: `Template "${templateId}" is missing id`,
-        })
-      } else if (!template.id.startsWith(GIGET_PREFIX)) {
-        issues.push({
-          severity: 'error',
-          message: `Template "${templateId}" id must start with "${GIGET_PREFIX}"`,
-        })
-      }
-
-      if (!template.path) {
-        issues.push({
-          severity: 'error',
-          message: `Template "${templateId}" is missing path`,
-        })
-      }
-
-      if (!Array.isArray(template.keywords)) {
-        issues.push({
-          severity: 'error',
-          message: `Template "${templateId}" keywords must be an array`,
-        })
-      } else if (template.keywords.length === 0) {
-        issues.push({
-          severity: 'warning',
-          message: `Template "${templateId}" has no keywords`,
-        })
-      }
-    })
-  })
-
-  return issues
+// Check every template carries keywords
+const checkTemplateKeywords = (groups: readonly TemplateJsonGroup[]): ValidationIssue[] => {
+  return groups.flatMap((group) =>
+    group.templates
+      .filter((template) => template.keywords.length === 0)
+      .map((template) => ({
+        severity: 'warning' as const,
+        message: `Template "${template.name}" has no keywords`,
+      })),
+  )
 }
 
 // Check for duplicate template IDs
-const checkDuplicateIds = (): ValidationIssue[] => {
+const checkDuplicateIds = (groups: readonly TemplateJsonGroup[]): ValidationIssue[] => {
   const issues: ValidationIssue[] = []
-
-  const jsonResult = readJsonFile<TemplateGroup[]>(TEMPLATES_JSON_PATH)
-  if (!jsonResult.ok) return issues
-
-  const groups = jsonResult.value
   const idMap = new Map<string, string[]>()
 
   groups.forEach((group) => {
@@ -192,9 +115,29 @@ const checkDuplicateIds = (): ValidationIssue[] => {
   return issues
 }
 
+// Check the catalog is not empty
+const checkGroupsPresent = (groups: readonly TemplateJsonGroup[]): ValidationIssue[] => {
+  if (groups.length > 0) return []
+
+  return [{ severity: 'warning', message: 'templates.json contains no groups' }]
+}
+
+// Repo-specific rules on top of the schema
+const checkGroups = (groups: readonly TemplateJsonGroup[]): ValidationIssue[] => [
+  ...checkGroupsPresent(groups),
+  ...checkTemplateIds(groups),
+  ...checkTemplateKeywords(groups),
+  ...checkDuplicateIds(groups),
+]
+
 // Main validation pipeline
 const validate = (): Result<void> => {
-  const allIssues: ValidationIssue[] = [...checkFilesExist(), ...validateTemplatesJson(), ...checkDuplicateIds()]
+  const parseResult = parseTemplatesJson()
+
+  const allIssues: ValidationIssue[] = [
+    ...checkFilesExist(),
+    ...(parseResult.ok ? checkGroups(parseResult.value) : [{ severity: 'error' as const, message: parseResult.error }]),
+  ]
 
   const errors = allIssues.filter((issue) => issue.severity === 'error')
   const warnings = allIssues.filter((issue) => issue.severity === 'warning')

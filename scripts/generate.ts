@@ -9,17 +9,11 @@
  * Usage: tsx scripts/generate.ts
  */
 
+import type { TemplateJsonGroup, TemplateJsonTemplate } from 'create-solana-dapp'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { hasPackageJson, readDirs, readPackageJson, writeFile, writeJsonFile } from './shared/fs-utils.js'
-import {
-  type GroupConfig,
-  isTemplatePackageJson,
-  type RootConfig,
-  type TemplateGroup,
-  type TemplateJson,
-  type TemplateMetadata,
-} from './shared/types.js'
+import { type GroupConfig, isTemplatePackageJson, type RootConfig, type TemplateMetadata } from './shared/types.js'
 import { err, ok, type Result } from './shared/result.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -143,7 +137,7 @@ const scanAllGroups = (groups: readonly GroupConfig[]): Result<Map<string, reado
 /**
  * Transform template metadata to JSON format
  */
-const toTemplateJson = (metadata: TemplateMetadata, repositoryName: string): TemplateJson => {
+const toTemplateJson = (metadata: TemplateMetadata, repositoryName: string): TemplateJsonTemplate => {
   const base = {
     description: metadata.description,
     id: generateTemplateId(repositoryName, metadata.path),
@@ -167,7 +161,7 @@ const buildTemplateGroups = (
   groups: readonly GroupConfig[],
   groupMap: Map<string, readonly TemplateMetadata[]>,
   repositoryName: string,
-): readonly TemplateGroup[] => {
+): readonly TemplateJsonGroup[] => {
   return groups
     .map((group) => {
       const templates = groupMap.get(group.path) || []
@@ -188,7 +182,7 @@ const buildTemplateGroups = (
 /**
  * Generate markdown for a single template
  */
-const templateToMarkdown = (template: TemplateJson): string => {
+const templateToMarkdown = (template: TemplateJsonTemplate): string => {
   const lines = [
     `### [${template.name}](${template.path})`,
     '',
@@ -204,7 +198,7 @@ const templateToMarkdown = (template: TemplateJson): string => {
 /**
  * Generate TEMPLATES.md content
  */
-const generateTemplatesMd = (groups: readonly TemplateGroup[]): string => {
+const generateTemplatesMd = (groups: readonly TemplateJsonGroup[]): string => {
   const sections = groups.map((group) => {
     const groupHeader = [`# ${group.name}`, '', group.description, ''].join('\n')
 
@@ -219,14 +213,14 @@ const generateTemplatesMd = (groups: readonly TemplateGroup[]): string => {
 /**
  * Extract all template paths from groups and sort them
  */
-const extractTemplatePaths = (groups: readonly TemplateGroup[]): readonly string[] => {
+const extractTemplatePaths = (groups: readonly TemplateJsonGroup[]): readonly string[] => {
   return groups.flatMap((group) => group.templates.map((template) => template.path)).sort((a, b) => a.localeCompare(b))
 }
 
 /**
  * Write generated files to disk
  */
-const writeGeneratedFiles = (groups: readonly TemplateGroup[]): Result<void> => {
+const writeGeneratedFiles = (groups: readonly TemplateJsonGroup[]): Result<void> => {
   // Write templates.json
   const jsonResult = writeJsonFile(TEMPLATES_JSON_PATH, groups)
   if (!jsonResult.ok) {
