@@ -40,18 +40,25 @@ npm run test:coverage  # run once with a coverage report
 
 `npm run ci` runs the suite alongside the type check, linter and formatter.
 
-### Two layers of tests
+### Three layers of tests
 
-The suite is deliberately split into two layers that both run on every commit. A third layer — driving a real wallet app on a real device — needs an emulator and is not part of this suite.
+L1 and L2 both run on every commit and need nothing but Node. L3 drives the built app on an emulator against a real wallet app, so it runs when you ask for it.
 
 | Layer  | Scope                                         | Example                                                                             |
 | ------ | --------------------------------------------- | ----------------------------------------------------------------------------------- |
 | **L1** | Pure functions, no React                      | [`ellipsify.test.ts`](utils/ellipsify.test.ts)                                      |
 | **L2** | Components and hooks, wallet transport mocked | [`account-feature-index.test.tsx`](features/account/account-feature-index.test.tsx) |
+| **L3** | The built app, a real emulator, a real wallet | [`e2e/fakewallet.sh`](e2e/fakewallet.sh)                                            |
 
 **L1** tests import a function and assert on its output — the formatting helpers in [`utils/`](utils) are the whole of it, because that is the whole of this template's logic that does not need React.
 
 Transaction building is deliberately _not_ tested at L1. Building the memo instruction is a single call into [`@solana-program/memo`](https://www.npmjs.com/package/@solana-program/memo); wrapping it in a function just to unit test it would only assert that a dependency and a template string work. What is worth pinning is that pressing the button hands the wallet the right instruction, and that is an L2 assertion. Extract a helper when a transaction grows logic of its own — branching, several instructions, computed amounts — and test it at L1 then.
+
+**L3** tests are the only ones that prove the app can actually talk to a wallet, because they are the only ones that do not mock the transport. They drive the emulator through `adb`, hand off to [fakewallet](https://github.com/solana-mobile/mobile-wallet-adapter), and come back — including the paths where the wallet declines or fails, which is where unhandled rejections hide. They need an emulator and a wallet APK, so they sit outside `npm run ci`; see [`e2e/README.md`](e2e/README.md).
+
+```bash
+npm run e2e
+```
 
 **L2** tests render real components and press real buttons. The only thing replaced is the Mobile Wallet Adapter transport — `useMobileWallet()` is mocked so that no wallet app is launched and no RPC request leaves the process:
 

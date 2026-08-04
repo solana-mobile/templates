@@ -112,6 +112,7 @@ describe('reset-project', () => {
       const gone = [
         'components/app-action-button.tsx',
         'components/app-status.tsx',
+        'e2e',
         'features',
         'scripts',
         'test',
@@ -194,7 +195,7 @@ describe('reset-project', () => {
       expect(index).not.toContain('NetworkFeatureIndex')
     })
 
-    it('drops the demo dependency and its own script entry, and keeps the rest of package.json', async () => {
+    it('drops the demo dependency and the stale script entries, and keeps the rest of package.json', async () => {
       const project = await copyProject()
       const before = await readPackageJson(project)
 
@@ -202,10 +203,14 @@ describe('reset-project', () => {
 
       const after = await readPackageJson(project)
       expect(after.scripts['reset-project']).toBeUndefined()
+      // The harness drives the demo screens and is deleted with them, so its script would point at
+      // a file that is gone.
+      expect(after.scripts['e2e']).toBeUndefined()
       expect(after.dependencies['@solana-program/memo']).toBeUndefined()
       expect(after.name).toBe(before.name)
       expect(after.dependencies['@wallet-ui/react-native-kit']).toBe(before.dependencies['@wallet-ui/react-native-kit'])
-      expect(Object.keys(after.scripts)).toEqual(Object.keys(before.scripts).filter((key) => key !== 'reset-project'))
+      const dropped = ['e2e', 'reset-project']
+      expect(Object.keys(after.scripts)).toEqual(Object.keys(before.scripts).filter((key) => !dropped.includes(key)))
     })
 
     /**
