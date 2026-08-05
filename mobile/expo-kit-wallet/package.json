@@ -41,6 +41,10 @@
         "to": "{{name}}"
       }
     },
+    "skills": [
+      "https://github.com/solana-foundation/solana-dev-skill",
+      "https://github.com/solana-mobile/solana-mobile-dev-skill"
+    ],
     "versions": {
       "adb": "33.0.0"
     }
