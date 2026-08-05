@@ -10,16 +10,14 @@
     "solana-kit"
   ],
   "create-solana-dapp": {
-    "instructions": [
-      "Build the Android app locally:",
-      "+{pm} run android"
-    ],
     "options": {
       "keep-example": {
         "default": true,
         "description": "Keep the example account and network screens",
         "group": "example",
         "instructions": [
+          "Build the Android app locally:",
+          "+{pm} run android",
           "Remove the example code and start from a blank app:",
           "+{pm} run reset-project"
         ]
@@ -28,6 +26,8 @@
         "description": "Start from a blank app instead of the example code",
         "group": "example",
         "instructions": [
+          "Build the Android app locally:",
+          "+{pm} run android",
           "Edit app/index.tsx to build your first screen.",
           "Reach for the wallet with useMobileWallet() from @wallet-ui/react-native-kit."
         ],
