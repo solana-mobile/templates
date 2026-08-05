@@ -28,6 +28,13 @@ npm run reset-project -- --yes
 pnpm run reset-project --yes
 ```
 
+If you already know you want a blank app, pass `--reset-project` when you create the project and the reset runs for you,
+before dependencies are installed so the demo-only dependency never gets installed at all:
+
+```bash
+npx create-solana-dapp@latest my-app --template expo-kit-minimal --reset-project
+```
+
 ## Testing
 
 Tests run on [Vitest](https://vitest.dev) with [React Native Testing Library](https://callstack.github.io/react-native-testing-library/). No emulator, device or wallet app is needed, so the whole suite runs in a couple of seconds and works in CI.
