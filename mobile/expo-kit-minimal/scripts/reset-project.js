@@ -39,9 +39,12 @@ const root = path.join(__dirname, '..')
  * which the reset writes anyway — so deleting the directory keeps this list correct as the demo grows
  * instead of leaving a new component behind importing something that is gone.
  *
+ * `e2e` goes because it drives the demo screens: it presses Connect and Sign Message and asserts on
+ * their labels, none of which survive the reset.
+ *
  * `scripts` holds this file, so it goes last.
  */
-const deletedPaths = ['components', 'features', 'test', 'utils', 'scripts']
+const deletedPaths = ['components', 'e2e', 'features', 'test', 'utils', 'scripts']
 
 /**
  * Files the reset writes, overwriting the demo versions where they exist.
@@ -343,9 +346,10 @@ async function confirm(targets) {
   }
 }
 
-/** Drop the demo dependencies and this script's own entry, which now points at a file that is gone. */
+/** Drop the demo dependencies and the script entries that now point at files that are gone. */
 async function writePackageJson(pkg) {
   delete pkg.scripts['reset-project']
+  delete pkg.scripts['e2e']
 
   for (const dependency of demoDependencies) {
     if (pkg.dependencies?.[dependency]) {

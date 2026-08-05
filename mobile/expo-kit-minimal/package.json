@@ -30,6 +30,7 @@
     "ci": "tsc --noEmit && npm run lint:check && npm run format:check && npm run test && npm run android:build",
     "dev": "expo start --clear --dev-client --reset-cache",
     "doctor": "npx -y expo-doctor@latest",
+    "e2e": "./e2e/fakewallet.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ios": "expo run:ios",
