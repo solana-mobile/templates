@@ -75,16 +75,31 @@ pnpm run
 
 - `pnpm clean` - Clean generated files and artifacts
 - `pnpm format` - Format code using prettier
+- `pnpm generate` - Regenerate the template metadata artifacts
 - `pnpm lint` - Check template metadata, generated artifacts, and formatting
 - `pnpm update-deps` - Update all dependencies to latest versions
+
+### Generated Files
+
+`templates.json`, `TEMPLATES.md`, `README.md`, and `.github/workflows/templates.json` are
+generated from the templates and their `package.json` files. They are committed to the
+repository, so regenerate and commit them whenever you change a template:
+
+```shell
+pnpm generate
+```
+
+CI regenerates them too and fails the pull request when the result differs from what you
+committed, with a diff of what is missing.
 
 ### Code Quality
 
 Ensure your code meets project standards:
 
 ```shell
-pnpm format  # Format code
-pnpm lint    # Check for issues
+pnpm format    # Format code
+pnpm generate  # Refresh generated artifacts
+pnpm lint      # Check for issues
 ```
 
 ### Committing Your Changes
