@@ -5,10 +5,11 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  merge_group:
+  pull_request:
   push:
     branches:
       - main
-  pull_request:
   schedule:
     - cron: '0 0 * * *' # Daily at midnight UTC
 
@@ -27,12 +28,20 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
         shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
         run: |
-          # Get changed files in the PR
-          git fetch origin ${{ github.base_ref }}
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          # A merge group is already built on the commit it will land on; a pull request is not.
+          if [[ -n "$MERGE_GROUP_BASE_SHA" ]]; then
+            BASE="$MERGE_GROUP_BASE_SHA"
+          else
+            git fetch origin "$BASE_REF"
+            BASE="origin/$BASE_REF"
+          fi
+          CHANGED_FILES=$(git diff --name-only "$BASE"...HEAD)
           echo "Changed files:"
           echo "$CHANGED_FILES"
           echo "changed_files<<EOF" >> $GITHUB_OUTPUT
@@ -53,8 +62,8 @@ jobs:
             exit 0
           fi
 
-          # For PRs, filter templates based on changed files
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          # For PRs and merge groups, filter templates based on changed files
+          if [[ "${{ github.event_name }}" == "pull_request" ]] || [[ "${{ github.event_name }}" == "merge_group" ]]; then
             CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
 
             # Check if test-related workflow or action files changed - if so, test all templates (except community)
