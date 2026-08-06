@@ -119,6 +119,26 @@
         "path": "mobile/expo-web3js-wallet",
         "displayName": "Expo Web3.js Wallet example",
         "usecase": "Mobile"
+      },
+      {
+        "description": "A sample Solana mobile app that reads and increments an on-chain Anchor counter through a Codama-generated client, built with Expo, React Native, Solana Kit, and Uniwind.",
+        "id": "gh:solana-mobile/templates/mobile/sample-kit-anchor-counter",
+        "image": "mobile/sample-kit-anchor-counter/og-image.png",
+        "keywords": [
+          "anchor",
+          "codama",
+          "expo",
+          "mobile-wallet-adapter",
+          "react-native",
+          "sample",
+          "solana-kit",
+          "tailwind",
+          "uniwind"
+        ],
+        "name": "sample-kit-anchor-counter",
+        "path": "mobile/sample-kit-anchor-counter",
+        "displayName": "Anchor Counter sample",
+        "usecase": "Mobile"
       }
     ]
   }

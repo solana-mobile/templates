@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "scheme": "sample-kit-anchor-counter",
+    "userInterfaceStyle": "automatic",
+    "orientation": "default",
+    "web": {
+      "output": "static"
+    },
+    "name": "sample-kit-anchor-counter",
+    "slug": "sample-kit-anchor-counter",
+    "android": {
+      "package": "com.anonymous.sample_kit_anchor_counter"
+    },
+    "plugins": ["expo-router"]
+  }
+}

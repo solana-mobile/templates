@@ -1,0 +1,91 @@
+{
+  "name": "sample-kit-anchor-counter",
+  "displayName": "Anchor Counter sample",
+  "description": "A sample Solana mobile app that reads and increments an on-chain Anchor counter through a Codama-generated client, built with Expo, React Native, Solana Kit, and Uniwind.",
+  "usecase": "Mobile",
+  "keywords": [
+    "anchor",
+    "codama",
+    "expo",
+    "mobile-wallet-adapter",
+    "react-native",
+    "sample",
+    "solana-kit",
+    "tailwind",
+    "uniwind"
+  ],
+  "create-solana-dapp": {
+    "instructions": [
+      "Build the Android app locally:",
+      "+{pm} run android"
+    ],
+    "rename": {
+      "Anchor Counter": {
+        "paths": [
+          "src/app"
+        ],
+        "to": "{{name}}"
+      }
+    },
+    "skills": [
+      "https://github.com/solana-foundation/solana-dev-skill",
+      "https://github.com/solana-mobile/solana-mobile-dev-skill"
+    ],
+    "versions": {
+      "adb": "33.0.0"
+    }
+  },
+  "main": "./index.js",
+  "version": "1.0.0",
+  "scripts": {
+    "android": "expo run:android",
+    "android:build": "expo prebuild -p android",
+    "build": "tsc --noEmit && npm run android:build",
+    "ci": "tsc --noEmit && npm run lint:check && npm run format:check && npm run android:build",
+    "codegen": "tsx anchor/codegen.ts && prettier --write src/features/counter/generated",
+    "dev": "expo start --clear --dev-client --reset-cache",
+    "doctor": "npx -y expo-doctor@latest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "ios": "expo run:ios",
+    "lint": "expo lint --fix",
+    "lint:check": "expo lint",
+    "localnet:sync": "tsx anchor/localnet.ts",
+    "start": "expo start",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~57.0.5",
+    "@solana/kit": "^7.0.0",
+    "@tanstack/react-query": "^5.101.4",
+    "@wallet-ui/react-native-kit": "^4.2.1",
+    "expo": "~57.0.6",
+    "expo-constants": "~57.0.5",
+    "expo-dev-client": "^57.0.6",
+    "expo-linking": "~57.0.3",
+    "expo-router": "~57.0.6",
+    "expo-status-bar": "~57.0.1",
+    "expo-system-ui": "~57.0.1",
+    "react": "~19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-quick-crypto": "^1.0.7",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.25.2",
+    "tailwindcss": "~4.1.16",
+    "uniwind": "~1.0.0"
+  },
+  "devDependencies": {
+    "@codama/nodes-from-anchor": "^1.5.3",
+    "@codama/renderers-js": "^2.3.1",
+    "@types/node": "^26.1.2",
+    "@types/react": "~19.2.14",
+    "codama": "^1.10.0",
+    "eslint": "^9.25.0",
+    "eslint-config-expo": "~57.0.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.23.9",
+    "typescript": "~6.0.3"
+  },
+  "private": true
+}

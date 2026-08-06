@@ -1,0 +1,99 @@
+{
+  "address": "ADraQ2ENAbVoVZhvH5SPxWPsF2hH5YmFcgx61TafHuwu",
+  "metadata": {
+    "name": "counter",
+    "version": "1.0.0",
+    "spec": "0.1.0",
+    "description": "The Anchor counter program used by the Anchor Counter sample"
+  },
+  "instructions": [
+    {
+      "name": "increment",
+      "discriminator": [11, 18, 104, 9, 104, 174, 59, 33],
+      "accounts": [
+        {
+          "name": "counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 117, 110, 116, 101, 114]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        {
+          "name": "counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 117, 110, 116, 101, 114]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Counter",
+      "discriminator": [255, 176, 4, 245, 188, 253, 124, 25]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "CannotGetBump",
+      "msg": "Cannot get the bump."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAmount",
+      "msg": "The amount must be between 1 and 100."
+    }
+  ],
+  "types": [
+    {
+      "name": "Counter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

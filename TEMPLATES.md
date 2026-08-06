@@ -57,3 +57,11 @@ Solana Mobile Templates
 > A wallet template for building a Solana mobile app with Expo, React Native, and Web3.js.
 
 `expo` `mobile-wallet-adapter` `react-native` `solana-web3js` `wallet` `wallet-ui`
+
+### [sample-kit-anchor-counter](mobile/sample-kit-anchor-counter)
+
+`gh:solana-mobile/templates/mobile/sample-kit-anchor-counter`
+
+> A sample Solana mobile app that reads and increments an on-chain Anchor counter through a Codama-generated client, built with Expo, React Native, Solana Kit, and Uniwind.
+
+`anchor` `codama` `expo` `mobile-wallet-adapter` `react-native` `sample` `solana-kit` `tailwind` `uniwind`
