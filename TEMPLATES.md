@@ -2,6 +2,14 @@
 
 Solana Mobile Templates
 
+### [expo-kit-anchor](mobile/expo-kit-anchor)
+
+`gh:solana-mobile/templates/mobile/expo-kit-anchor`
+
+> A template for building a Solana mobile app with Expo, React Native, Solana Kit, Anchor, and Uniwind.
+
+`anchor` `expo` `mobile-wallet-adapter` `react-native` `solana-kit` `tailwind` `uniwind`
+
 ### [expo-kit-minimal](mobile/expo-kit-minimal)
 
 `gh:solana-mobile/templates/mobile/expo-kit-minimal`

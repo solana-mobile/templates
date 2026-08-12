@@ -5,6 +5,24 @@
     "path": "mobile",
     "templates": [
       {
+        "description": "A template for building a Solana mobile app with Expo, React Native, Solana Kit, Anchor, and Uniwind.",
+        "id": "gh:solana-mobile/templates/mobile/expo-kit-anchor",
+        "image": "mobile/expo-kit-anchor/og-image.png",
+        "keywords": [
+          "anchor",
+          "expo",
+          "mobile-wallet-adapter",
+          "react-native",
+          "solana-kit",
+          "tailwind",
+          "uniwind"
+        ],
+        "name": "expo-kit-anchor",
+        "path": "mobile/expo-kit-anchor",
+        "displayName": "Expo Kit Anchor example",
+        "usecase": "Mobile"
+      },
+      {
         "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
         "id": "gh:solana-mobile/templates/mobile/expo-kit-minimal",
         "image": "mobile/expo-kit-minimal/og-image.png",
