@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "scheme": "expo-kit-anchor",
+    "userInterfaceStyle": "automatic",
+    "orientation": "default",
+    "web": {
+      "output": "static"
+    },
+    "name": "expo-kit-anchor",
+    "slug": "expo-kit-anchor",
+    "android": {
+      "package": "com.anonymous.expo_kit_anchor"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      "expo-router"
+    ]
+  }
+}
