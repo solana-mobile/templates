@@ -16,7 +16,7 @@
     ],
     "rename": {
       "Expo Web3js Minimal": {
-        "paths": [
+        "in": [
           "components"
         ],
         "to": "{{name}}"

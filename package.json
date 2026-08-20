@@ -23,7 +23,7 @@
     "puppeteer": "^23.11.1",
     "react": "^19.2.7",
     "sharp": "^0.33.5",
-    "solana-mobile": "0.2.0-canary-20260804183815",
+    "solana-mobile": "0.2.0",
     "tsx": "^4.19.2"
   },
   "repokit": {

@@ -18,7 +18,7 @@
     ],
     "rename": {
       "Expo Kit Uniwind": {
-        "paths": [
+        "in": [
           "src/app"
         ],
         "to": "{{name}}"

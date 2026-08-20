@@ -51,7 +51,7 @@
     ],
     "rename": {
       "Expo Kit Privy": {
-        "paths": [
+        "in": [
           "src/features/core/data-access"
         ],
         "to": "{{name}}"
