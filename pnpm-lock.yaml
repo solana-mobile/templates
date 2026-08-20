@@ -30,8 +30,8 @@ importers:
         specifier: ^0.33.5
         version: 0.33.5
       solana-mobile:
-        specifier: 0.2.0-canary-20260804183815
-        version: 0.2.0-canary-20260804183815
+        specifier: 0.2.0
+        version: 0.2.0
       tsx:
         specifier: ^4.19.2
         version: 4.20.6
@@ -684,15 +684,10 @@ packages:
       typescript:
         optional: true
 
-  create-solana-dapp@0.0.0-canary-20260804175003:
-    resolution: {integrity: sha512-w2q9pxHGqsfascjsAbgqLoyGFpoSlDK4q5P2ppmsvN+TJx2Ca8lylE1tD69xKtD/73+0RR4wyGzw44iYFpQ4Kg==}
-    engines: {node: '>=20.12.0'}
+  create-solana-dapp@0.0.0-canary-20260806144555:
+    resolution: {integrity: sha512-6Ulel/sP9YV8QxMLPj5oY9m9BYjf9YrygIDHpJcscjh9M4pGszxPfcr6lUbencOyI6G8SyR/RXKJy8tgHj71wA==}
+    engines: {node: '>=22.12.0'}
     hasBin: true
-    peerDependencies:
-      zod: ^4
-    peerDependenciesMeta:
-      zod:
-        optional: true
 
   css-background-parser@0.1.0:
     resolution: {integrity: sha512-2EZLisiZQ+7m4wwur/qiYJRniHX4K5Tc9w93MT3AS0WS1u5kaZ4FKXlOTBhOjc+CgEgPiGY+fX1yWD8UwpEqUA==}
@@ -1202,11 +1197,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  semver@7.7.3:
-    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   semver@7.8.5:
     resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
@@ -1234,8 +1224,8 @@ packages:
     resolution: {integrity: sha512-HLpt+uLy/pxB+bum/9DzAgiKS8CX1EvbWxI4zlmgGCExImLdiad2iCwXT5Z4c9c3Eq8rP2318mPW2c+QbtjK8A==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
-  solana-mobile@0.2.0-canary-20260804183815:
-    resolution: {integrity: sha512-lyI2+XOgWPKu2arGE7Xmx9iuDxaPUoV1Pa5+HafztwKdeDdium55l01dJxaGmuL1yjBQjsQi7vQkCpnSd2eD9A==}
+  solana-mobile@0.2.0:
+    resolution: {integrity: sha512-NiUXhWUe2hFNVYAMdHG0G87hbAr1eKQyMr5q5FjQQFtxAU4sPc2Ecc6ItiC2t3mGqg/SF7davVSLydL9onlnPQ==}
     hasBin: true
 
   source-map@0.6.1:
@@ -1679,7 +1669,7 @@ snapshots:
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.5.0
-      semver: 7.7.3
+      semver: 7.8.5
       tar-fs: 3.1.1
       unbzip2-stream: 1.4.3
       yargs: 17.7.2
@@ -1933,7 +1923,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  create-solana-dapp@0.0.0-canary-20260804175003(zod@4.4.3):
+  create-solana-dapp@0.0.0-canary-20260806144555:
     dependencies:
       '@clack/prompts': 1.7.0
       commander: 14.0.0
@@ -1942,7 +1932,6 @@ snapshots:
       picocolors: 1.1.1
       semver: 7.8.5
       update-notifier: 7.3.1
-    optionalDependencies:
       zod: 4.4.3
 
   css-background-parser@0.1.0: {}
@@ -2468,8 +2457,6 @@ snapshots:
 
   semver@7.7.2: {}
 
-  semver@7.7.3: {}
-
   semver@7.8.5: {}
 
   sharp@0.33.5:
@@ -2519,11 +2506,11 @@ snapshots:
       ip-address: 10.0.1
       smart-buffer: 4.2.0
 
-  solana-mobile@0.2.0-canary-20260804183815:
+  solana-mobile@0.2.0:
     dependencies:
       '@clack/prompts': 1.6.0
       commander: 14.0.3
-      create-solana-dapp: 0.0.0-canary-20260804175003(zod@4.4.3)
+      create-solana-dapp: 0.0.0-canary-20260806144555
       zod: 4.4.3
 
   source-map@0.6.1:

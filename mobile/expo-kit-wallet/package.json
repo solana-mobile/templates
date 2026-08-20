@@ -35,7 +35,7 @@
     ],
     "rename": {
       "Expo Kit Wallet": {
-        "paths": [
+        "in": [
           "."
         ],
         "to": "{{name}}"
