@@ -180,6 +180,95 @@ jobs:
           package-manager: 'yarn'
           template: ${{ matrix.template }}
 
+  test-anchor:
+    name: Test Anchor
+    runs-on: ubuntu-latest
+    needs: [setup-templates]
+    if: needs.setup-templates.outputs.templates != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22]
+        template: ${{ fromJson(needs.setup-templates.outputs.templates) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Only templates that ship a program have an anchor directory. For the rest, every step
+      # below is skipped and the job reports success.
+      - name: Look for an Anchor workspace
+        id: workspace
+        shell: bash
+        run: |
+          if [[ -d "${{ matrix.template }}/anchor" ]]; then
+            echo 'found=true' | tee --append $GITHUB_OUTPUT
+          else
+            echo 'found=false' | tee --append $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Environment
+        if: steps.workspace.outputs.found == 'true'
+        uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager: 'pnpm'
+
+      # Copy the template out of the repository before installing anything. Anchor runs the package
+      # manager itself, and inside the repository that install climbs into the workspace at the root
+      # and pulls in dependencies that have nothing to do with the template.
+      - name: Copy the template out of the repository
+        if: steps.workspace.outputs.found == 'true'
+        shell: bash
+        run: |
+          DIR="$RUNNER_TEMP/anchor-test"
+          mkdir -p "$DIR"
+          cp -R "${{ matrix.template }}/." "$DIR/"
+          # A template is installed without the build scripts this repository trusts in its own
+          # workspace file, and pnpm fails an install that ignored one. Those builds are only needed
+          # for linting, which the other jobs cover. Anchor runs the package manager itself, so this
+          # has to be configuration rather than a flag on the install below.
+          printf 'strictDepBuilds: false\n' > "$DIR/pnpm-workspace.yaml"
+          echo "TEMPLATE_DIR=$DIR" | tee --append $GITHUB_ENV
+
+      # The validator is handed the program together with its upgrade authority, which is the wallet
+      # configured in Anchor.toml. A runner has no keypair, and this one only ever signs against a
+      # throwaway validator, so generate it here.
+      - name: Create a provider wallet
+        if: steps.workspace.outputs.found == 'true'
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.config/solana"
+          solana-keygen new --no-bip39-passphrase --force --silent -o "$HOME/.config/solana/id.json"
+          solana address
+
+      # Install the template on its own, the way someone who scaffolds it would. Build scripts that
+      # pnpm has not been told to trust are only needed for linting, which runs in the other jobs,
+      # so an ignored build is not a reason to fail here.
+      - name: Install dependencies
+        if: steps.workspace.outputs.found == 'true'
+        working-directory: ${{ env.TEMPLATE_DIR }}
+        shell: bash
+        run: pnpm install
+
+      # A fresh checkout has no program keypair, so the program id has to be synced into the source
+      # and the generated client before building. Without it the program is deployed to a different
+      # address than the one it declares and every instruction fails with a mismatch.
+      - name: Sync the program id and generate the client
+        if: steps.workspace.outputs.found == 'true'
+        working-directory: ${{ env.TEMPLATE_DIR }}
+        shell: bash
+        run: pnpm run anchor:setup
+
+      # Surfpool, which `anchor test` uses by default, deploys the program while it starts up, and
+      # Anchor only waits for its RPC to answer before running the tests. That race makes the first
+      # instruction fail because the program is not executable yet. The legacy validator is handed
+      # the program when it launches, so it is always ready, and it ships with the Solana CLI.
+      - name: Test the Anchor program
+        if: steps.workspace.outputs.found == 'true'
+        working-directory: ${{ env.TEMPLATE_DIR }}
+        shell: bash
+        run: pnpm run anchor test --validator legacy
+
   # A single check to require in branch protection.
   #
   # The matrix jobs are named after the template they run, so their check names change from one pull
@@ -190,7 +279,7 @@ jobs:
   template-tests:
     name: Template tests
     runs-on: ubuntu-latest
-    needs: [setup-templates, test-bun, test-npm, test-pnpm, test-yarn]
+    needs: [setup-templates, test-anchor, test-bun, test-npm, test-pnpm, test-yarn]
     if: always()
     steps:
       - name: Check the results of every template test job

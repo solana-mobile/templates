@@ -13,6 +13,8 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "npx vitest run"
+# The default 5s timeout is enough for Surfpool, but not for the slower validator
+# that `anchor test --validator legacy` starts, which warms up on first invoke.
+test = "npx vitest run --testTimeout=60000"
 
 [hooks]
