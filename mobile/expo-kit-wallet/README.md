@@ -9,7 +9,7 @@ mobile wallet, read account state, and run example wallet actions.
 - [@solana/kit](https://www.solanakit.com/)
 - [@wallet-ui/react-native-kit](https://wallet-ui.dev/)
 - [Expo](https://expo.dev)
-- [HeroUI Native](https://github.com/heroui-inc/heroui-native)
+- [HeroUI Native](https://heroui.com/docs/native)
 - [Uniwind](https://uniwind.dev/) (Tailwind CSS for React Native)
 
 ## Included wallet flows
