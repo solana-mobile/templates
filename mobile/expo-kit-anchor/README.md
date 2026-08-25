@@ -7,8 +7,8 @@ This is an [Expo](https://expo.dev) project pre-configured with an [Anchor](http
 - [Anchor](https://www.anchor-lang.com/) (Solana program framework)
 - [Expo](https://expo.dev)
 - [Uniwind](https://uniwind.dev/) (Tailwind CSS for React Native)
-- [@solana/kit](https://github.com/solana-labs/solana-web3.js)
-- [@wallet-ui/react-native-kit](https://github.com/wallet-ui/wallet-ui)
+- [@solana/kit](https://www.solanakit.com/)
+- [@wallet-ui/react-native-kit](https://wallet-ui.dev/)
 
 ## Get started
 
