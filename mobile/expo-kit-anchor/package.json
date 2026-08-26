@@ -102,5 +102,13 @@
     "typescript": "~6.0.3",
     "vitest": "^4.1.10"
   },
+  "overrides": {
+    "react-native-reanimated": "4.5.4",
+    "react-native-worklets": "0.10.4"
+  },
+  "resolutions": {
+    "react-native-reanimated": "4.5.4",
+    "react-native-worklets": "0.10.4"
+  },
   "private": true
 }
