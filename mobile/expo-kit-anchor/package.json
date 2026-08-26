@@ -38,7 +38,7 @@
     "versions": {
       "adb": "33.0.0",
       "anchor": "1.1.2",
-      "solana": "4.2.0"
+      "solana": "3.1.10"
     }
   },
   "main": "./index.js",

@@ -7,6 +7,10 @@ inputs:
   package-manager:
     description: 'The package manager to use.'
     required: true
+  solana-version:
+    description: 'The Solana CLI version to install. Keep in sync with the templates that pin [toolchain] solana_version.'
+    default: '3.1.10'
+    required: false
 
 runs:
   using: 'composite'
@@ -47,18 +51,42 @@ runs:
         path: |
           ~/.cache/solana/
           ~/.local/share/solana/
-        key: solana-cli-${{ runner.os }}-4.2.1
+        key: solana-cli-${{ runner.os }}-${{ inputs.solana-version }}
 
     - name: Install Solana CLI
+      env:
+        SOLANA_VERSION: ${{ inputs.solana-version }}
       run: |
-        sh -c "$(curl -sSfL https://release.anza.xyz/v4.2.1/install)"
+        sh -c "$(curl -sSfL "https://release.anza.xyz/v${SOLANA_VERSION}/install")"
         echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
       shell: bash
 
-    - name: Verify installations
+    # `anchor` resolves a Solana version through avm on every invocation and activates it globally,
+    # so this runs in a throwaway workspace pinning the version installed above. Unpinned, it would
+    # resolve whatever avm recommends for this Anchor version and leave that active for the rest of
+    # the job. avm needs `agave-install` on PATH, so this cannot run before the install step.
+    - name: Verify Anchor
+      env:
+        SOLANA_VERSION: ${{ inputs.solana-version }}
       run: |
+        DIR=$(mktemp -d)
+        printf '[toolchain]\nsolana_version = "%s"\n' "$SOLANA_VERSION" > "$DIR/Anchor.toml"
+        cd "$DIR"
         anchor --version
-        solana --version
+      shell: bash
+
+    # Assert rather than print: this step only echoed the version, so a mismatch between what was
+    # installed and what ended up active passed silently.
+    - name: Verify the Solana CLI
+      env:
+        SOLANA_VERSION: ${{ inputs.solana-version }}
+      run: |
+        ACTUAL=$(solana --version)
+        echo "$ACTUAL"
+        case "$ACTUAL" in
+          "solana-cli $SOLANA_VERSION "*) ;;
+          *) echo "::error::Expected Solana CLI $SOLANA_VERSION, got: $ACTUAL"; exit 1 ;;
+        esac
       shell: bash
 
     - name: Install Node.js
