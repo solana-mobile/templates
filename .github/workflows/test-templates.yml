@@ -227,7 +227,9 @@ jobs:
           # workspace file, and pnpm fails an install that ignored one. Those builds are only needed
           # for linting, which the other jobs cover. Anchor runs the package manager itself, so this
           # has to be configuration rather than a flag on the install below.
-          printf 'strictDepBuilds: false\n' > "$DIR/pnpm-workspace.yaml"
+          # Appended, because a template may ship its own pnpm-workspace.yaml — overwriting it
+          # would drop settings the template needs and test something users never get.
+          printf 'strictDepBuilds: false\n' >> "$DIR/pnpm-workspace.yaml"
           echo "TEMPLATE_DIR=$DIR" | tee --append $GITHUB_ENV
 
       # The validator is handed the program together with its upgrade authority, which is the wallet
