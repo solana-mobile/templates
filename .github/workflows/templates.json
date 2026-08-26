@@ -6,5 +6,6 @@
   "mobile/expo-kit-wallet",
   "mobile/expo-web3js-minimal",
   "mobile/expo-web3js-paper",
-  "mobile/expo-web3js-wallet"
+  "mobile/expo-web3js-wallet",
+  "mobile/react-kit-shadcn"
 ]
