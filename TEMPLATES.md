@@ -18,14 +18,6 @@ Solana Mobile Templates
 
 `expo` `mobile-wallet-adapter` `react-native` `solana-kit`
 
-### [expo-kit-privy](mobile/expo-kit-privy)
-
-`gh:solana-mobile/templates/mobile/expo-kit-privy`
-
-> A Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.
-
-`expo` `privy` `react-native` `solana-kit` `tailwind` `uniwind`
-
 ### [expo-kit-uniwind](mobile/expo-kit-uniwind)
 
 `gh:solana-mobile/templates/mobile/expo-kit-uniwind`
@@ -73,3 +65,11 @@ Solana Mobile Templates
 > A template for building a Solana web app with React, Vite, shadcn/ui, Solana Kit, and Mobile Wallet Adapter.
 
 `mobile-wallet-adapter` `react` `shadcn` `solana-kit` `tailwind` `vite` `wallet`
+
+### [sample-expo-kit-privy](mobile/sample-expo-kit-privy)
+
+`gh:solana-mobile/templates/mobile/sample-expo-kit-privy`
+
+> A sample Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.
+
+`expo` `privy` `react-native` `sample` `solana-kit` `tailwind` `uniwind`

@@ -1,11 +1,11 @@
 [
   "mobile/expo-kit-anchor",
   "mobile/expo-kit-minimal",
-  "mobile/expo-kit-privy",
   "mobile/expo-kit-uniwind",
   "mobile/expo-kit-wallet",
   "mobile/expo-web3js-minimal",
   "mobile/expo-web3js-paper",
   "mobile/expo-web3js-wallet",
-  "mobile/react-kit-shadcn"
+  "mobile/react-kit-shadcn",
+  "mobile/sample-expo-kit-privy"
 ]
