@@ -65,3 +65,11 @@ Solana Mobile Templates
 > A wallet template for building a Solana mobile app with Expo, React Native, and Web3.js.
 
 `expo` `mobile-wallet-adapter` `react-native` `solana-web3js` `wallet` `wallet-ui`
+
+### [react-kit-shadcn](mobile/react-kit-shadcn)
+
+`gh:solana-mobile/templates/mobile/react-kit-shadcn`
+
+> A template for building a Solana web app with React, Vite, shadcn/ui, Solana Kit, and Mobile Wallet Adapter.
+
+`mobile-wallet-adapter` `react` `shadcn` `solana-kit` `tailwind` `vite` `wallet`

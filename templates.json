@@ -137,6 +137,24 @@
         "path": "mobile/expo-web3js-wallet",
         "displayName": "Expo Web3.js Wallet example",
         "usecase": "Mobile"
+      },
+      {
+        "description": "A template for building a Solana web app with React, Vite, shadcn/ui, Solana Kit, and Mobile Wallet Adapter.",
+        "id": "gh:solana-mobile/templates/mobile/react-kit-shadcn",
+        "image": "mobile/react-kit-shadcn/og-image.png",
+        "keywords": [
+          "mobile-wallet-adapter",
+          "react",
+          "shadcn",
+          "solana-kit",
+          "tailwind",
+          "vite",
+          "wallet"
+        ],
+        "name": "react-kit-shadcn",
+        "path": "mobile/react-kit-shadcn",
+        "displayName": "React Kit shadcn/ui example",
+        "usecase": "Mobile"
       }
     ]
   }
