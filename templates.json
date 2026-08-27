@@ -156,6 +156,26 @@
         "path": "mobile/sample-expo-kit-privy",
         "displayName": "Expo Kit Privy sample",
         "usecase": "Mobile"
+      },
+      {
+        "description": "A sample Solana web app with React, Privy auth, Solana Kit, and Mobile Wallet Adapter.",
+        "id": "gh:solana-mobile/templates/mobile/sample-react-kit-privy",
+        "image": "mobile/sample-react-kit-privy/og-image.png",
+        "keywords": [
+          "mobile-wallet-adapter",
+          "privy",
+          "react",
+          "sample",
+          "shadcn",
+          "solana-kit",
+          "tailwind",
+          "vite",
+          "wallet"
+        ],
+        "name": "sample-react-kit-privy",
+        "path": "mobile/sample-react-kit-privy",
+        "displayName": "React Kit Privy sample",
+        "usecase": "Mobile"
       }
     ]
   }
