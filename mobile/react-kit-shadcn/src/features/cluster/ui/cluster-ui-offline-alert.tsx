@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useClusterHealth } from '@/features/cluster/data-access/use-cluster-health'
-import { getCluster } from '@/features/cluster/data-access/clusters'
+import { CLUSTERS, getCluster } from '@/features/cluster/data-access/clusters'
 import { useAppCluster } from '@/features/core/data-access/use-app-cluster'
 
 /**
@@ -20,14 +20,27 @@ export function ClusterUiOfflineAlert() {
   }
 
   if (health.status === 'mismatch') {
+    const actual = getCluster(health.actual)
+    // Only point at the network menu when the detected network is actually in it. Mainnet stays out
+    // of the picker until `VITE_RPC_URL_MAINNET` names an endpoint, and telling someone to pick an
+    // entry that is not there reads as a broken app rather than a wrong endpoint.
+    const offered = CLUSTERS.some((candidate) => candidate.id === actual.id)
     return (
       <Alert variant="destructive">
         <AlertTitle>This endpoint is not {cluster.label}</AlertTitle>
         <AlertDescription>
           <span>
-            <code className="font-mono text-xs">{cluster.rpcUrl}</code> reports the genesis hash of{' '}
-            {getCluster(health.actual).label}. Point it at {cluster.label}, or pick {getCluster(health.actual).label} in
-            the network menu.
+            <code className="font-mono text-xs">{cluster.rpcUrl}</code> reports the genesis hash of {actual.label}.{' '}
+            {offered ? (
+              <>
+                Point it at {cluster.label}, or pick {actual.label} in the network menu.
+              </>
+            ) : (
+              <>
+                Point it at {cluster.label}, or set <code className="font-mono text-xs">VITE_RPC_URL_MAINNET</code> and
+                restart to offer {actual.label} in the network menu.
+              </>
+            )}
           </span>
         </AlertDescription>
       </Alert>
