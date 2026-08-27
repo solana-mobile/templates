@@ -1,5 +1,5 @@
 {
-  "name": "expo-kit-privy",
+  "name": "sample-expo-kit-privy",
   "scripts": {
     "android": "expo run:android",
     "android:build": "expo prebuild -p android",
@@ -15,13 +15,14 @@
     "start": "expo start",
     "web": "expo start --web"
   },
-  "displayName": "Expo Kit Privy example",
-  "description": "A Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.",
+  "displayName": "Expo Kit Privy sample",
+  "description": "A sample Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.",
   "usecase": "Mobile",
   "keywords": [
     "expo",
     "privy",
     "react-native",
+    "sample",
     "solana-kit",
     "tailwind",
     "uniwind"

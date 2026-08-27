@@ -1,6 +1,6 @@
-# expo-kit-privy
+# sample-expo-kit-privy
 
-This is an [Expo](https://expo.dev) project pre-configured with [Uniwind](https://uniwind.dev/) for styling and Solana libraries.
+This is a reference sample: read it, run it, copy the parts you need. It shows a working [Privy](https://privy.io) integration in an [Expo](https://expo.dev) project pre-configured with [Uniwind](https://uniwind.dev/) for styling and Solana libraries.
 
 ## Technologies
 
@@ -50,7 +50,7 @@ In the output, you'll find options to open the app in an Android development bui
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 
-This template requires native modules and Mobile Wallet Adapter support, so it does not support Expo Go or iOS simulator.
+This sample requires native modules and Mobile Wallet Adapter support, so it does not support Expo Go or iOS simulator.
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 

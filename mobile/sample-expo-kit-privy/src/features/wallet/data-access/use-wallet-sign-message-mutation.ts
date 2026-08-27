@@ -8,7 +8,7 @@ export function useWalletSignMessageMutation(address: Address) {
   const { signMessages } = useMobileWallet()
   const mutation = useMutation({
     mutationFn: async () => {
-      const message = `gm from expo-kit-privy: ${address}`
+      const message = `gm from sample-expo-kit-privy: ${address}`
       const signatureBytes = await signMessages(new TextEncoder().encode(message))
 
       return fromUint8Array(signatureBytes)

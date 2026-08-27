@@ -9,7 +9,7 @@ export function useWalletSignTransactionMutation(address: Address) {
   const { sendTransactions } = useMobileWallet()
   const mutation = useMutation({
     mutationFn: async () => {
-      const instructions: Instruction[] = [getAddMemoInstruction({ memo: `gm from expo-kit-privy: ${address}` })]
+      const instructions: Instruction[] = [getAddMemoInstruction({ memo: `gm from sample-expo-kit-privy: ${address}` })]
 
       return await sendTransactions(instructions)
     },
