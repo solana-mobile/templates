@@ -66,6 +66,14 @@ Solana Mobile Templates
 
 `mobile-wallet-adapter` `react` `shadcn` `solana-kit` `tailwind` `vite` `wallet`
 
+### [sample-expo-kit-cause-pots](mobile/sample-expo-kit-cause-pots)
+
+`gh:solana-mobile/templates/mobile/sample-expo-kit-cause-pots`
+
+> A sample collaborative savings app with time-locked, multi-signature pots, built with Expo, React Native, Solana Kit, Anchor, and Uniwind.
+
+`anchor` `expo` `mobile-wallet-adapter` `react-native` `sample` `solana-kit` `tailwind` `uniwind`
+
 ### [sample-expo-kit-privy](mobile/sample-expo-kit-privy)
 
 `gh:solana-mobile/templates/mobile/sample-expo-kit-privy`
