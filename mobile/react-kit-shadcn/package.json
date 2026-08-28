@@ -54,6 +54,7 @@
     "@solana/kit-plugin-wallet": "^0.18.0",
     "@solana/react": "^8.0.0",
     "@solana/wallet-standard-chains": "^1.1.2",
+    "@solana/wallet-standard-util": "^1.1.3",
     "@tanstack/react-query": "^5.102.6",
     "@wallet-standard/react": "^1.0.3",
     "@wallet-standard/ui": "^1.0.3",

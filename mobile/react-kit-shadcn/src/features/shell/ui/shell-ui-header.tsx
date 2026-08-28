@@ -16,7 +16,7 @@ export function ShellUiHeader() {
             thing to edit, and its internal colors remain what the browser tab renders.
           */}
           <span aria-hidden className="app-logo size-6 shrink-0" />
-          React Kit Shadcn
+          <span className="max-sm:sr-only">React Kit Shadcn</span>
         </a>
         <ClusterUiSelect />
         <WalletUiConnectMenu />

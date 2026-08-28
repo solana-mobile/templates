@@ -27,12 +27,12 @@ export function WalletFeatureAccount({ account }: { account: UiWalletAccount }) 
         <div className="flex flex-col gap-1">
           <span className="text-muted-foreground text-xs">Address</span>
           <a
-            className="text-primary inline-flex items-center gap-1 font-mono text-sm break-all underline underline-offset-4"
+            className="text-primary inline-flex max-w-full items-center gap-1 font-mono text-sm underline underline-offset-4"
             href={getExplorerUrl(cluster, `/address/${account.address}`)}
             rel="noreferrer"
             target="_blank"
           >
-            {account.address}
+            <span className="truncate">{account.address}</span>
             <ExternalLinkIcon className="size-3 shrink-0" />
           </a>
         </div>

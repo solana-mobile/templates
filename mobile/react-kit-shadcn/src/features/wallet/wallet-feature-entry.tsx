@@ -40,7 +40,7 @@ export function WalletFeatureEntry() {
     <div className="flex flex-col gap-6">
       <WalletFeatureAccount account={connected.account} />
       <div className="grid gap-6 lg:grid-cols-2">
-        <WalletFeatureSignIn wallet={connected.wallet} />
+        <WalletFeatureSignIn account={connected.account} wallet={connected.wallet} />
         <WalletFeatureSignMessage account={connected.account} />
         <WalletFeatureSignTransaction account={connected.account} walletName={connected.wallet.name} />
         <WalletFeatureSendMemo />
