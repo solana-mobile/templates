@@ -12,7 +12,7 @@ import {
  * wallets announce themselves on, so the wallet plugin discovers it alongside everything else and
  * no code below this point knows the difference.
  *
- * Without `VITE_MWA_REMOTE_HOST_AUTHORITY` set, MWA appears only on Android browsers, where it
+ * Without `VITE_MWA_REMOTE_HOST_AUTHORITY` set, MWA appears only in Chrome on Android, where it
  * connects to a wallet installed on the same device. Pointing that variable at a reflector host
  * additionally offers the QR code flow, which pairs a desktop browser with a wallet on a phone.
  *

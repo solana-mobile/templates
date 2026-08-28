@@ -116,7 +116,7 @@ export function WalletUiConnectMenu() {
           <DropdownMenuSeparator />
           {wallets.length === 0 && unsupportedWallets.length === 0 ? (
             <div className="text-muted-foreground px-2 py-3 text-sm">
-              No wallet found. Install a browser wallet, or open this page on Android to use a mobile wallet.
+              No wallet found. Install a browser wallet, or open this page in Chrome on Android to use a mobile wallet.
             </div>
           ) : null}
           {wallets.length === 0 && unsupportedWallets.length > 0 ? (

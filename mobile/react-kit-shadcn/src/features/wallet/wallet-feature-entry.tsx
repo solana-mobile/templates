@@ -10,6 +10,11 @@ import { WalletFeatureSignIn } from './wallet-feature-sign-in'
 import { WalletFeatureSignMessage } from './wallet-feature-sign-message'
 import { WalletFeatureSignTransaction } from './wallet-feature-sign-transaction'
 
+/**
+ * The page's content: the account card plus one card per wallet operation, or a pointer to the
+ * connect menu while nothing is connected. Each card receives the connected account or wallet as a
+ * prop rather than reading the connection itself, so every example stays readable on its own.
+ */
 export function WalletFeatureEntry() {
   const client = useAppClient()
   const connected = useConnectedWallet(client)
@@ -23,7 +28,7 @@ export function WalletFeatureEntry() {
             No wallet connected
           </CardTitle>
           <CardDescription>
-            Connect a wallet to read your balance and run the examples below it. On an Android browser the list includes
+            Connect a wallet to read your balance and run the examples below it. In Chrome on Android the list includes
             any wallet installed on this device, over Mobile Wallet Adapter.
           </CardDescription>
         </CardHeader>

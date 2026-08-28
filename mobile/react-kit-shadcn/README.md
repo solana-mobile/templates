@@ -99,9 +99,9 @@ chain: the wallet plugin is bound to a single chain, and the wallet authorized t
 
 ## Mobile Wallet Adapter
 
-With no configuration, Mobile Wallet Adapter appears in the wallet list only on Android browsers, where it connects to
-a wallet installed on the same device. On every other platform it is silently absent, which is why a desktop browser
-with no extension wallet sees an empty wallet list.
+With no configuration, Mobile Wallet Adapter appears in the wallet list only in Chrome on Android, where it connects
+to a wallet installed on the same device. Other Android browsers and iOS do not support it, and everywhere else it is
+silently absent — which is why a desktop browser with no extension wallet sees an empty wallet list.
 
 Set `VITE_MWA_REMOTE_HOST_AUTHORITY` to a reflector host to additionally offer the QR code flow, which pairs a desktop
 browser with a wallet on a phone.
