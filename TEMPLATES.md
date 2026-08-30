@@ -73,3 +73,11 @@ Solana Mobile Templates
 > A sample Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.
 
 `expo` `privy` `react-native` `sample` `solana-kit` `tailwind` `uniwind`
+
+### [sample-react-kit-privy](mobile/sample-react-kit-privy)
+
+`gh:solana-mobile/templates/mobile/sample-react-kit-privy`
+
+> A sample Solana web app with React, Privy auth, Solana Kit, and Mobile Wallet Adapter.
+
+`mobile-wallet-adapter` `privy` `react` `sample` `shadcn` `solana-kit` `tailwind` `vite` `wallet`
