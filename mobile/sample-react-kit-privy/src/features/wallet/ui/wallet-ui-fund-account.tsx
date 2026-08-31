@@ -3,7 +3,7 @@ import { useAirdrop } from '@solana/react'
 import { ExternalLinkIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import type { Cluster } from '@/features/cluster/data-access/clusters'
+import { getFaucetUrl, type Cluster } from '@/features/cluster/data-access/clusters'
 import { useAppClient } from '@/features/core/data-access/use-app-client'
 import { formatError } from '@/features/wallet/util/format-error'
 
@@ -31,6 +31,7 @@ export function WalletUiFundAccount({ address, cluster }: { address: Address; cl
 
 function FundAccount({ address, client, cluster }: { address: Address; client: ClientWithAirdrop; cluster: Cluster }) {
   const { dispatch, error, isRunning } = useAirdrop(client)
+  const faucetUrl = getFaucetUrl(cluster, address)
 
   return (
     <div className="bg-muted/40 flex flex-col gap-2 rounded-lg border p-3">
@@ -38,12 +39,12 @@ function FundAccount({ address, client, cluster }: { address: Address; client: C
         <Button disabled={isRunning} onClick={() => dispatch(address, ONE_SOL)} size="sm" variant="outline">
           {isRunning ? 'Requesting…' : 'Airdrop 1 SOL'}
         </Button>
-        {cluster.faucetUrl ? (
+        {faucetUrl ? (
           <span className="text-muted-foreground text-xs">
             or use{' '}
             <a
               className="text-primary inline-flex items-center gap-1 underline underline-offset-4"
-              href={cluster.faucetUrl}
+              href={faucetUrl}
               rel="noreferrer"
               target="_blank"
             >
@@ -56,7 +57,7 @@ function FundAccount({ address, client, cluster }: { address: Address; client: C
       {error ? (
         <p className="text-destructive text-xs">
           {formatError(error, 'The airdrop failed.')}
-          {cluster.faucetUrl ? ' The RPC faucet is heavily rate limited — the web faucet is more reliable.' : ''}
+          {faucetUrl ? ' The RPC faucet is heavily rate limited — the web faucet is more reliable.' : ''}
         </p>
       ) : null}
     </div>

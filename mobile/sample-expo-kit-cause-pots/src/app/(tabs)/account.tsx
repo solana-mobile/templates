@@ -14,7 +14,7 @@ import { formatError } from '../../utils/format-error'
 
 export default function AccountScreen() {
   const { account, disconnect } = useMobileWallet()
-  const { chain } = useNetwork()
+  const { chain, getFaucetUrl } = useNetwork()
   const airdropMutation = useAirdropMutation()
   const balanceQuery = useBalanceQuery()
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +53,7 @@ export default function AccountScreen() {
         />
       ) : null}
       {hasNoSol && !isLocalnet ? (
-        <Pressable onPress={() => void openURL('https://faucet.solana.com')}>
+        <Pressable onPress={() => void openURL(getFaucetUrl(account?.address.toString()))}>
           <Text className="text-amber-600 dark:text-amber-400 text-center">
             Your wallet has no SOL to pay for transactions.{'\n'}
             Get some at <Text className="underline">faucet.solana.com</Text>

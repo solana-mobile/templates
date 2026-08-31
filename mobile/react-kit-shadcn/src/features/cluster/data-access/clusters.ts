@@ -88,6 +88,20 @@ export function getExplorerUrl(cluster: Cluster, path: string): string {
 }
 
 /**
+ * Links to the cluster's web faucet with the network and address pre-filled, if the cluster has
+ * one. The faucet takes the same `cluster` values the explorer does.
+ */
+export function getFaucetUrl(cluster: Cluster, address: string): string | undefined {
+  if (!cluster.faucetUrl) {
+    return undefined
+  }
+  const url = new URL(cluster.faucetUrl)
+  url.searchParams.set('cluster', cluster.explorerParam)
+  url.searchParams.set('walletAddress', address)
+  return url.toString()
+}
+
+/**
  * Genesis hashes of the three public networks, verified against each endpoint.
  *
  * A genesis hash identifies a network exactly, so it answers two questions in one call: whether the

@@ -2,6 +2,7 @@ import type { Signature } from '@solana/kit'
 import { openURL } from 'expo-linking'
 import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { useMobileWallet } from '@wallet-ui/react-native-kit'
 import { AppAddressLink } from '../../components/app-address-link'
 import { formatError } from '../../utils/format-error'
 import { useAirdropMutation } from '../account/data-access/use-airdrop-mutation'
@@ -11,7 +12,8 @@ import { useCounterQuery } from './data-access/use-counter-query'
 import { useCounterProgram } from './data-access/use-counter-program'
 
 export function CounterFeature() {
-  const { chain, getExplorerUrl } = useNetwork()
+  const { account } = useMobileWallet()
+  const { chain, getExplorerUrl, getFaucetUrl } = useNetwork()
   const airdropMutation = useAirdropMutation()
   const balanceQuery = useBalanceQuery()
   const counterQuery = useCounterQuery()
@@ -55,7 +57,7 @@ export function CounterFeature() {
         </Pressable>
       ) : null}
       {hasNoSol && !isLocalnet ? (
-        <Pressable onPress={() => void openURL('https://faucet.solana.com')}>
+        <Pressable onPress={() => void openURL(getFaucetUrl(account?.address.toString()))}>
           <Text className="text-amber-600 dark:text-amber-400 mt-3 text-center">
             Your wallet has no SOL to pay for transactions.{'\n'}
             Get some at <Text className="underline">faucet.solana.com</Text>
