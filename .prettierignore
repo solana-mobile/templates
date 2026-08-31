@@ -11,7 +11,10 @@ TEMPLATES.md
 uniwind-types.d.ts
 
 # Ignore any dist, tmp, or node_modules directories
+mobile/**/.expo
 mobile/**/anchor/.anchor
 mobile/**/anchor/src/client/js/generated
 mobile/**/anchor/target
+mobile/**/android
 mobile/**/coverage
+mobile/**/ios
