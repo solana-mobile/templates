@@ -1,9 +1,10 @@
 import { useConnectedWallet } from '@solana/kit-plugin-wallet/react'
 import { WalletIcon } from 'lucide-react'
 
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppClient } from '@/features/core/data-access/use-app-client'
 
+import { WalletUiSeekerButton } from './ui/wallet-ui-seeker-button'
 import { WalletFeatureAccount } from './wallet-feature-account'
 import { WalletFeatureSendMemo } from './wallet-feature-send-memo'
 import { WalletFeatureSignIn } from './wallet-feature-sign-in'
@@ -32,6 +33,14 @@ export function WalletFeatureEntry() {
             any wallet installed on this device, over Mobile Wallet Adapter.
           </CardDescription>
         </CardHeader>
+        {/*
+          Seeker Connect ships two entry points: the wallet-standard registration that puts it in the
+          connect menu (top right), and this branded button. Both drive the same connection — the
+          button is the first-class surface for reaching a Seeker directly.
+        */}
+        <CardContent>
+          <WalletUiSeekerButton variant="connect" />
+        </CardContent>
       </Card>
     )
   }
