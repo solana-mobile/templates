@@ -70,7 +70,7 @@
     "@solana-mobile/wallet-standard-mobile": "0.0.0-canary-20260828231154",
     "@solana-program/memo": "^0.13.0",
     "@solana-program/system": "^0.14.0",
-    "@solana-program/token": "^0.16.0",
+    "@solana-program/token": "^0.16.1",
     "@solana/kit": "^8.0.0",
     "@solana/kit-plugin-rpc": "^0.18.0",
     "@solana/kit-plugin-wallet": "^0.18.0",
