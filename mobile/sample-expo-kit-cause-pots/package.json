@@ -15,6 +15,8 @@
   ],
   "create-solana-dapp": {
     "instructions": [
+      "Verify your Android development environment:",
+      "+npx -y solana-mobile@latest doctor",
       "Build the Android app locally:",
       "+{pm} run android",
       "To configure the Anchor deployment keypair and generate the program client (requires the Rust, Solana, and Anchor toolchains):",

@@ -16,6 +16,8 @@
         "description": "Keep the example account and network screens",
         "group": "example",
         "instructions": [
+          "Verify your Android development environment:",
+          "+npx -y solana-mobile@latest doctor",
           "Build the Android app locally:",
           "+{pm} run android",
           "Remove the example code and start from a blank app:",
@@ -26,6 +28,8 @@
         "description": "Start from a blank app instead of the example code",
         "group": "example",
         "instructions": [
+          "Verify your Android development environment:",
+          "+npx -y solana-mobile@latest doctor",
           "Build the Android app locally:",
           "+{pm} run android",
           "Edit app/index.tsx to build your first screen.",

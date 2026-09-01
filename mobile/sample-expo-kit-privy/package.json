@@ -47,6 +47,8 @@
       "",
       "Do not put the Privy app secret in .env; this Expo app only uses public client-side Privy identifiers.",
       "",
+      "Verify your Android development environment:",
+      "+npx -y solana-mobile@latest doctor",
       "Build the Android app locally:",
       "+{pm} run android"
     ],
