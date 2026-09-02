@@ -65,9 +65,9 @@ AI coding agents should start with [AGENTS.md](AGENTS.md), which links to the fo
 
 ## Contributors
 
-<!-- automd:contributors github="solana-mobile/templates" license="MIT" -->
+<!-- automd:contributors github="solana-mobile/templates" license="Apache-2.0" -->
 
-Published under the [MIT](https://github.com/solana-mobile/templates/blob/main/LICENSE) license.
+Published under the [APACHE-2.0](https://github.com/solana-mobile/templates/blob/main/LICENSE) license.
 Made by [community](https://github.com/solana-mobile/templates/graphs/contributors) 💛
 <br><br>
 <a href="https://github.com/solana-mobile/templates/graphs/contributors">
