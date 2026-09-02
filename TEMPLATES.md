@@ -89,3 +89,11 @@ Solana Mobile Templates
 > A sample Solana web app with React, Privy auth, Solana Kit, and Mobile Wallet Adapter.
 
 `mobile-wallet-adapter` `privy` `react` `sample` `shadcn` `solana-kit` `tailwind` `vite` `wallet`
+
+### [typescript-kit-minimal](mobile/typescript-kit-minimal)
+
+`gh:solana-mobile/templates/mobile/typescript-kit-minimal`
+
+> A minimal template for building a Solana web app with plain TypeScript, Vite, Solana Kit, and Mobile Wallet Adapter — no framework.
+
+`mobile-wallet-adapter` `solana-kit` `typescript` `vite` `wallet` `wallet-standard`
