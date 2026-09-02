@@ -195,6 +195,23 @@
         "path": "mobile/sample-react-kit-privy",
         "displayName": "React Kit Privy sample",
         "usecase": "Mobile"
+      },
+      {
+        "description": "A minimal template for building a Solana web app with plain TypeScript, Vite, Solana Kit, and Mobile Wallet Adapter — no framework.",
+        "id": "gh:solana-mobile/templates/mobile/typescript-kit-minimal",
+        "image": "mobile/typescript-kit-minimal/og-image.png",
+        "keywords": [
+          "mobile-wallet-adapter",
+          "solana-kit",
+          "typescript",
+          "vite",
+          "wallet",
+          "wallet-standard"
+        ],
+        "name": "typescript-kit-minimal",
+        "path": "mobile/typescript-kit-minimal",
+        "displayName": "TypeScript Kit Minimal example",
+        "usecase": "Mobile"
       }
     ]
   }
