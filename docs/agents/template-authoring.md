@@ -6,6 +6,7 @@ Use this when adding or changing a template.
 
 Each template directory scanned by `repokit.groups` must include:
 
+- `LICENSE`, the Apache 2.0 text with the appendix boilerplate left as `Copyright [yyyy] [name of copyright owner]` so a scaffolded project asserts its own copyright, not Solana Mobile Inc.
 - `package.json`
 - `og-image.png`
 
