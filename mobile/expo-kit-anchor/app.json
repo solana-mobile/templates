@@ -20,6 +20,13 @@
           }
         }
       ],
+      [
+        "expo-dev-client",
+        {
+          "showMenuAtLaunch": false,
+          "skipOnboarding": true
+        }
+      ],
       "expo-router"
     ]
   }

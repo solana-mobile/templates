@@ -11,6 +11,15 @@
     "android": {
       "package": "com.anonymous.expo_kit_uniwind"
     },
-    "plugins": ["expo-router"]
+    "plugins": [
+      [
+        "expo-dev-client",
+        {
+          "showMenuAtLaunch": false,
+          "skipOnboarding": true
+        }
+      ],
+      "expo-router"
+    ]
   }
 }
