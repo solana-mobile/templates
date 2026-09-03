@@ -148,81 +148,79 @@ export const generateOgImage = async (
 
   try {
     const imageResponse = new ImageResponse(
-      (
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#000',
+          backgroundImage: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+        }}
+      >
         <div
           style={{
-            height: '100%',
-            width: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#000',
-            backgroundImage: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+            gap: '60px',
           }}
         >
+          <img src={solanaLogoDataUri} width={200} height={175} alt="Solana" />
+
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '60px',
+              fontSize: '120px',
+              fontWeight: 'bold',
+              color: '#fff',
             }}
           >
-            <img src={solanaLogoDataUri} width={200} height={175} alt="Solana" />
+            +
+          </div>
 
+          {customLogoDataUri ? (
             <div
               style={{
-                fontSize: '120px',
-                fontWeight: 'bold',
-                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '300px',
+                height: '300px',
               }}
             >
-              +
+              <img
+                src={customLogoDataUri}
+                style={{
+                  maxWidth: '300px',
+                  maxHeight: '300px',
+                  objectFit: 'contain',
+                }}
+                alt="Custom Logo"
+              />
             </div>
-
-            {customLogoDataUri ? (
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                maxWidth: '600px',
+              }}
+            >
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '300px',
-                  height: '300px',
+                  fontSize: '84px',
+                  fontWeight: 'bold',
+                  color: '#fff',
+                  lineHeight: 1.2,
                 }}
               >
-                <img
-                  src={customLogoDataUri}
-                  style={{
-                    maxWidth: '300px',
-                    maxHeight: '300px',
-                    objectFit: 'contain',
-                  }}
-                  alt="Custom Logo"
-                />
+                {text}
               </div>
-            ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  maxWidth: '600px',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '84px',
-                    fontWeight: 'bold',
-                    color: '#fff',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {text}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      ),
+      </div>,
       {
         width: IMAGE_WIDTH,
         height: IMAGE_HEIGHT,

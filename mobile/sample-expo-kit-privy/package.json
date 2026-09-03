@@ -116,7 +116,7 @@
     "@types/react": "~19.2.14",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~57.0.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.9.6",
     "typescript": "~6.0.3"
   },
   "private": true
