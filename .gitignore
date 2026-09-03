@@ -12,6 +12,7 @@ mobile/**/yarn.lock
 mobile/**/.next
 mobile/**/.env
 mobile/**/.env.local
+mobile/**/.kotlin/
 mobile/**/anchor/target/.rustc_info.json
 mobile/**/anchor/target/CACHEDIR.TAG
 mobile/**/anchor/target/debug

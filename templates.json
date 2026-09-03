@@ -122,6 +122,22 @@
         "usecase": "Mobile"
       },
       {
+        "description": "A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Mobile Wallet Adapter.",
+        "id": "gh:solana-mobile/templates/mobile/kotlin-compose-minimal",
+        "image": "mobile/kotlin-compose-minimal/og-image.png",
+        "keywords": [
+          "android",
+          "jetpack-compose",
+          "kotlin",
+          "mobile-wallet-adapter",
+          "solana"
+        ],
+        "name": "kotlin-compose-minimal",
+        "path": "mobile/kotlin-compose-minimal",
+        "displayName": "Kotlin Compose Minimal example",
+        "usecase": "Mobile"
+      },
+      {
         "description": "A template for building a Solana web app with React, Vite, shadcn/ui, Solana Kit, and Mobile Wallet Adapter.",
         "id": "gh:solana-mobile/templates/mobile/react-kit-shadcn",
         "image": "mobile/react-kit-shadcn/og-image.png",
