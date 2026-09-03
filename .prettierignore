@@ -5,6 +5,10 @@
 pnpm-lock.yaml
 .next
 
+# Vendored agent skills
+.agents
+skills-lock.json
+
 # Generated files
 templates.json
 TEMPLATES.md

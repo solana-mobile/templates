@@ -28,4 +28,7 @@ mobile/**/node_modules
 mobile/**/tmp
 
 # AI
-**/.claude/
+# Enumerate what stays local; the committed skills live in .agents/ and .claude/skills.
+.claude/launch.json
+.claude/settings.local.json
+mobile/**/.claude/
