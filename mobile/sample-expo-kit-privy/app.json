@@ -11,6 +11,17 @@
     "android": {
       "package": "com.anonymous.sample_expo_kit_privy"
     },
-    "plugins": ["expo-router", "expo-secure-store", "expo-web-browser"]
+    "plugins": [
+      [
+        "expo-dev-client",
+        {
+          "showMenuAtLaunch": false,
+          "skipOnboarding": true
+        }
+      ],
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser"
+    ]
   }
 }

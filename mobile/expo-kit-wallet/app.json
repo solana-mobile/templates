@@ -21,6 +21,13 @@
     "name": "Expo Kit Wallet",
     "orientation": "portrait",
     "plugins": [
+      [
+        "expo-dev-client",
+        {
+          "showMenuAtLaunch": false,
+          "skipOnboarding": true
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",

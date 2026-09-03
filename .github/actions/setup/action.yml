@@ -103,7 +103,11 @@ runs:
         git config --global user.name "CI Bot"
       shell: bash
 
+    # The npm leg gets a current npm rather than the one bundled with Node, which is 10.9.8 for
+    # Node 22. That npm crashes inside its own peer resolver with "Cannot read properties of null
+    # (reading 'edgesOut')" on dependency graphs the templates legitimately produce, and reports it
+    # as nothing more than a failed `npm install` because create-solana-dapp installs with --silent.
+    # Fixed in npm 11.19.1 and later.
     - name: Install package manager
-      if: ${{  inputs.package-manager != 'npm' }}
-      run: npm install -g ${{ inputs.package-manager }}
+      run: npm install -g ${{ inputs.package-manager == 'npm' && 'npm@12' || inputs.package-manager }}
       shell: bash
