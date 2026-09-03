@@ -46,6 +46,7 @@
           "resizeMode": "contain"
         }
       ],
+      "expo-status-bar",
       "expo-web-browser"
     ],
     "experiments": {

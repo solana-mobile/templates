@@ -23,7 +23,15 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-dev-client",
+        {
+          "showMenuAtLaunch": false,
+          "skipOnboarding": true
+        }
+      ],
       "expo-font",
+      "expo-image",
       "expo-router",
       [
         "expo-splash-screen",
@@ -38,9 +46,11 @@
           "resizeMode": "contain"
         }
       ],
+      "expo-status-bar",
       "expo-web-browser"
     ],
     "experiments": {
+      "reactCompiler": true,
       "typedRoutes": true
     },
     "extra": {

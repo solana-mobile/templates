@@ -46,6 +46,7 @@
           }
         }
       ],
+      "expo-status-bar",
       "expo-web-browser"
     ],
     "experiments": {
