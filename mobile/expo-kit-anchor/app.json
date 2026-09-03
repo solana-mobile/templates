@@ -13,14 +13,6 @@
     },
     "plugins": [
       [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          }
-        }
-      ],
-      [
         "expo-dev-client",
         {
           "showMenuAtLaunch": false,

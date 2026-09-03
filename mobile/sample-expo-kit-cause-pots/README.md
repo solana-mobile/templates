@@ -120,7 +120,7 @@ For a faster loop you can run everything against a local validator, forwarded to
 3. Switch the network to Localnet with the selector in the app
 4. Connect your wallet and tap Request Airdrop to fund it
 
-Two things to know: the app enables `usesCleartextTraffic` through `expo-build-properties` so release builds can reach the cleartext `http://localhost` endpoint — this allows cleartext HTTP to any host, so remove it from `app.json` if you don't need localnet in release builds. And the regular Seeker wallet only signs for public clusters, so signing on localnet requires a localnet-capable wallet such as [fakewallet](https://github.com/solana-mobile/mobile-wallet-adapter/tree/main/android/fakewallet).
+Two things to know: localnet needs a debug build — `npm run android` makes one, and Android debug builds allow the cleartext `http://localhost` endpoint while release builds only talk HTTPS. And the regular Seeker wallet only signs for public clusters, so signing on localnet requires a localnet-capable wallet such as [fakewallet](https://github.com/solana-mobile/mobile-wallet-adapter/tree/main/android/fakewallet).
 
 ## Learn more
 
