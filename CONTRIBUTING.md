@@ -92,6 +92,18 @@ pnpm generate
 CI regenerates them too and fails the pull request when the result differs from what you
 committed, with a diff of what is missing.
 
+### Agent Skills
+
+The [Expo agent skills](https://github.com/expo/skills) are vendored into the repository so every contributor gets the same guidance regardless of which agent they use. The files live in `.agents/skills`, the location read by Codex, Cursor, Gemini CLI, Cline and others; `.claude/skills` symlinks to them for Claude Code. `skills-lock.json` pins each skill by content hash.
+
+Refresh them to the latest upstream versions with:
+
+```shell
+pnpm dlx skills@latest update -p -y
+```
+
+Add a skill from the same repository with `pnpm dlx skills@latest add expo/skills --skill <name> -y`. Both commands update `skills-lock.json`; commit the result along with the changed skill files.
+
 ### Code Quality
 
 Ensure your code meets project standards:
