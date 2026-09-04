@@ -175,6 +175,29 @@
         "usecase": "Mobile"
       },
       {
+        "description": "A sample Bun-only full-stack Solana app with Better Auth, Expo, Hono, Solana Kit, TanStack Start, and Turborepo.",
+        "id": "gh:solana-mobile/templates/mobile/sample-expo-kit-fullstack",
+        "image": "mobile/sample-expo-kit-fullstack/og-image.png",
+        "keywords": [
+          "better-auth",
+          "bun",
+          "expo",
+          "hono",
+          "mobile-wallet-adapter",
+          "monorepo",
+          "react-native",
+          "sample",
+          "solana-kit",
+          "tanstack-start",
+          "turborepo",
+          "wallet-ui"
+        ],
+        "name": "sample-expo-kit-fullstack",
+        "path": "mobile/sample-expo-kit-fullstack",
+        "displayName": "Expo Kit Fullstack sample",
+        "usecase": "Mobile"
+      },
+      {
         "description": "A sample Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.",
         "id": "gh:solana-mobile/templates/mobile/sample-expo-kit-privy",
         "image": "mobile/sample-expo-kit-privy/og-image.png",

@@ -1,0 +1,144 @@
+{
+  "dependencies": {
+    "@repo/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "description": "A sample Bun-only full-stack Solana app with Better Auth, Expo, Hono, Solana Kit, TanStack Start, and Turborepo.",
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@repo/config": "workspace:*",
+    "@types/bun": "catalog:",
+    "lefthook": "^2.0.13",
+    "turbo": "^2.9.4",
+    "typescript": "catalog:"
+  },
+  "displayName": "Expo Kit Fullstack sample",
+  "keywords": [
+    "better-auth",
+    "bun",
+    "expo",
+    "hono",
+    "mobile-wallet-adapter",
+    "monorepo",
+    "react-native",
+    "sample",
+    "solana-kit",
+    "tanstack-start",
+    "turborepo",
+    "wallet-ui"
+  ],
+  "name": "sample-expo-kit-fullstack",
+  "packageManager": "bun@1.4.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "ci": "bun run build && bun run check-types && bun run lint && bun run test",
+    "clean": "find . -type d \\( -name '.expo' -o -name '.turbo' -o -path './apps/mobile/android' -o -path './apps/mobile/ios' -o -name 'build' -o -name 'dist' -o -name 'node_modules' \\) -prune -exec rm -rf '{}' +",
+    "db:generate": "bun run --cwd packages/db db:generate",
+    "db:local": "bun run --cwd packages/db db:local",
+    "db:migrate": "bun run --cwd packages/db db:migrate",
+    "db:push": "bun run --cwd packages/db db:push",
+    "db:studio": "bun run --cwd packages/db db:studio",
+    "dev:api": "bun run --cwd apps/api dev",
+    "dev:mobile": "bun run --cwd apps/mobile android",
+    "dev:web": "bun run --cwd apps/web dev",
+    "docker:build:api": "docker build -f Dockerfile.api -t ghcr.io/your-org/sample-expo-kit-fullstack-api .",
+    "docker:build:web": "docker build -f Dockerfile.web -t ghcr.io/your-org/sample-expo-kit-fullstack-web .",
+    "docker:push:api": "docker push ghcr.io/your-org/sample-expo-kit-fullstack-api",
+    "docker:push:web": "docker push ghcr.io/your-org/sample-expo-kit-fullstack-web",
+    "docker:run:api": "docker run --rm --name sample-expo-kit-fullstack-api --init --stop-signal=SIGINT -it --env-file apps/api/.env -p 3000:3000 ghcr.io/your-org/sample-expo-kit-fullstack-api",
+    "docker:run:web": "docker run --rm --name sample-expo-kit-fullstack-web --init --stop-signal=SIGINT -it -p 3001:3001 ghcr.io/your-org/sample-expo-kit-fullstack-web",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "rename": "bun scripts/rename.ts",
+    "setup": "bun run scripts/copy-env.ts && bun run lint:fix",
+    "start:web": "bun run --cwd apps/web start",
+    "test": "turbo test"
+  },
+  "type": "module",
+  "usecase": "Mobile",
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*",
+      "scripts",
+      "turbo/generators"
+    ],
+    "catalog": {
+      "@ai-sdk/react": "^3.0.3",
+      "@better-auth/expo": "^1.5.6",
+      "@libsql/client": "0.15.15",
+      "@orpc/client": "^1.12.2",
+      "@orpc/openapi": "^1.12.2",
+      "@orpc/server": "^1.12.2",
+      "@orpc/tanstack-query": "^1.12.2",
+      "@orpc/zod": "^1.12.2",
+      "@solana-program/memo": "^0.13.1",
+      "@solana/kit": "^8.2.0",
+      "@solana/kit-plugin-rpc": "^0.19.0",
+      "@solana/kit-plugin-wallet": "^0.19.0",
+      "@solana/react": "^8.2.0",
+      "@solana/wallet-standard-chains": "^1.1.2",
+      "@types/bun": "^1.4.0",
+      "@types/react": "^19.2.10",
+      "@types/react-dom": "^19.2.3",
+      "@wallet-standard/react": "^1.0.3",
+      "@wallet-standard/ui": "^1.0.3",
+      "ai": "^6.0.3",
+      "better-auth": "^1.5.6",
+      "better-auth-solana": "1.0.0",
+      "dotenv": "^17.2.2",
+      "drizzle-orm": "^0.45.1",
+      "hono": "^4.8.2",
+      "libsql": "0.5.22",
+      "react": "^19.2.8",
+      "react-dom": "^19.2.8",
+      "typescript": "^5.9.3",
+      "zod": "^4.1.13"
+    }
+  },
+  "create-solana-dapp": {
+    "instructions": [
+      "Set up the local database:",
+      "+bun run db:local",
+      "Apply the schema once:",
+      "+bun run db:push",
+      "~",
+      "Your database is ready. Start the API:",
+      "+bun run dev:api",
+      "Start the web app:",
+      "+bun run dev:web",
+      "Verify your Android development environment:",
+      "+bunx solana-mobile@latest doctor",
+      "Start the Android app:",
+      "+bun run dev:mobile"
+    ],
+    "packageManager": "bun",
+    "rename": {
+      "Sample Expo Kit Fullstack": {
+        "in": [
+          "."
+        ],
+        "to": "{{name}}"
+      }
+    },
+    "skills": [
+      "https://github.com/better-auth/skills/tree/main/better-auth/best-practices",
+      "https://github.com/heroui-inc/heroui/tree/v3/skills/heroui-native",
+      "https://github.com/honojs/skills/tree/main/skills/hono",
+      "https://github.com/solana-foundation/solana-dev-skill",
+      "https://github.com/solana-mobile/solana-mobile-dev-skill",
+      "https://github.com/vercel-labs/agent-skills/tree/main/skills/composition-patterns",
+      "https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices",
+      "https://github.com/vercel-labs/agent-skills/tree/main/skills/react-native-skills",
+      "https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines",
+      "https://github.com/vercel/ai/tree/main/skills/use-ai-sdk",
+      "https://github.com/vercel/turborepo/tree/main/skills/turborepo"
+    ],
+    "versions": {
+      "adb": "33.0.0"
+    }
+  }
+}
