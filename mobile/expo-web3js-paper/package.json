@@ -63,7 +63,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-clipboard/clipboard": "^1.16.3",
     "@solana/spl-token": "^0.4.15",
-    "@solana/web3.js": "^1.98.4",
+    "@solana/web3.js": "^1.99.0",
     "@tanstack/react-query": "^5.102.8",
     "@wallet-ui/react-native-web3js": "^4.3.0",
     "deepmerge": "^4.3.1",
