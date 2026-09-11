@@ -42,8 +42,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@solana-mobile/seeker-connect-ui": "0.0.0-canary-20260818002408",
-    "@solana-mobile/seeker-connect-wallet-standard": "0.0.0-canary-20260818002408",
+    "@solana-mobile/seeker-connect-ui": "^0.1.0",
+    "@solana-mobile/seeker-connect-wallet-standard": "^0.1.0",
     "@solana-mobile/wallet-standard-mobile": "0.0.0-canary-20260828231154",
     "@solana-program/memo": "^0.13.1",
     "@solana/kit": "^8.2.0",
