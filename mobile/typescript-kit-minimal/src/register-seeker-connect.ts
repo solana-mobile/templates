@@ -36,6 +36,6 @@ export function registerSeekerConnectWallet(): void {
       name: 'TypeScript Kit Minimal',
       uri: window.location.origin,
     },
-    relayDomain: 'relay.solanamobile.com',
+    relayDomain: 'relay.primal.net',
   })
 }
