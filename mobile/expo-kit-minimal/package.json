@@ -52,7 +52,7 @@
     "android": "expo run:android",
     "android:build": "expo prebuild -p android",
     "build": "tsc --noEmit && npm run android:build",
-    "ci": "tsc --noEmit && npm run lint:check && npm run format:check && npm run test && npm run android:build",
+    "ci": "tsc --noEmit && npm run lint:check && npm run format:check && npm run test && npm run android:build && npm run web:build",
     "dev": "expo start --clear --dev-client --reset-cache",
     "doctor": "npx -y expo-doctor@latest",
     "e2e": "./e2e/fakewallet.sh",
@@ -66,7 +66,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "web:build": "expo export -p web"
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.5",
@@ -77,6 +78,7 @@
     "@solana/kit": "^7.0.0",
     "@tanstack/react-query": "^5.90.7",
     "@wallet-ui/core": "^4.2.1",
+    "@wallet-ui/react": "^4.2.1",
     "@wallet-ui/react-native-kit": "^4.2.1",
     "expo": "~57.0.6",
     "expo-constants": "~57.0.5",

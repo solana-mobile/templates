@@ -128,7 +128,8 @@ describe('reset-project', () => {
         'constants/app-config.ts',
         'constants/app-styles.ts',
         'index.js',
-        'polyfill.js',
+        'polyfill.native.js',
+        'polyfill.web.js',
         'vitest.config.mts',
       ]
       for (const target of kept) {
@@ -358,7 +359,7 @@ describe('reset-project', () => {
 
       // The network provider lives in `features`, so claiming it survives would be a lie.
       expect(stdout).not.toMatch(/network provider/i)
-      expect(stdout).toContain('Kept: the crypto polyfill')
+      expect(stdout).toContain('Kept: the crypto polyfills')
     })
 
     it('deletes nothing when there is no answer at all', async () => {

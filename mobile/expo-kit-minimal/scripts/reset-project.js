@@ -3,7 +3,7 @@
 /**
  * Reset the project to a minimal starting point.
  *
- * Keeps everything that wires up the SDK — the crypto polyfill, the providers and the app config —
+ * Keeps everything that wires up the SDK — the crypto polyfills, the providers and the app config —
  * and deletes the demo built on top of it: the account screens, the network switcher and its read
  * queries, the formatting helpers and the tests that cover them.
  *
@@ -323,7 +323,7 @@ async function confirm(targets) {
   }
 
   console.log(
-    '\nKept: the crypto polyfill, the app styles, the layout and the Expo config. The app config keeps' +
+    '\nKept: the crypto polyfills, the app styles, the layout and the Expo config. The app config keeps' +
       '\nits identity and its first network, which becomes the single cluster the app talks to.\n',
   )
 
