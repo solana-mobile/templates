@@ -3,11 +3,11 @@
 /**
  * Reset the project to a minimal starting point.
  *
- * Keeps everything that wires up the SDK — the crypto polyfills, the providers and the app config —
- * and deletes the demo built on top of it: the account screens, the network switcher and its read
- * queries, the formatting helpers and the tests that cover them.
+ * Keeps everything that wires up the SDK — the crypto polyfills, the wallet seam, the providers and
+ * the app config — and deletes the demo built on top of it: the account screens, the network
+ * switcher and its read queries, the formatting helpers and the tests that cover them.
  *
- * The switcher goes because `MobileWalletProvider` takes a single cluster, so the reset app holds one
+ * The switcher goes because `WalletProvider` takes a single cluster, so the reset app holds one
  * in `constants/app-config.ts` instead of a list to pick from.
  *
  * Usage:
@@ -31,10 +31,13 @@ const root = path.join(__dirname, '..')
 /**
  * Demo code, relative to the project root. Directories are deleted whole.
  *
- * `features` goes entirely: the account screens are a demo, and so is the network switcher, because
- * `MobileWalletProvider` takes a single cluster and the app config holds one after the reset.
+ * `features` no longer goes entirely — only its demo halves do. `features/account` is the demo
+ * screens, and `features/network` is the demo switcher, which goes because `WalletProvider` takes
+ * a single cluster and the app config holds one after the reset. `features/wallet` survives: it
+ * is platform wiring, not demo code — the same seam the providers below plug into — and the reset
+ * app's web build depends on it, so deleting it would strip web support along with the demo.
  *
- * `components` goes the same way and is rebuilt from `writtenPaths` below, rather than naming the
+ * `components` goes whole and is rebuilt from `writtenPaths` below, rather than naming the
  * demo's own components here. Everything in it exists to serve the demo screens except the providers,
  * which the reset writes anyway — so deleting the directory keeps this list correct as the demo grows
  * instead of leaving a new component behind importing something that is gone.
@@ -44,7 +47,7 @@ const root = path.join(__dirname, '..')
  *
  * `scripts` holds this file, so it goes last.
  */
-const deletedPaths = ['components', 'e2e', 'features', 'test', 'utils', 'scripts']
+const deletedPaths = ['components', 'e2e', 'features/account', 'features/network', 'test', 'utils', 'scripts']
 
 /**
  * Files the reset writes, overwriting the demo versions where they exist.
@@ -60,7 +63,12 @@ const writtenPaths = [
   'README.md',
 ]
 
-/** Dependencies only the demo features imported. */
+/**
+ * Dependencies only the demo features imported.
+ *
+ * The wallet dependencies — `@wallet-ui/core`, `@wallet-ui/react`, `@solana/react` — are absent on
+ * purpose: the surviving seam uses them, and the reset app's own `ci` still runs `web:build`.
+ */
 const demoDependencies = ['@solana-program/memo']
 
 /** Lockfile to package manager, for when the script is run directly instead of through a script. */
@@ -73,7 +81,8 @@ const lockfiles = {
 }
 
 function appConfigContent({ cluster, creator, identity }) {
-  return `import { AppIdentity, ${creator}, SolanaCluster } from '@wallet-ui/react-native-kit'
+  return `import { ${creator}, SolanaCluster } from '@wallet-ui/core'
+import type { AppIdentity } from '@/features/wallet/wallet-types'
 
 export class AppConfig {
   static cluster: SolanaCluster = ${cluster}
@@ -84,7 +93,7 @@ export class AppConfig {
 
 const appProvidersContent = `import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PropsWithChildren } from 'react'
-import { MobileWalletProvider } from '@wallet-ui/react-native-kit'
+import { WalletProvider } from '@/features/wallet/wallet-provider'
 import { AppConfig } from '@/constants/app-config'
 
 const queryClient = new QueryClient()
@@ -92,9 +101,9 @@ const queryClient = new QueryClient()
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
-      <MobileWalletProvider cluster={AppConfig.cluster} identity={AppConfig.identity}>
+      <WalletProvider cluster={AppConfig.cluster} identity={AppConfig.identity}>
         {children}
-      </MobileWalletProvider>
+      </WalletProvider>
     </QueryClientProvider>
   )
 }
@@ -124,8 +133,8 @@ import { AppConfig } from '@/constants/app-config'
 import { appStyles } from '@/constants/app-styles'
 
 export default function HomeScreen() {
-  // Anywhere below \`AppProviders\`, \`useMobileWallet()\` from '@wallet-ui/react-native-kit' gives you
-  // the connected account, the RPC client and the sign and send methods.
+  // Anywhere below \`AppProviders\`, \`useWallet()\` from '@/features/wallet/use-wallet' gives you
+  // the connected account, the RPC client and the sign and send methods — on Android and on web.
   return (
     <SafeAreaView style={appStyles.screen}>
       <View style={appStyles.stack}>
@@ -140,51 +149,56 @@ export default function HomeScreen() {
 function readmeContent({ name, pm }) {
   return `# ${name}
 
-An [Expo](https://expo.dev) app wired up to the Solana Mobile Wallet Adapter with
-[\`@wallet-ui/react-native-kit\`](https://www.npmjs.com/package/@wallet-ui/react-native-kit).
-
-Mobile Wallet Adapter is Android only, so connecting a wallet needs an Android device or emulator
-with a wallet app installed.
+An [Expo](https://expo.dev) app wired up for Solana on Android and on the web. All wallet access
+goes through the seam in \`features/wallet/\`: Mobile Wallet Adapter on Android, wallet-standard
+browser wallets on web.
 
 ## Getting started
 
 \`\`\`bash
 ${pm} install
-${pm} run android
+${pm} run android  # needs an Android device or emulator with a wallet app installed
+${pm} run web      # needs a browser with a Solana wallet extension
 \`\`\`
 
 ## What is wired up
 
-- \`index.js\` installs the crypto polyfill, then hands off to \`expo-router\`.
+- \`index.js\` installs the crypto polyfill on native, then hands off to \`expo-router\`.
 - \`constants/app-config.ts\` holds the cluster the app talks to and the identity wallets show on
   approval. Change the cluster there to point somewhere else.
-- \`components/app-providers.tsx\` sets up React Query and \`MobileWalletProvider\`.
+- \`components/app-providers.tsx\` sets up React Query and the seam's \`WalletProvider\`.
+- \`features/wallet/\` is the platform seam: \`use-wallet\` and \`wallet-provider\` each have a
+  \`.native\` variant backed by Mobile Wallet Adapter and a \`.web\` variant backed by
+  wallet-standard wallets, and app code only ever imports the shared facade.
 - \`app/index.tsx\` is the home screen — empty, ready for your own code.
 
 ## Using the wallet
 
-\`useMobileWallet()\` works anywhere below \`AppProviders\`:
+\`useWallet()\` works anywhere below \`AppProviders\`, on both platforms:
 
 \`\`\`tsx
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useWallet } from '@/features/wallet/use-wallet'
 
-const { account, chain, client, connect, disconnect, sendTransactions, signIn, signMessages } = useMobileWallet()
+const { account, chain, client, connect, disconnect, sendTransactions, signIn, signMessages } = useWallet()
 \`\`\`
 
-\`account\` is \`null\` until a wallet is connected, and \`client.rpc\` is a
+\`account\` is \`undefined\` until a wallet is connected, and \`client.rpc\` is a
 [\`@solana/kit\`](https://www.npmjs.com/package/@solana/kit) RPC client pointed at the cluster from
 \`app-config.ts\`.
 
 Every call that touches the wallet — \`connect\`, \`signIn\`, \`signMessages\`, \`sendTransactions\` —
-launches the wallet app for the user to approve, and rejects if they decline.
+asks the user to approve: it launches the wallet app on Android and prompts the browser extension
+on web, and rejects if they decline.
 
 ## Scripts
 
 \`\`\`bash
-${pm} run dev      # start the dev server
-${pm} run android  # build and run on a device or emulator
-${pm} run test     # run the test suite
-${pm} run ci       # type check, lint, format check, test, prebuild
+${pm} run dev        # start the dev server
+${pm} run android    # build and run on a device or emulator
+${pm} run web        # start the dev server for the browser
+${pm} run web:build  # export the static web build to dist/
+${pm} run test       # run the test suite
+${pm} run ci         # type check, lint, format check, test, prebuild, web export
 \`\`\`
 `
 }
@@ -235,8 +249,8 @@ async function main() {
 
   1. Run \`${pm} install\` so the dependencies match the trimmed package.json.
   2. Edit app/index.tsx to build your first screen.
-  3. Reach for the wallet with \`useMobileWallet()\`, and change the cluster in
-     constants/app-config.ts.
+  3. Reach for the wallet with \`useWallet()\` from '@/features/wallet/use-wallet',
+     and change the cluster in constants/app-config.ts.
 `)
 }
 
@@ -323,8 +337,9 @@ async function confirm(targets) {
   }
 
   console.log(
-    '\nKept: the crypto polyfills, the app styles, the layout and the Expo config. The app config keeps' +
-      '\nits identity and its first network, which becomes the single cluster the app talks to.\n',
+    '\nKept: the crypto polyfills, the app styles, the layout, the Expo config and the wallet seam' +
+      '\nin features/wallet. The app config keeps its identity and its first network, which becomes' +
+      '\nthe single cluster the app talks to.\n',
   )
 
   if (process.argv.slice(2).includes('--yes')) {

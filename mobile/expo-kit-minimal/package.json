@@ -32,8 +32,10 @@
           "+npx -y solana-mobile@latest doctor",
           "Build the Android app locally:",
           "+{pm} run android",
+          "Or run the app on the web:",
+          "+{pm} run web",
           "Edit app/index.tsx to build your first screen.",
-          "Reach for the wallet with useMobileWallet() from @wallet-ui/react-native-kit."
+          "Reach for the wallet with useWallet() from @/features/wallet/use-wallet — it works on Android and on web."
         ],
         "run": "reset-project -- --yes"
       }

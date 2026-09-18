@@ -7,9 +7,10 @@ import { useWallet } from '@/features/wallet/use-wallet'
 import { WalletProvider } from '@/features/wallet/wallet-provider'
 import type { UseWalletReturn } from '@/features/wallet/wallet-types'
 
-// This file must stay self-contained — no `@/test/…` imports. `reset-project`
-// deletes `test/` but keeps `features/wallet/`, so a helper import from there
-// would dangle in the reset app's suite.
+// This file must stay self-contained — it must not import from the `test/`
+// helpers directory. `reset-project` deletes `test/` but keeps
+// `features/wallet/`, so a helper import from there would dangle in the reset
+// app's suite.
 
 const kit = vi.hoisted(() => ({
   mobileWallet: undefined as unknown,

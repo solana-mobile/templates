@@ -113,7 +113,8 @@ describe('reset-project', () => {
         'components/app-action-button.tsx',
         'components/app-status.tsx',
         'e2e',
-        'features',
+        'features/account',
+        'features/network',
         'scripts',
         'test',
         'utils',
@@ -122,11 +123,21 @@ describe('reset-project', () => {
         expect(await exists(path.join(project, target)), `${target} should be gone`).toBe(false)
       }
 
+      // The wallet seam is platform wiring, not demo code — it survives the reset the same way the
+      // providers and polyfills do, and the reset app's web build depends on it.
       const kept = [
         'app/_layout.tsx',
         'components/app-providers.tsx',
         'constants/app-config.ts',
         'constants/app-styles.ts',
+        'features/wallet/wallet-provider.tsx',
+        'features/wallet/wallet-provider.native.tsx',
+        'features/wallet/wallet-provider.web.tsx',
+        'features/wallet/use-wallet.ts',
+        'features/wallet/use-wallet.native.ts',
+        'features/wallet/use-wallet.web.ts',
+        'features/wallet/wallet-types.ts',
+        'features/wallet/create-client.ts',
         'index.js',
         'polyfill.native.js',
         'polyfill.web.js',
@@ -147,17 +158,29 @@ describe('reset-project', () => {
       expect(appConfig).not.toContain('networks')
       expect(appConfig).not.toContain('createSolanaTestnet')
 
+      // The emitted providers go through the wallet seam — the same seam the demo used — rather
+      // than importing the kit directly, so the reset app keeps working on web and Android.
       const providers = await fs.readFile(path.join(project, 'components/app-providers.tsx'), 'utf8')
+      expect(providers).toContain("import { WalletProvider } from '@/features/wallet/wallet-provider'")
       expect(providers).toContain('cluster={AppConfig.cluster}')
       expect(providers).not.toContain('NetworkProvider')
+      expect(providers).not.toContain('MobileWalletProvider')
+      expect(providers).not.toContain('@wallet-ui/react-native-kit')
     })
 
+    /**
+     * The cluster and identity are recovered by regexing the literal text of `app-config.ts`, so
+     * this fixture is written in the seam shape the reset itself emits — and it is the only test
+     * covering those regexes. If they stopped matching, the reset would fall back to a devnet
+     * config and this test would be the thing that notices.
+     */
     it('carries over a cluster and identity the project had already changed', async () => {
       const project = await copyProject()
       await fs.writeFile(
         path.join(project, 'constants/app-config.ts'),
         [
-          "import { AppIdentity, createSolanaMainnet, SolanaCluster } from '@wallet-ui/react-native-kit'",
+          "import { createSolanaMainnet, SolanaCluster } from '@wallet-ui/core'",
+          "import type { AppIdentity } from '@/features/wallet/wallet-types'",
           '',
           'export class AppConfig {',
           "  static identity: AppIdentity = { name: 'my-app', uri: 'https://example.com' }",
@@ -174,7 +197,8 @@ describe('reset-project', () => {
         "static cluster: SolanaCluster = createSolanaMainnet({ url: 'https://example.com/rpc' })",
       )
       expect(appConfig).toContain("static identity: AppIdentity = { name: 'my-app', uri: 'https://example.com' }")
-      expect(appConfig).toContain('import { AppIdentity, createSolanaMainnet, SolanaCluster } from')
+      expect(appConfig).toContain("import { createSolanaMainnet, SolanaCluster } from '@wallet-ui/core'")
+      expect(appConfig).toContain("import type { AppIdentity } from '@/features/wallet/wallet-types'")
     })
 
     it('leaves a test suite that still covers the wiring', async () => {
@@ -210,6 +234,15 @@ describe('reset-project', () => {
       expect(after.dependencies['@solana-program/memo']).toBeUndefined()
       expect(after.name).toBe(before.name)
       expect(after.dependencies['@wallet-ui/react-native-kit']).toBe(before.dependencies['@wallet-ui/react-native-kit'])
+      // The web dependencies are not demo dependencies: the reset app's own `ci` still runs
+      // `web:build`, so pruning them would leave the export it runs unbuildable.
+      for (const dependency of ['@wallet-ui/core', '@wallet-ui/react', '@solana/react']) {
+        expect(after.dependencies[dependency], `${dependency} should survive the prune`).toBe(
+          before.dependencies[dependency],
+        )
+      }
+      // Only the two script entries whose files are gone get dropped — `build`, `ci`, `web` and
+      // `web:build` all survive untouched.
       const dropped = ['e2e', 'reset-project']
       expect(Object.keys(after.scripts)).toEqual(Object.keys(before.scripts).filter((key) => !dropped.includes(key)))
     })
@@ -233,12 +266,17 @@ describe('reset-project', () => {
       await runTool(project, 'tsc', ['--noEmit'])
     }, 180_000)
 
+    /**
+     * The specifiers name what the reset actually deletes — `@/features/` itself cannot be on the
+     * list, because `features/wallet/` survives and the providers and app config the reset writes
+     * legitimately import from it.
+     */
     it('leaves no import pointing at a file it deleted', async () => {
       const project = await copyProject()
 
       await reset(project)
 
-      const deleted = ['@/features/', '@/test/', '@/utils/', 'useNetwork']
+      const deleted = ['@/features/account/', '@/features/network/', '@/test/', '@/utils/', 'useNetwork']
       for (const file of await sourceFiles(project)) {
         const source = await fs.readFile(file, 'utf8')
 
@@ -304,7 +342,9 @@ describe('reset-project', () => {
       expect(await exists(path.join(elsewhere, 'README.md'))).toBe(true)
       expect(await exists(path.join(elsewhere, 'scripts/build.sh'))).toBe(true)
       expect(JSON.parse(await fs.readFile(path.join(elsewhere, 'package.json'), 'utf8')).name).toBe('elsewhere')
-      expect(await exists(path.join(project, 'features'))).toBe(false)
+      expect(await exists(path.join(project, 'features/account'))).toBe(false)
+      expect(await exists(path.join(project, 'features/network'))).toBe(false)
+      expect(await exists(path.join(project, 'features/wallet'))).toBe(true)
     })
   })
 
@@ -345,11 +385,14 @@ describe('reset-project', () => {
 
       const { stdout } = await reset(project, { args: [], stdin: 'n\n' })
 
-      for (const target of ['features', 'test', 'utils', 'scripts']) {
+      // `features` is no longer deleted whole — the prompt names the demo feature directories
+      // individually, and the wallet seam that shares their parent belongs under `Kept:`.
+      for (const target of ['features/account', 'features/network', 'test', 'utils', 'scripts']) {
         expect(stdout, `${target} should be listed as deleted`).toMatch(
           new RegExp(`Deleted:[\\s\\S]*^ {2}${target}$`, 'm'),
         )
       }
+      expect(stdout).not.toMatch(/^ {2}features$/m)
 
       for (const target of ['constants/app-config.ts', 'components/app-providers.tsx', 'app/index.tsx', 'README.md']) {
         expect(stdout, `${target} should be listed as written`).toMatch(
@@ -357,9 +400,11 @@ describe('reset-project', () => {
         )
       }
 
-      // The network provider lives in `features`, so claiming it survives would be a lie.
+      // The network provider is deleted with `features/network`, so claiming it survives would be
+      // a lie; the wallet seam does survive and the prompt should say so.
       expect(stdout).not.toMatch(/network provider/i)
       expect(stdout).toContain('Kept: the crypto polyfills')
+      expect(stdout).toMatch(/Kept:[\s\S]*features\/wallet/)
     })
 
     it('deletes nothing when there is no answer at all', async () => {
@@ -376,7 +421,9 @@ describe('reset-project', () => {
 
       await reset(project, { args: [], stdin: 'y\n' })
 
-      expect(await exists(path.join(project, 'features'))).toBe(false)
+      expect(await exists(path.join(project, 'features/account'))).toBe(false)
+      expect(await exists(path.join(project, 'features/network'))).toBe(false)
+      expect(await exists(path.join(project, 'features/wallet'))).toBe(true)
     })
   })
 

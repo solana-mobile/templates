@@ -7,9 +7,10 @@ import { useWallet } from '@/features/wallet/use-wallet.web'
 import { WalletProvider } from '@/features/wallet/wallet-provider.web'
 import type { UseWalletReturn, WalletAccount } from '@/features/wallet/wallet-types'
 
-// This file must stay self-contained — no `@/test/…` imports. `reset-project`
-// deletes `test/` but keeps `features/wallet/`, so a helper import from there
-// would dangle in the reset app's suite.
+// This file must stay self-contained — it must not import from the `test/`
+// helpers directory. `reset-project` deletes `test/` but keeps
+// `features/wallet/`, so a helper import from there would dangle in the reset
+// app's suite.
 //
 // The `.web` modules are imported by their explicit filenames, which sidesteps
 // platform resolution — the suite runs with `platform: 'android'` and would
