@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native'
 import React from 'react'
 import { AccountFeatureGetBalance } from '@/features/account/account-feature-get-balance'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useWallet } from '@/features/wallet/use-wallet'
 import { appStyles } from '@/constants/app-styles'
 import { AccountFeatureSignMessage } from '@/features/account/account-feature-sign-message'
 import { AccountFeatureSignTransaction } from '@/features/account/account-feature-sign-transaction'
@@ -10,7 +10,7 @@ import { AccountFeatureDisconnect } from '@/features/account/account-feature-dis
 import { AccountFeatureConnect } from '@/features/account/account-feature-connect'
 
 export function AccountFeatureIndex() {
-  const { account } = useMobileWallet()
+  const { account } = useWallet()
 
   return (
     <View style={appStyles.stack}>

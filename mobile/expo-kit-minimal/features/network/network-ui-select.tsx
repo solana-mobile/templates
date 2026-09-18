@@ -1,6 +1,6 @@
 import { Button, View } from 'react-native'
 import React from 'react'
-import { SolanaCluster } from '@wallet-ui/react-native-kit'
+import { SolanaCluster } from '@wallet-ui/core'
 import { appStyles } from '@/constants/app-styles'
 
 export function NetworkUiSelect({

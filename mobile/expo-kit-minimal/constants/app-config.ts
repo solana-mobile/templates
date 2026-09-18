@@ -1,10 +1,5 @@
-import {
-  AppIdentity,
-  createSolanaDevnet,
-  createSolanaLocalnet,
-  createSolanaTestnet,
-  SolanaCluster,
-} from '@wallet-ui/react-native-kit'
+import { createSolanaDevnet, createSolanaLocalnet, createSolanaTestnet, SolanaCluster } from '@wallet-ui/core'
+import type { AppIdentity } from '@/features/wallet/wallet-types'
 
 export class AppConfig {
   static identity: AppIdentity = { name: 'expo-kit-minimal' }

@@ -1,8 +1,9 @@
-import { Account, useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useWallet } from '@/features/wallet/use-wallet'
+import type { WalletAccount } from '@/features/wallet/wallet-types'
 import { AppActionButton } from '@/components/app-action-button'
 
-export function AccountFeatureSignIn({ account }: { account?: Account }) {
-  const { chain, identity, signIn } = useMobileWallet()
+export function AccountFeatureSignIn({ account }: { account?: WalletAccount }) {
+  const { chain, identity, signIn } = useWallet()
 
   return (
     <AppActionButton

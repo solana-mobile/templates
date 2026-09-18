@@ -40,11 +40,10 @@ export interface MobileWalletMockOptions {
 }
 
 /**
- * Build a stand-in for `useMobileWallet()`.
+ * Build a stand-in for the wallet seam's `useWallet()` return value (`UseWalletReturn`).
  *
- * This is the seam that replaces the Mobile Wallet Adapter transport: no wallet app, no device and
- * no RPC calls are involved, so the tests stay fast and deterministic while still driving the real
- * components.
+ * This replaces the Mobile Wallet Adapter transport: no wallet app, no device and no RPC calls are
+ * involved, so the tests stay fast and deterministic while still driving the real components.
  */
 export function createMobileWalletMock({
   account,
@@ -65,7 +64,8 @@ export function createMobileWalletMock({
   }
 
   return {
-    account: account === undefined ? { address: TEST_ADDRESS, label: 'Test Wallet' } : account,
+    // `null` in the options means "disconnected"; the seam models that as `undefined`.
+    account: account === undefined ? { address: TEST_ADDRESS, label: 'Test Wallet' } : (account ?? undefined),
     chain: 'solana:devnet',
     client: {
       rpc: {

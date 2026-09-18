@@ -1,5 +1,5 @@
 import { act, fireEvent, waitFor } from '@testing-library/react-native'
-import { createSolanaDevnet, createSolanaTestnet } from '@wallet-ui/react-native-kit'
+import { createSolanaDevnet, createSolanaTestnet } from '@wallet-ui/core'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { NetworkFeatureIndex } from '@/features/network/network-feature-index'
 import { NetworkProvider } from '@/features/network/network-provider'
@@ -7,10 +7,7 @@ import { createMobileWalletMock, renderWithProviders } from '@/test/test-utils'
 
 const wallet = vi.hoisted(() => ({ current: null as ReturnType<typeof createMobileWalletMock> | null }))
 
-vi.mock('@wallet-ui/react-native-kit', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@wallet-ui/react-native-kit')>()),
-  useMobileWallet: () => wallet.current,
-}))
+vi.mock('@/features/wallet/use-wallet', () => ({ useWallet: () => wallet.current }))
 
 const devnet = createSolanaDevnet({ url: 'https://api.devnet.solana.com' })
 const testnet = createSolanaTestnet({ url: 'https://api.testnet.solana.com' })

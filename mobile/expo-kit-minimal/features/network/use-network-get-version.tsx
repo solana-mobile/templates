@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useWallet } from '@/features/wallet/use-wallet'
 
 export function useNetworkGetVersion() {
-  const { chain, client } = useMobileWallet()
+  const { chain, client } = useWallet()
   return useQuery({
     queryKey: ['getVersion', chain],
     queryFn: () =>

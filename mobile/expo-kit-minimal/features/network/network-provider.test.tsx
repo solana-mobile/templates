@@ -1,10 +1,5 @@
 import { act, render } from '@testing-library/react-native'
-import {
-  createSolanaDevnet,
-  createSolanaLocalnet,
-  createSolanaTestnet,
-  SolanaCluster,
-} from '@wallet-ui/react-native-kit'
+import { createSolanaDevnet, createSolanaLocalnet, createSolanaTestnet, SolanaCluster } from '@wallet-ui/core'
 import { describe, expect, it } from 'vitest'
 import { NetworkProvider, NetworkProviderContextValue } from '@/features/network/network-provider'
 

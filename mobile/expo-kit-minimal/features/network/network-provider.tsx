@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useMemo, useState } from 'react'
-import { SolanaCluster, SolanaClusterId } from '@wallet-ui/react-native-kit'
+import { SolanaCluster, SolanaClusterId } from '@wallet-ui/core'
 
 export interface NetworkProviderContextValue {
   chain: SolanaClusterId

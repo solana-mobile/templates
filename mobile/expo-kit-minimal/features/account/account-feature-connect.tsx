@@ -1,9 +1,9 @@
 import React from 'react'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useWallet } from '@/features/wallet/use-wallet'
 import { AppActionButton } from '@/components/app-action-button'
 
 export function AccountFeatureConnect() {
-  const { account, connect } = useMobileWallet()
+  const { account, connect } = useWallet()
 
   return (
     <AppActionButton

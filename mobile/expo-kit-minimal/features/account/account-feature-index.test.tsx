@@ -4,13 +4,11 @@ import { AccountFeatureIndex } from '@/features/account/account-feature-index'
 import { createMobileWalletMock, renderWithProviders, TEST_ADDRESS } from '@/test/test-utils'
 
 // `vi.mock` is hoisted above the imports, so the mock value lives in a mutable holder that each test
-// reassigns before rendering.
+// reassigns before rendering. The mock sits at the wallet seam — the module the feature code
+// actually imports — not at the kit underneath it.
 const wallet = vi.hoisted(() => ({ current: null as ReturnType<typeof createMobileWalletMock> | null }))
 
-vi.mock('@wallet-ui/react-native-kit', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@wallet-ui/react-native-kit')>()),
-  useMobileWallet: () => wallet.current,
-}))
+vi.mock('@/features/wallet/use-wallet', () => ({ useWallet: () => wallet.current }))
 
 describe('AccountFeatureIndex', () => {
   beforeEach(() => {
