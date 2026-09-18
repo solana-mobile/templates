@@ -23,14 +23,16 @@
         "usecase": "Mobile"
       },
       {
-        "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
+        "description": "A minimal template for building a Solana app on Android and the web with Expo, React Native, and Solana Kit.",
         "id": "gh:solana-mobile/templates/mobile/expo-kit-minimal",
         "image": "mobile/expo-kit-minimal/og-image.png",
         "keywords": [
           "expo",
           "mobile-wallet-adapter",
           "react-native",
-          "solana-kit"
+          "solana-kit",
+          "wallet-standard",
+          "web"
         ],
         "name": "expo-kit-minimal",
         "path": "mobile/expo-kit-minimal",

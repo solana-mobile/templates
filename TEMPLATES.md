@@ -14,9 +14,9 @@ Solana Mobile Templates
 
 `gh:solana-mobile/templates/mobile/expo-kit-minimal`
 
-> A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.
+> A minimal template for building a Solana app on Android and the web with Expo, React Native, and Solana Kit.
 
-`expo` `mobile-wallet-adapter` `react-native` `solana-kit`
+`expo` `mobile-wallet-adapter` `react-native` `solana-kit` `wallet-standard` `web`
 
 ### [expo-kit-uniwind](mobile/expo-kit-uniwind)
 

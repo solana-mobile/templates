@@ -1,13 +1,15 @@
 {
   "name": "expo-kit-minimal",
   "displayName": "Expo Kit Minimal example",
-  "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
+  "description": "A minimal template for building a Solana app on Android and the web with Expo, React Native, and Solana Kit.",
   "usecase": "Mobile",
   "keywords": [
     "expo",
     "mobile-wallet-adapter",
     "react-native",
-    "solana-kit"
+    "solana-kit",
+    "wallet-standard",
+    "web"
   ],
   "create-solana-dapp": {
     "options": {
