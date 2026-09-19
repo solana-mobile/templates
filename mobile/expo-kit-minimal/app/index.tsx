@@ -15,9 +15,11 @@ export default function HomeScreen() {
           <Text>
             Name <Text style={{ fontWeight: 'bold' }}>{AppConfig.identity.name}</Text>
           </Text>
-          <Text>
-            URL <Text style={{ fontWeight: 'bold' }}>{AppConfig.identity.uri}</Text>
-          </Text>
+          {AppConfig.identity.uri ? (
+            <Text>
+              URL <Text style={{ fontWeight: 'bold' }}>{AppConfig.identity.uri}</Text>
+            </Text>
+          ) : null}
         </View>
         <AccountFeatureIndex />
         <NetworkFeatureIndex />

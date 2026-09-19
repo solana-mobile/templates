@@ -1,6 +1,7 @@
 import { useWallet } from '@/features/wallet/use-wallet'
 import type { WalletAccount } from '@/features/wallet/wallet-types'
 import { AppActionButton } from '@/components/app-action-button'
+import { ellipsify } from '@/utils/ellipsify'
 
 export function AccountFeatureSignIn({ account }: { account?: WalletAccount }) {
   const { chain, identity, signIn } = useWallet()
@@ -19,7 +20,7 @@ export function AccountFeatureSignIn({ account }: { account?: WalletAccount }) {
           title: 'Sign In',
         } as const
       }}
-      title={`Sign In ${account ? `with ${account.label}` : 'and connect'}`}
+      title={`Sign In ${account ? `with ${account.label ?? ellipsify(account.address)}` : 'and connect'}`}
     />
   )
 }

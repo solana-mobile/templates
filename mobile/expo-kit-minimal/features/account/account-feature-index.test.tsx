@@ -30,6 +30,7 @@ describe('AccountFeatureIndex', () => {
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
       expect(screen.getByText('Connected to Gsbw..ZoP1')).toBeTruthy()
+      expect(screen.getByRole('button', { name: /sign in with gsbw\.\.zop1/i })).toBeTruthy()
     })
 
     it('renders the balance returned by the RPC client', async () => {
