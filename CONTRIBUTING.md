@@ -1,28 +1,57 @@
-# Contributing to create-solana-dapp
+# Contributing to Solana Templates
 
-We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+Thanks for your interest in improving the Solana Mobile templates! This document explains how we work so that your
+contribution lands quickly.
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+## Issues first, then pull requests
 
-## We Develop with GitHub
+**Open an issue before you open a pull request.**
 
-We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+The templates in this repository are deliberately small and opinionated. Every template is a starting point that
+developers generate and then own, so anything we add to one becomes something every new project carries. When the issue
+comes first we can agree on whether a change belongs in a template, and in which one, before anyone writes code. That
+saves your time as well as ours.
 
-## We use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), so all code changes happen through pull requests
+The workflow is:
 
-Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
+1. **Search existing issues.** Someone may already have reported it.
+2. **File an issue** at https://github.com/solana-mobile/templates/issues/new. Describe the problem or the change you
+   want to make and which template(s) it affects.
+3. **Wait for a maintainer to accept it.** If you'd like to work on it, say so in a comment.
+4. **Open a pull request** that references the issue with a closing keyword such as `Fixes #123`.
 
-1. Fork the repo and create your branch from `main`.
-2. Prefix your branch with your GitHub username (eg, `beeman/fix-anchor-issue` and not `fix/anchor-issue`)
-3. If you've added code that should be tested, add tests.
-4. If you've changed APIs, update the documentation.
-5. Ensure the test suite passes.
-6. Make sure your code lints.
-7. Issue that pull request!
+Pull requests that don't reference an accepted issue may be closed without review. We'd rather point you to the right
+place than let your work sit unreviewed, so we'll always leave a comment explaining why.
+
+### Exceptions
+
+You don't need an issue for trivial changes: typos, broken links, comment-only fixes, or small documentation
+corrections. Write "trivial" in the linked-issue field of the PR template.
+
+### What belongs here
+
+This repository is for the templates themselves. The issue tracker is **not** the right place for:
+
+- **Bugs in Mobile Wallet Adapter or other SDKs.** Report those in the SDK's own repository, for example
+  [mobile-wallet-adapter](https://github.com/solana-mobile/mobile-wallet-adapter/issues).
+- **Usage and how-to questions.** Ask on [Solana Stack Exchange](https://solana.stackexchange.com/questions/ask) with the
+  `solana-mobile` tag, or join the [Solana Mobile Discord](https://discord.gg/solanamobile).
+- **Features that only some projects need.** Templates stay minimal on purpose. If a feature is useful but not for
+  everyone, it probably belongs in a sample or in documentation rather than in a template.
+
+## Pull request guidelines
+
+- **Keep it scoped.** One issue per pull request. Refactors, formatting changes, and unrelated fixes go in their own
+  PRs.
+- **Respect the template's scope.** A `minimal` template stays minimal. Adding platforms, providers, or abstractions to
+  a template needs to be agreed in the issue first.
+- **Describe how to verify it.** The PR template asks which template(s) you generated and what you checked. This is what
+  lets a maintainer confirm the change without re-deriving your setup.
+- **Regenerate metadata.** Run `pnpm generate` and commit the result whenever you change a template. CI fails the PR
+  when the committed metadata is out of date.
+- **Prefix your branch with your GitHub username**, for example `beeman/fix-anchor-issue` and not `fix/anchor-issue`.
+- **Expect review turnaround to vary.** This is a small team. Linking an accepted issue is the best way to get to the
+  front of the queue.
 
 ## Any contributions you make will be under the Apache 2.0 Software License
 
@@ -32,7 +61,7 @@ In short, when you submit code changes, your submissions are understood to be un
 ## Report bugs using GitHub's [issues](https://github.com/solana-mobile/templates/issues)
 
 We use GitHub issues to track public bugs. Report a bug by
-[opening a new issue](https://github.com/solana-mobile/templates/issues/new); it's that easy!
+[opening a new issue](https://github.com/solana-mobile/templates/issues/new).
 
 **Great Bug Reports** tend to have:
 
