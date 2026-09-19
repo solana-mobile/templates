@@ -576,4 +576,344 @@ describe('wallet seam (web)', () => {
     expect(seen()?.account).toBeUndefined()
     await expect(seen()!.sendTransactions([])).rejects.toThrow(/connect a wallet/i)
   })
+
+  it('keeps the app subtree mounted across connect and disconnect', async () => {
+    kit.wallets = [makeWallet()]
+    let mounts = 0
+    let unmounts = 0
+    // A probe under the provider's children: if connecting or disconnecting
+    // swapped the provider branch above it, this component would remount and
+    // everything beneath the provider — navigator included — would lose
+    // state. It must mount exactly once.
+    function Probe() {
+      useEffect(() => {
+        mounts += 1
+        return () => {
+          unmounts += 1
+        }
+      }, [])
+      return <Text>probe</Text>
+    }
+    const { Reader, seen } = readWallet()
+    await render(
+      <WalletProvider cluster={DEVNET} identity={IDENTITY}>
+        <Reader />
+        <Probe />
+      </WalletProvider>,
+    )
+    expect(mounts).toBe(1)
+
+    await connectWallet(seen)
+    expect(seen()?.account?.address).toBe(ADDRESS)
+    expect(mounts).toBe(1)
+    expect(unmounts).toBe(0)
+
+    await act(async () => {
+      await seen()!.disconnect()
+    })
+    expect(seen()?.account).toBeUndefined()
+    expect(mounts).toBe(1)
+    expect(unmounts).toBe(0)
+  })
+
+  it('rejects a pending connect when the provider unmounts', async () => {
+    kit.wallets = [
+      makeWallet({
+        impl: { connect: vi.fn(() => new Promise<{ accounts: FakeAccount[] }>(() => {})) },
+        name: 'Stuck Wallet',
+      }),
+    ]
+    const { screen, seen } = await renderWallet()
+
+    let outcome: Promise<WalletAccount | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .connect()
+        .then(
+          (account) => account,
+          (error: Error) => error,
+        )
+    })
+    // The single wallet auto-connects; its request never resolves.
+    expect(kit.connectCalls).toEqual(['Stuck Wallet'])
+
+    await act(async () => {
+      screen.unmount()
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/unmounted/i)
+  })
+
+  it('rejects a pending sign-in when the provider unmounts', async () => {
+    kit.wallets = [
+      makeWallet({
+        impl: { connect: vi.fn(() => new Promise<{ accounts: FakeAccount[] }>(() => {})) },
+        name: 'Stuck Wallet',
+      }),
+    ]
+    const { screen, seen } = await renderWallet()
+
+    let outcome: Promise<Awaited<ReturnType<UseWalletReturn['signIn']>> | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+    expect(kit.connectCalls).toEqual(['Stuck Wallet'])
+
+    await act(async () => {
+      screen.unmount()
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/unmounted/i)
+  })
+
+  it('rejects a second disconnected sign-in while the first is still connecting', async () => {
+    const fakeAccount = makeAccount()
+    kit.wallets = [makeWallet({ accounts: [fakeAccount], name: 'Alpha Wallet' }), makeWallet({ name: 'Beta Wallet' })]
+    const { screen, seen } = await renderWallet()
+
+    type SignInResult = Awaited<ReturnType<UseWalletReturn['signIn']>>
+    let first: Promise<SignInResult | Error> | undefined
+    let second: Promise<SignInResult | Error> | undefined
+    await act(async () => {
+      first = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+      second = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+
+    // The second caller is refused outright — never queued over the first
+    // in a way that would orphan the first's deferred.
+    const secondSettled = await second!
+    expect(secondSettled).toBeInstanceOf(Error)
+    expect((secondSettled as Error).message).toMatch(/already in progress/i)
+
+    // The first still owns the connect: it drove the picker open and is
+    // fulfilled against the account it selected.
+    expect(await screen.findByText('Connect a wallet')).toBeTruthy()
+    await act(async () => {
+      await fireEvent.press(screen.getByRole('button', { name: /alpha wallet/i }))
+    })
+
+    const firstSettled = await first!
+    expect(firstSettled).not.toBeInstanceOf(Error)
+    expect((firstSettled as SignInResult).account.address).toBe(ADDRESS)
+    expect((firstSettled as SignInResult).signature).toBe(SIGNATURE)
+  })
+
+  it('rejects a deferred sign-in when the picker is cancelled', async () => {
+    kit.wallets = [makeWallet({ name: 'Alpha Wallet' }), makeWallet({ name: 'Beta Wallet' })]
+    const { screen, seen } = await renderWallet()
+
+    type SignInResult = Awaited<ReturnType<UseWalletReturn['signIn']>>
+    let outcome: Promise<SignInResult | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+    expect(await screen.findByText('Connect a wallet')).toBeTruthy()
+
+    await act(async () => {
+      await fireEvent.press(screen.getByRole('button', { name: /cancel/i }))
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/cancelled/i)
+    expect(seen()?.account).toBeUndefined()
+  })
+
+  it('rejects a deferred sign-in and closes the picker when disconnect is called mid-connect', async () => {
+    kit.wallets = [makeWallet({ name: 'Alpha Wallet' }), makeWallet({ name: 'Beta Wallet' })]
+    const { screen, seen } = await renderWallet()
+
+    type SignInResult = Awaited<ReturnType<UseWalletReturn['signIn']>>
+    let outcome: Promise<SignInResult | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+    expect(await screen.findByText('Connect a wallet')).toBeTruthy()
+
+    await act(async () => {
+      await seen()!.disconnect()
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/disconnected/i)
+    // The in-flight connect attempt is torn down with it.
+    expect(screen.queryByText('Connect a wallet')).toBeNull()
+  })
+
+  it('reconnects to the same account after a disconnect', async () => {
+    const fakeAccount = makeAccount()
+    kit.wallets = [makeWallet({ accounts: [fakeAccount] })]
+    const { seen } = await renderWallet()
+
+    await connectWallet(seen)
+    expect(seen()?.account?.address).toBe(ADDRESS)
+    await act(async () => {
+      await seen()!.disconnect()
+    })
+    expect(seen()?.account).toBeUndefined()
+
+    // The second connect withdraws then republishes the connected ops; the
+    // seam must vend a working account again, not the stale null.
+    await connectWallet(seen)
+    expect(seen()?.account?.address).toBe(ADDRESS)
+    let signed: Uint8Array | undefined
+    await act(async () => {
+      signed = await seen()!.signMessages(new TextEncoder().encode('again'))
+    })
+    expect(signed).toBeDefined()
+  })
+
+  it('keeps the app subtree mounted when the wallet switches accounts', async () => {
+    kit.wallets = [makeWallet()]
+    let mounts = 0
+    function Probe() {
+      useEffect(() => {
+        mounts += 1
+      }, [])
+      return null
+    }
+    const { Reader, seen } = readWallet()
+    await render(
+      <WalletProvider cluster={DEVNET} identity={IDENTITY}>
+        <Reader />
+        <Probe />
+      </WalletProvider>,
+    )
+    await connectWallet(seen)
+    expect(mounts).toBe(1)
+
+    await act(async () => {
+      kit.switchAccount?.(makeAccount({ label: 'Second Account' }))
+    })
+
+    expect(mounts).toBe(1)
+    expect(seen()?.account?.label).toBe('Second Account')
+    // The republished ops sign with the new account.
+    let signed: Uint8Array | undefined
+    await act(async () => {
+      signed = await seen()!.signMessages(new TextEncoder().encode('hi'))
+    })
+    expect(signed).toBeDefined()
+  })
+
+  it('fulfills a sign-in invoked through a reference captured before the connected ops published', async () => {
+    const fakeAccount = makeAccount()
+    kit.wallets = [makeWallet({ accounts: [fakeAccount] })]
+    // Record every vended context value: the render between "account set"
+    // and "ops published" still serves the disconnected contract, and the
+    // last disconnected entry is that render's value.
+    const values: UseWalletReturn[] = []
+    function Recorder() {
+      values.push(useWallet())
+      return null
+    }
+    await render(
+      <WalletProvider cluster={DEVNET} identity={IDENTITY}>
+        <Recorder />
+      </WalletProvider>,
+    )
+    let connectPromise: Promise<WalletAccount> | undefined
+    await act(async () => {
+      connectPromise = values.at(-1)!.connect()
+    })
+    await connectPromise!
+    expect(values.at(-1)?.account?.address).toBe(ADDRESS)
+
+    const gapValue = [...values].reverse().find((v) => v.account === undefined)!
+    // Calling the captured signIn now lands a deferred request while the
+    // connected bridge is already mounted — it must still be drained on
+    // the commit the request itself schedules.
+    let signInPromise: Promise<Awaited<ReturnType<UseWalletReturn['signIn']>>> | undefined
+    await act(async () => {
+      signInPromise = gapValue.signIn({ chainId: 'solana:devnet' })
+    })
+    const output = await signInPromise!
+    expect(output.account.address).toBe(ADDRESS)
+    expect(output.signature).toBe(SIGNATURE)
+  })
+
+  it('rejects a sign-in in flight at the wallet when the provider unmounts', async () => {
+    const fakeAccount = makeAccount()
+    fakeAccount.impl.signIn = vi.fn(() => new Promise<never>(() => {}))
+    kit.wallets = [makeWallet({ accounts: [fakeAccount] })]
+    const { screen, seen } = await renderWallet()
+
+    type SignInResult = Awaited<ReturnType<UseWalletReturn['signIn']>>
+    let outcome: Promise<SignInResult | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+    // Connected; the request was handed to a wallet that never answers.
+    expect(seen()?.account?.address).toBe(ADDRESS)
+
+    await act(async () => {
+      screen.unmount()
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/unmounted/i)
+  })
+
+  it('rejects a sign-in in flight at the wallet when disconnect is called', async () => {
+    const fakeAccount = makeAccount()
+    fakeAccount.impl.signIn = vi.fn(() => new Promise<never>(() => {}))
+    kit.wallets = [makeWallet({ accounts: [fakeAccount] })]
+    const { seen } = await renderWallet()
+
+    type SignInResult = Awaited<ReturnType<UseWalletReturn['signIn']>>
+    let outcome: Promise<SignInResult | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+    expect(seen()?.account?.address).toBe(ADDRESS)
+
+    await act(async () => {
+      await seen()!.disconnect()
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/disconnected/i)
+  })
 })

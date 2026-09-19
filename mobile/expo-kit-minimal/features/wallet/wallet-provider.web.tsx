@@ -11,7 +11,18 @@ import {
   signAndSendTransactionMessageWithSigners,
   type Instruction,
 } from '@solana/kit'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from 'react'
 import { Button, Modal, StyleSheet, Text, View } from 'react-native'
 import { createClient } from './create-client'
 import type {
@@ -28,12 +39,18 @@ import type {
 // Three layers, because account-bound hooks (`useSignMessage`, `useSignIn`,
 // the signer) cannot be called conditionally:
 //
-// 1. WebWalletBridge — owns connect() (opens the picker; resolves on a
-//    compatible selection, rejects on cancel, wallet error, or a wallet that
-//    returns no usable account), disconnect, the RPC client, and the
-//    disconnected context.
-// 2. ConnectedBridge — mounted only once a COMPATIBLE account exists; calls
-//    the account-bound hooks unconditionally and publishes the full context.
+// 1. WebWalletBridge — owns ONE stable WebWalletContext.Provider around the
+//    app children for the provider's whole lifetime, plus connect() (opens
+//    the picker; resolves on a compatible selection, rejects on cancel,
+//    wallet error, or a wallet that returns no usable account), disconnect,
+//    the RPC client, and the disconnected context. Because the provider
+//    element and the children's position inside it never change with wallet
+//    state, connecting or disconnecting re-renders consumers but never
+//    remounts the subtree beneath it — navigator state included.
+// 2. ConnectedBridge — mounted as a SIBLING of the children while an account
+//    exists; calls the account-bound hooks unconditionally and publishes the
+//    connected operations up to the bridge, which swaps them into the
+//    context value in place. Its mount/unmount cycle is confined to itself.
 // 3. WalletPickerRow — one per discovered wallet; `useConnect(wallet)` per row
 //    is the rules-of-hooks-safe way to drive a dynamic wallet list.
 //
@@ -44,6 +61,13 @@ import type {
 // superseded attempt — is dropped instead of applying a connection nobody is
 // waiting for. Attempts also re-key the rows, so a new attempt always starts
 // a fresh `useConnect` call rather than tripping a stale row's busy guard.
+//
+// Request lifecycle: every pending caller of the seam must settle — success,
+// wallet rejection, picker cancel, an explicit disconnect, a concurrent
+// sign-in, or provider unmount. The pending connect attempt and deferred
+// sign-in live in refs the bridge rejects on each of those paths; unmount
+// rejection runs in an effect cleanup so an abandoned connect()/signIn()
+// can never hang forever.
 //
 // The picker is rendered with React Native components (Modal/View/Text/Button
 // through react-native-web), never a library DOM widget, and lives here under
@@ -123,6 +147,20 @@ interface PendingConnect {
 interface PendingSignIn {
   deferred: Deferred<WalletSignInOutput>
   input: WalletSignInInput
+  // True once the connected bridge has handed the request to the wallet.
+  // The entry stays in the ref until the wallet settles so unmount,
+  // disconnect, or a picker cancel can still reject an in-flight sign-in.
+  started: boolean
+}
+
+// The connected half of the context, produced by ConnectedBridge (which owns
+// the account-bound hooks) and published up to WebWalletBridge, which swaps
+// it into the stable provider value.
+interface ConnectedOps {
+  account: WalletAccount
+  sendTransactions: UseWalletReturn['sendTransactions']
+  signIn: UseWalletReturn['signIn']
+  signMessages: UseWalletReturn['signMessages']
 }
 
 // Features the app cannot function without, enforced at two levels. Wallets
@@ -168,6 +206,36 @@ function WebWalletBridge({
   const pendingConnect = useRef<PendingConnect | null>(null)
   const pendingSignIn = useRef<PendingSignIn | null>(null)
   const [connectAttempt, setConnectAttempt] = useState<number | null>(null)
+  const [connectedOps, setConnectedOps] = useState<ConnectedOps | null>(null)
+  const [, bumpSignInDrain] = useState(0) // write-only: exists to schedule a drain commit
+
+  // Every pending request the bridge owns must settle — including when the
+  // provider itself goes away. Rejecting on unmount guarantees a caller is
+  // never left awaiting a promise nobody can still fulfill.
+  useEffect(
+    () => () => {
+      const reason = new Error('The wallet provider was unmounted.')
+      pendingConnect.current?.deferred.reject(reason)
+      pendingConnect.current = null
+      pendingSignIn.current?.deferred.reject(reason)
+      pendingSignIn.current = null
+    },
+    [],
+  )
+
+  // A deferred sign-in that loses its account before the connected bridge
+  // could hand it to the wallet can never be fulfilled — reject it rather
+  // than leaving the caller waiting on a future connect. Fires only on the
+  // connected→disconnected transition, so a request still waiting through
+  // an open connect attempt is untouched; wallet-side disconnects that
+  // bypass disconnectAll land here.
+  useEffect(() => {
+    if (account) return
+    const pending = pendingSignIn.current
+    if (!pending) return
+    pendingSignIn.current = null
+    pending.deferred.reject(new Error('The wallet was disconnected.'))
+  }, [account])
 
   const connect = useCallback(async (): Promise<WalletAccount> => {
     if (account) {
@@ -182,6 +250,10 @@ function WebWalletBridge({
       deferred: createDeferred<UiWalletAccount>(),
     }
     pendingConnect.current = pending
+    // The deferred can also be rejected by onCancel/onError/unmount on paths
+    // where nobody awaits it directly; mark it handled so those rejections
+    // never surface as unhandled-promise noise.
+    pending.deferred.promise.catch(() => {})
     setConnectAttempt(pending.attempt)
     const uiAccount = await pending.deferred.promise
     return toWalletAccount(uiAccount)
@@ -247,11 +319,23 @@ function WebWalletBridge({
   }, [])
 
   // Sign-in before connect: remember the request, connect, then let the
-  // connected bridge (which owns the account-bound hooks) fulfill it on mount.
+  // connected bridge (which owns the account-bound hooks) fulfill it on
+  // mount. One at a time: a second call while the first is still connecting
+  // is rejected outright rather than overwriting the pending slot and
+  // orphaning the first caller forever.
   const signInDisconnected = useCallback(
     async (input: WalletSignInInput): Promise<WalletSignInOutput> => {
-      const pending: PendingSignIn = { deferred: createDeferred<WalletSignInOutput>(), input }
+      if (pendingSignIn.current) {
+        throw new Error('A sign-in is already in progress.')
+      }
+      const pending: PendingSignIn = { deferred: createDeferred<WalletSignInOutput>(), input, started: false }
       pendingSignIn.current = pending
+      // Guarantee a commit follows this call: a request created while the
+      // connected bridge is already mounted — a signIn reference captured
+      // during the pre-publish window and invoked later — is drained by the
+      // every-commit effect, but only if a render happens. Nothing else
+      // would schedule one.
+      bumpSignInDrain((n) => n + 1)
       // The deferred is rejected by onCancel / ConnectedBridge on paths where
       // nobody awaits it (e.g. connect threw first); mark it handled so those
       // rejections don't surface as unhandled-promise console noise.
@@ -260,9 +344,15 @@ function WebWalletBridge({
         await connect()
       } catch (error) {
         // Connect failed (no wallet, cancelled): drop the request so a later
-        // connect cannot fulfill a sign-in nobody is still awaiting.
+        // connect cannot fulfill a sign-in nobody is still awaiting — unless
+        // the bridge already started it (a restored session or a parallel
+        // connect handed it to the wallet first), in which case the request
+        // keeps its own outcome.
         if (pendingSignIn.current === pending) {
           pendingSignIn.current = null
+        }
+        if (pending.started) {
+          return pending.deferred.promise
         }
         throw error
       }
@@ -271,19 +361,41 @@ function WebWalletBridge({
     [connect],
   )
 
+  // An explicit disconnect cancels everything still in flight — an open
+  // connect attempt (picker included) and a sign-in still waiting to be
+  // fulfilled — so no caller hangs on a wallet the user just dropped.
+  const disconnectAll = useCallback(async () => {
+    const reason = new Error('The wallet was disconnected.')
+    const conn = pendingConnect.current
+    pendingConnect.current = null
+    setConnectAttempt(null)
+    conn?.deferred.reject(reason)
+    const signInReq = pendingSignIn.current
+    pendingSignIn.current = null
+    signInReq?.deferred.reject(reason)
+    await disconnect()
+  }, [disconnect])
+
   const base = useMemo(
     () => ({
       chain: cluster.id,
       client,
       connect,
-      disconnect: async () => disconnect(),
+      disconnect: disconnectAll,
       identity,
     }),
-    [cluster.id, client, connect, disconnect, identity],
+    [cluster.id, client, connect, disconnectAll, identity],
   )
 
-  const disconnectedValue = useMemo<UseWalletReturn>(
-    () => ({
+  const value = useMemo<UseWalletReturn>(() => {
+    // Published ops are vended only while they still describe the account
+    // wallet-ui reports — a stale set (disconnect not yet cleaned up, or a
+    // mid-switch account) falls back to the disconnected contract rather
+    // than signing with the wrong account.
+    if (connectedOps && account && connectedOps.account.address === account.address) {
+      return { ...base, ...connectedOps }
+    }
+    return {
       ...base,
       account: undefined,
       sendTransactions: async () => {
@@ -293,19 +405,19 @@ function WebWalletBridge({
       signMessages: async () => {
         throw new Error('Connect a wallet before signing messages.')
       },
-    }),
-    [base, signInDisconnected],
-  )
+    }
+  }, [account, base, connectedOps, signInDisconnected])
 
+  // ONE provider for the provider's whole lifetime: `children` sits at a
+  // fixed position inside it, so wallet state changes re-render consumers
+  // but never remount the app subtree. The hook-bearing ConnectedBridge and
+  // the picker live as siblings, not wrappers.
   return (
-    <>
+    <WebWalletContext.Provider value={value}>
+      {children}
       {account ? (
-        <ConnectedBridge account={account} base={base} pendingSignInRef={pendingSignIn}>
-          {children}
-        </ConnectedBridge>
-      ) : (
-        <WebWalletContext.Provider value={disconnectedValue}>{children}</WebWalletContext.Provider>
-      )}
+        <ConnectedBridge account={account} base={base} pendingSignInRef={pendingSignIn} publishOps={setConnectedOps} />
+      ) : null}
       <WalletPicker
         attempt={connectAttempt}
         onAccounts={onAccounts}
@@ -314,15 +426,15 @@ function WebWalletBridge({
         visible={connectAttempt !== null}
         wallets={wallets}
       />
-    </>
+    </WebWalletContext.Provider>
   )
 }
 
 interface ConnectedBridgeProps {
   account: UiWalletAccount
   base: Pick<UseWalletReturn, 'chain' | 'client' | 'connect' | 'disconnect' | 'identity'>
-  children: ReactNode
   pendingSignInRef: { current: PendingSignIn | null }
+  publishOps: Dispatch<SetStateAction<ConnectedOps | null>>
 }
 
 // The account-bound hooks throw at render for an account missing a required
@@ -444,33 +556,57 @@ function ConnectedBridgeUnsupported(props: ConnectedBridgeProps) {
 
 function ConnectedBridgeCore({
   account,
-  base,
-  children,
   pendingSignInRef,
+  publishOps,
   sendTransactions,
   signIn,
   signMessages,
 }: ConnectedBridgeProps & Pick<UseWalletReturn, 'sendTransactions' | 'signIn' | 'signMessages'>) {
-  // Fulfill a sign-in that was requested before the wallet connected.
+  // Fulfill a sign-in that was requested while the disconnected contract
+  // was being vended. Runs on EVERY commit, not just mount: the context
+  // still serves the disconnected signIn for the commit between "account
+  // set" and "ops published" (and the same window on account switch), so a
+  // request can land here while the bridge is already mounted — the next
+  // commit (the ops publish is always one) drains it. `started` marks the
+  // hand-off: the entry then stays in the ref until the wallet settles, so
+  // unmount, disconnect, or a picker cancel can still reject an in-flight
+  // sign-in; the identity check keeps a settled request from clearing a
+  // newer one.
   useEffect(() => {
     const pending = pendingSignInRef.current
-    if (!pending) return
-    pendingSignInRef.current = null
-    signIn(pending.input).then(pending.deferred.resolve, pending.deferred.reject)
-  }, [pendingSignInRef, signIn])
+    if (!pending || pending.started) return
+    pending.started = true
+    signIn(pending.input).then(
+      (output) => {
+        if (pendingSignInRef.current === pending) {
+          pendingSignInRef.current = null
+        }
+        pending.deferred.resolve(output)
+      },
+      (error) => {
+        if (pendingSignInRef.current === pending) {
+          pendingSignInRef.current = null
+        }
+        pending.deferred.reject(error)
+      },
+    )
+  })
 
-  const value = useMemo<UseWalletReturn>(
-    () => ({
-      ...base,
-      account: toWalletAccount(account),
-      sendTransactions,
-      signIn,
-      signMessages,
-    }),
-    [base, account, sendTransactions, signIn, signMessages],
-  )
+  // Publish this variant's operations up to the stable context — but only
+  // when the account changes. The account-bound hooks are free to vend
+  // fresh function identities every render, so republishing per render
+  // would re-render the bridge forever; every op is bound to `account`
+  // anyway, so a published set is stale only when the account itself is.
+  const opsRef = useRef<ConnectedOps | null>(null)
+  // Render-phase write by design: the ref is read only by the post-commit
+  // publish effect below, so the committed render's write is the one read.
+  opsRef.current = { account: toWalletAccount(account), sendTransactions, signIn, signMessages }
+  useEffect(() => {
+    publishOps(opsRef.current)
+    return () => publishOps(null)
+  }, [account, publishOps])
 
-  return <WebWalletContext.Provider value={value}>{children}</WebWalletContext.Provider>
+  return null
 }
 
 function WalletPicker({
