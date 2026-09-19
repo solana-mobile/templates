@@ -9,7 +9,7 @@ import { appStyles } from '@/constants/app-styles'
 export default function HomeScreen() {
   return (
     <SafeAreaView style={appStyles.screen}>
-      <View style={appStyles.stack}>
+      <View style={[appStyles.stack, appStyles.content]}>
         <Text style={appStyles.title}>App Config</Text>
         <View style={appStyles.card}>
           <Text>

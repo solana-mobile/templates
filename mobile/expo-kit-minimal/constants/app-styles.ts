@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 export const appStyles = StyleSheet.create({
   card: {
@@ -8,6 +8,14 @@ export const appStyles = StyleSheet.create({
     borderWidth: 1,
     elevation: 1,
     padding: 4,
+    // `elevation` is Android-only; give web cards the same subtle depth.
+    ...Platform.select({ web: { boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.12)' } }),
+  },
+  // Keeps the phone-width layout from stretching edge to edge on wide screens.
+  content: {
+    alignSelf: 'center',
+    maxWidth: 600,
+    width: '100%',
   },
   screen: {
     flex: 1,
