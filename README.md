@@ -36,21 +36,11 @@ See [TEMPLATES.md](TEMPLATES.md) for the complete list.
 
 ## Contributing
 
-We welcome contributions!
+We welcome contributions! Found a bug or have an idea? [Open an issue](https://github.com/solana-mobile/templates/issues/new)
+first. Pull requests need to reference an accepted issue; the templates are deliberately small and opinionated, so we
+agree on a change before code is written. Trivial fixes such as typos and broken links are exempt.
 
-**Improving existing templates:**
-
-- Report issues or suggest improvements
-- Submit PRs for bug fixes or enhancements
-- Update documentation
-
-**Adding a new template:**
-
-External contributors must create an [issue](https://github.com/solana-mobile/templates/issues) before adding a new
-template. Describe the template you want to add and wait for a confirmation before sending a PR. This prevents you doing
-work that won't get merged into this repo.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ## Development
 
