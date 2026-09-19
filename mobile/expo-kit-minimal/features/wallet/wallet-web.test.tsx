@@ -1,5 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
-import { createContext, createElement, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, createElement, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Text } from 'react-native'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createSolanaDevnet } from '@wallet-ui/core'
@@ -85,6 +85,7 @@ function makeWallet(overrides: Partial<FakeWallet> = {}): FakeWallet {
 
 const kit = vi.hoisted(() => ({
   connectCalls: [] as string[],
+  switchAccount: undefined as ((account: FakeAccount | undefined) => void) | undefined,
   wallets: [] as FakeWallet[],
 }))
 
@@ -106,6 +107,15 @@ vi.mock('@wallet-ui/react', () => {
 
   function WalletUi({ children }: { children?: ReactNode }) {
     const [account, setAccount] = useState<FakeAccount | undefined>(undefined)
+    // Real wallets can switch the selected account underneath the app
+    // (`standard:change` events); the mock exposes the setter so tests can
+    // drive the same transition.
+    useEffect(() => {
+      kit.switchAccount = setAccount
+      return () => {
+        kit.switchAccount = undefined
+      }
+    }, [])
     const value = useMemo(
       () => ({
         account,
@@ -200,6 +210,7 @@ async function connectWallet(seen: () => UseWalletReturn | undefined): Promise<W
 describe('wallet seam (web)', () => {
   beforeEach(() => {
     kit.connectCalls = []
+    kit.switchAccount = undefined
     kit.wallets = []
   })
 
@@ -307,6 +318,164 @@ describe('wallet seam (web)', () => {
     expect(seen()?.account).toBeUndefined()
   })
 
+  it('rejects connect when the wallet declines authorization', async () => {
+    kit.wallets = [
+      makeWallet({
+        impl: {
+          connect: vi.fn(async () => {
+            throw new Error('The user rejected the request.')
+          }),
+        },
+      }),
+    ]
+    const { screen, seen } = await renderWallet()
+
+    let outcome: Promise<WalletAccount | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .connect()
+        .then(
+          (account) => account,
+          (error: Error) => error,
+        )
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/rejected/i)
+    expect(seen()?.account).toBeUndefined()
+    // The failed attempt dismisses the picker rather than leaving it open.
+    expect(screen.queryByText('Connect a wallet')).toBeNull()
+  })
+
+  it('ignores a wallet response that resolves after the picker is cancelled', async () => {
+    let resolveConnect!: (value: { accounts: FakeAccount[] }) => void
+    kit.wallets = [
+      makeWallet({
+        impl: {
+          connect: vi.fn(
+            () =>
+              new Promise<{ accounts: FakeAccount[] }>((resolve) => {
+                resolveConnect = resolve
+              }),
+          ),
+        },
+        name: 'Slow Wallet',
+      }),
+    ]
+    const { screen, seen } = await renderWallet()
+
+    let outcome: Promise<WalletAccount | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .connect()
+        .then(
+          (account) => account,
+          (error: Error) => error,
+        )
+    })
+
+    // The single wallet auto-connects; its request is still in flight.
+    expect(await screen.findByText('Connect a wallet')).toBeTruthy()
+    expect(kit.connectCalls).toEqual(['Slow Wallet'])
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole('button', { name: /cancel/i }))
+    })
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/cancelled/i)
+
+    // The wallet's late approval must not connect the app.
+    await act(async () => {
+      resolveConnect({ accounts: [makeAccount()] })
+    })
+    expect(seen()?.account).toBeUndefined()
+  })
+
+  it('rejects connect when the wallet returns no account that can sign on this cluster', async () => {
+    kit.wallets = [
+      makeWallet({
+        accounts: [
+          makeAccount({ features: ['solana:signMessage'], label: 'Limited Account' }),
+          makeAccount({ chains: ['solana:mainnet'], label: 'Wrong Chain Account' }),
+        ],
+      }),
+    ]
+    const { screen, seen } = await renderWallet()
+
+    let outcome: Promise<WalletAccount | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .connect()
+        .then(
+          (account) => account,
+          (error: Error) => error,
+        )
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/no account that can sign and send transactions/i)
+    // Rejected at selection: nothing mounts the account-bound hooks.
+    expect(seen()?.account).toBeUndefined()
+    expect(screen.getByText('inside the wallet')).toBeTruthy()
+  })
+
+  it('excludes wallets that do not support the active cluster', async () => {
+    kit.wallets = [makeWallet({ chains: ['solana:mainnet'], name: 'Mainnet Only' })]
+    const { seen } = await renderWallet()
+
+    await expect(seen()!.connect()).rejects.toThrow(/install a solana wallet/i)
+  })
+
+  it('keeps the app alive with helpful errors when the wallet switches to an incompatible account', async () => {
+    kit.wallets = [makeWallet()]
+    const { screen, seen } = await renderWallet()
+    await connectWallet(seen)
+    expect(seen()?.account?.address).toBe(ADDRESS)
+
+    // `standard:change` can surface an account that cannot sign on this
+    // cluster; mounting the account-bound hooks for it would throw at render.
+    await act(async () => {
+      kit.switchAccount?.(makeAccount({ features: ['solana:signMessage'], label: 'Switched Account' }))
+    })
+
+    expect(screen.getByText('inside the wallet')).toBeTruthy()
+    expect(seen()?.account?.address).toBe(ADDRESS)
+    await expect(seen()!.sendTransactions([])).rejects.toThrow(/cannot sign and send transactions/i)
+    await expect(seen()!.signMessages(new Uint8Array())).rejects.toThrow(/cannot sign messages/i)
+    await expect(seen()!.signIn({})).rejects.toThrow(/does not support sign in with solana/i)
+  })
+
+  it('propagates a declined connect to a sign-in requested while disconnected', async () => {
+    kit.wallets = [
+      makeWallet({
+        impl: {
+          connect: vi.fn(async () => {
+            throw new Error('The user rejected the request.')
+          }),
+        },
+      }),
+    ]
+    const { seen } = await renderWallet()
+
+    let outcome: Promise<Awaited<ReturnType<UseWalletReturn['signIn']>> | Error> | undefined
+    await act(async () => {
+      outcome = seen()!
+        .signIn({ chainId: 'solana:devnet' })
+        .then(
+          (output) => output,
+          (error: Error) => error,
+        )
+    })
+
+    const settled = await outcome!
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/rejected/i)
+    expect(seen()?.account).toBeUndefined()
+  })
+
   it('signs a single message and a batch with the connected account', async () => {
     const fakeAccount = makeAccount()
     kit.wallets = [makeWallet({ accounts: [fakeAccount] })]
@@ -318,7 +487,10 @@ describe('wallet seam (web)', () => {
     await act(async () => {
       signed = await seen()!.signMessages(message)
     })
-    expect(signed).toBe(SIGNATURE)
+    // MWA parity: a signed payload is the signed message bytes with the
+    // signature appended — the same shape the native side vends.
+    const concat = (m: Uint8Array) => new Uint8Array([...m, ...SIGNATURE])
+    expect(signed).toEqual(concat(message))
     expect(fakeAccount.impl.signMessage).toHaveBeenCalledWith({ account: fakeAccount, message })
 
     const batch = [new TextEncoder().encode('one'), new TextEncoder().encode('two')]
@@ -326,7 +498,7 @@ describe('wallet seam (web)', () => {
     await act(async () => {
       signedBatch = await seen()!.signMessages(batch)
     })
-    expect(signedBatch).toEqual([SIGNATURE, SIGNATURE])
+    expect(signedBatch).toEqual([concat(batch[0]), concat(batch[1])])
   })
 
   it('signs in with the connected account', async () => {

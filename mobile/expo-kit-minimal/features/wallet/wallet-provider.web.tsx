@@ -1,3 +1,4 @@
+import type { SolanaClusterId } from '@wallet-ui/core'
 import { createWalletUiConfig, useConnect, useWalletUi, WalletUi } from '@wallet-ui/react'
 import { useSignIn, useSignMessage, useWalletAccountTransactionSendingSigner } from '@solana/react'
 import {
@@ -27,12 +28,22 @@ import type {
 // Three layers, because account-bound hooks (`useSignMessage`, `useSignIn`,
 // the signer) cannot be called conditionally:
 //
-// 1. WebWalletBridge — owns connect() (opens the picker, resolves on
-//    selection), disconnect, the RPC client, and the disconnected context.
-// 2. ConnectedBridge — mounted only once an account exists; calls the
-//    account-bound hooks unconditionally and publishes the full context.
+// 1. WebWalletBridge — owns connect() (opens the picker; resolves on a
+//    compatible selection, rejects on cancel, wallet error, or a wallet that
+//    returns no usable account), disconnect, the RPC client, and the
+//    disconnected context.
+// 2. ConnectedBridge — mounted only once a COMPATIBLE account exists; calls
+//    the account-bound hooks unconditionally and publishes the full context.
 // 3. WalletPickerRow — one per discovered wallet; `useConnect(wallet)` per row
 //    is the rules-of-hooks-safe way to drive a dynamic wallet list.
+//
+// Connect lifecycle: every attempt carries an id (the `connectAttempt` state
+// doubles as picker visibility and attempt identity). Rows report their
+// result tagged with the attempt that spawned them; the bridge settles only
+// the current attempt, so a wallet response landing after cancel — or from a
+// superseded attempt — is dropped instead of applying a connection nobody is
+// waiting for. Attempts also re-key the rows, so a new attempt always starts
+// a fresh `useConnect` call rather than tripping a stale row's busy guard.
 //
 // The picker is rendered with React Native components (Modal/View/Text/Button
 // through react-native-web), never a library DOM widget, and lives here under
@@ -104,19 +115,38 @@ function createDeferred<T>(): Deferred<T> {
   return { promise, reject, resolve }
 }
 
+interface PendingConnect {
+  attempt: number
+  deferred: Deferred<UiWalletAccount>
+}
+
 interface PendingSignIn {
   deferred: Deferred<WalletSignInOutput>
   input: WalletSignInInput
 }
 
-// Features the app cannot function without. Wallets lacking them are excluded
-// from the picker: calling an account-bound hook (useSignMessage, the signer)
-// for an unsupported wallet THROWS AT RENDER TIME. `solana:signIn` is optional
-// and handled separately in ConnectedBridge below.
+// Features the app cannot function without, enforced at two levels. Wallets
+// lacking them — or not declaring the active chain — are excluded from the
+// picker. But wallet-level declarations don't guarantee the account: the
+// account-bound hooks (`useSignMessage`, the transaction sending signer)
+// bind the ACCOUNT's own feature list and chain set and THROW AT RENDER on a
+// miss, so the returned account is checked again at selection, and again as
+// a guard before ConnectedBridge mounts the hooks. `solana:signIn` is
+// optional and handled separately in ConnectedBridge below.
 const REQUIRED_FEATURES = ['solana:signMessage', 'solana:signAndSendTransaction']
 
-function isCompatibleWallet(wallet: UiWallet): boolean {
-  return REQUIRED_FEATURES.every((feature) => wallet.features.includes(feature as never))
+function isCompatibleWallet(wallet: UiWallet, chain: SolanaClusterId): boolean {
+  return (
+    REQUIRED_FEATURES.every((feature) => wallet.features.includes(feature as never)) &&
+    wallet.chains.includes(chain as never)
+  )
+}
+
+function isCompatibleAccount(account: UiWalletAccount, chain: SolanaClusterId): boolean {
+  return (
+    REQUIRED_FEATURES.every((feature) => account.features.includes(feature as never)) &&
+    account.chains.includes(chain as never)
+  )
 }
 
 function WebWalletBridge({
@@ -129,11 +159,15 @@ function WebWalletBridge({
   identity: AppIdentity
 }) {
   const { account, connect: selectAccount, disconnect, wallets: allWallets } = useWalletUi()
-  const wallets = useMemo(() => allWallets.filter(isCompatibleWallet), [allWallets])
+  const wallets = useMemo(
+    () => allWallets.filter((wallet) => isCompatibleWallet(wallet, cluster.id)),
+    [allWallets, cluster.id],
+  )
   const client = useMemo(() => createClient(cluster), [cluster])
-  const [pickerVisible, setPickerVisible] = useState(false)
-  const pendingConnect = useRef<Deferred<UiWalletAccount> | null>(null)
+  const nextConnectAttempt = useRef(0)
+  const pendingConnect = useRef<PendingConnect | null>(null)
   const pendingSignIn = useRef<PendingSignIn | null>(null)
+  const [connectAttempt, setConnectAttempt] = useState<number | null>(null)
 
   const connect = useCallback(async (): Promise<WalletAccount> => {
     if (account) {
@@ -142,28 +176,72 @@ function WebWalletBridge({
     if (wallets.length === 0) {
       throw new Error('No wallet-standard wallets detected in this browser. Install a Solana wallet extension.')
     }
-    const deferred = pendingConnect.current ?? createDeferred<UiWalletAccount>()
-    pendingConnect.current = deferred
-    setPickerVisible(true)
-    const uiAccount = await deferred.promise
+    // Concurrent connect() calls share the open attempt's deferred.
+    const pending = pendingConnect.current ?? {
+      attempt: ++nextConnectAttempt.current,
+      deferred: createDeferred<UiWalletAccount>(),
+    }
+    pendingConnect.current = pending
+    setConnectAttempt(pending.attempt)
+    const uiAccount = await pending.deferred.promise
     return toWalletAccount(uiAccount)
   }, [account, wallets])
 
-  const onSelect = useCallback(
-    (uiAccount: UiWalletAccount) => {
-      selectAccount(uiAccount)
-      setPickerVisible(false)
-      pendingConnect.current?.resolve(uiAccount)
-      pendingConnect.current = null
+  // Settle the pending attempt — but only if `attempt` still identifies it.
+  // A picker row whose wallet finished after the user cancelled, or that
+  // belongs to a superseded attempt, lands here with a stale id and is
+  // dropped rather than applying a connection nobody is waiting for.
+  const settleConnect = useCallback((attempt: number | null): PendingConnect | null => {
+    const pending = pendingConnect.current
+    if (attempt === null || !pending || pending.attempt !== attempt) {
+      return null
+    }
+    pendingConnect.current = null
+    setConnectAttempt(null)
+    return pending
+  }, [])
+
+  const onAccounts = useCallback(
+    (accounts: readonly UiWalletAccount[], attempt: number | null) => {
+      const pending = settleConnect(attempt)
+      if (!pending) {
+        return
+      }
+      try {
+        // The wallet's feature list says nothing about the account it
+        // returns: pick the first account that can actually sign on this
+        // cluster, or reject rather than mounting hooks that throw at render.
+        const list = Array.isArray(accounts) ? accounts : []
+        const selected = list.find((a) => isCompatibleAccount(a, cluster.id))
+        if (!selected) {
+          throw new Error(
+            list.length === 0
+              ? 'The selected wallet did not return any accounts.'
+              : `The selected wallet has no account that can sign and send transactions on ${cluster.id}.`,
+          )
+        }
+        selectAccount(selected)
+        pending.deferred.resolve(selected)
+      } catch (error) {
+        pending.deferred.reject(error instanceof Error ? error : new Error(String(error)))
+      }
     },
-    [selectAccount],
+    [cluster.id, selectAccount, settleConnect],
+  )
+
+  const onError = useCallback(
+    (error: unknown, attempt: number | null) => {
+      settleConnect(attempt)?.deferred.reject(error instanceof Error ? error : new Error(String(error)))
+    },
+    [settleConnect],
   )
 
   const onCancel = useCallback(() => {
-    setPickerVisible(false)
-    const reason = new Error('Wallet connection was cancelled.')
-    pendingConnect.current?.reject(reason)
+    const pending = pendingConnect.current
     pendingConnect.current = null
+    setConnectAttempt(null)
+    const reason = new Error('Wallet connection was cancelled.')
+    pending?.deferred.reject(reason)
     pendingSignIn.current?.deferred.reject(reason)
     pendingSignIn.current = null
   }, [])
@@ -228,7 +306,14 @@ function WebWalletBridge({
       ) : (
         <WebWalletContext.Provider value={disconnectedValue}>{children}</WebWalletContext.Provider>
       )}
-      <WalletPicker onCancel={onCancel} onSelect={onSelect} visible={pickerVisible} wallets={wallets} />
+      <WalletPicker
+        attempt={connectAttempt}
+        onAccounts={onAccounts}
+        onCancel={onCancel}
+        onError={onError}
+        visible={connectAttempt !== null}
+        wallets={wallets}
+      />
     </>
   )
 }
@@ -240,14 +325,20 @@ interface ConnectedBridgeProps {
   pendingSignInRef: { current: PendingSignIn | null }
 }
 
-// `useSignIn` throws at render when the wallet lacks `solana:signIn`, so the
-// hook may only be mounted behind a feature check. Wallets without it get a
-// `signIn` that reports unsupported rather than crashing the screen.
+// The account-bound hooks throw at render for an account missing a required
+// feature or the active chain, so every variant is gated on
+// `isCompatibleAccount` — the picker's filter is not the only path an account
+// can arrive by (a wallet can switch accounts after connecting). Optional
+// `solana:signIn` gets its own branch: wallets without it get a `signIn`
+// that reports unsupported rather than crashing the screen.
 function ConnectedBridge(props: ConnectedBridgeProps) {
+  if (!isCompatibleAccount(props.account, props.base.chain)) {
+    return <ConnectedBridgeUnsupported {...props} />
+  }
   if (props.account.features.includes('solana:signIn' as never)) {
     return <ConnectedBridgeWithSignIn {...props} />
   }
-  return <ConnectedBridgeCore {...props} signIn={signInUnsupported} />
+  return <ConnectedBridgeWithSigning {...props} signIn={signInUnsupported} />
 }
 
 async function signInUnsupported(): Promise<WalletSignInOutput> {
@@ -272,30 +363,36 @@ function ConnectedBridgeWithSignIn(props: ConnectedBridgeProps) {
     [signInWithAccount],
   )
 
-  return <ConnectedBridgeCore {...props} signIn={signIn} />
+  return <ConnectedBridgeWithSigning {...props} signIn={signIn} />
 }
 
-function ConnectedBridgeCore({
-  account,
-  base,
-  children,
-  pendingSignInRef,
+// Mounted only for accounts that satisfy `isCompatibleAccount`: both hooks
+// below throw at render when the account lacks the feature or the chain.
+function ConnectedBridgeWithSigning({
   signIn,
+  ...props
 }: ConnectedBridgeProps & { signIn: UseWalletReturn['signIn'] }) {
+  const { account, base } = props
   const signer = useWalletAccountTransactionSendingSigner(account, base.chain)
   const signMessage = useSignMessage(account)
 
   const signMessages = useCallback(
     async <K extends Uint8Array | Uint8Array[]>(message: K): Promise<K> => {
-      // MWA concatenates [message][signature]; wallet-standard returns
-      // {signature} separately. Consumers here only await the result, so the
-      // signature bytes are the honest shape to return.
-      if (Array.isArray(message)) {
-        const signed = await Promise.all(message.map(async (m) => (await signMessage({ message: m })).signature))
-        return signed as K
+      // MWA's sign_messages returns signed payloads — the message bytes with
+      // the signature appended. wallet-standard returns `{signedMessage,
+      // signature}` separately, so the seam concatenates here: both platforms
+      // must vend the same shape or the contract is not portable.
+      const sign = async (m: Uint8Array) => {
+        const { signature, signedMessage } = await signMessage({ message: m })
+        const signed = new Uint8Array(signedMessage.length + signature.length)
+        signed.set(signedMessage)
+        signed.set(signature, signedMessage.length)
+        return signed
       }
-      const { signature } = await signMessage({ message: message as Uint8Array })
-      return signature as K
+      if (Array.isArray(message)) {
+        return (await Promise.all(message.map(sign))) as K
+      }
+      return (await sign(message as Uint8Array)) as K
     },
     [signMessage],
   )
@@ -315,6 +412,45 @@ function ConnectedBridgeCore({
     [base.client, signer],
   )
 
+  return (
+    <ConnectedBridgeCore {...props} sendTransactions={sendTransactions} signIn={signIn} signMessages={signMessages} />
+  )
+}
+
+// Reached when the wallet switches to an account that cannot sign on this
+// cluster after connecting: the account-bound hooks would throw at render,
+// so the context still reports the account but every signing action fails
+// with a helpful error instead of crashing the screen.
+function ConnectedBridgeUnsupported(props: ConnectedBridgeProps) {
+  const chain = props.base.chain
+  const sendTransactions = useCallback(async (): Promise<string> => {
+    throw new Error(`The connected account cannot sign and send transactions on ${chain}.`)
+  }, [chain])
+  const signMessages = useCallback(
+    async <K extends Uint8Array | Uint8Array[]>(_message: K): Promise<K> => {
+      throw new Error(`The connected account cannot sign messages on ${chain}.`)
+    },
+    [chain],
+  )
+  return (
+    <ConnectedBridgeCore
+      {...props}
+      sendTransactions={sendTransactions}
+      signIn={signInUnsupported}
+      signMessages={signMessages}
+    />
+  )
+}
+
+function ConnectedBridgeCore({
+  account,
+  base,
+  children,
+  pendingSignInRef,
+  sendTransactions,
+  signIn,
+  signMessages,
+}: ConnectedBridgeProps & Pick<UseWalletReturn, 'sendTransactions' | 'signIn' | 'signMessages'>) {
   // Fulfill a sign-in that was requested before the wallet connected.
   useEffect(() => {
     const pending = pendingSignInRef.current
@@ -338,13 +474,17 @@ function ConnectedBridgeCore({
 }
 
 function WalletPicker({
+  attempt,
+  onAccounts,
   onCancel,
-  onSelect,
+  onError,
   visible,
   wallets,
 }: {
+  attempt: number | null
+  onAccounts: (accounts: readonly UiWalletAccount[], attempt: number | null) => void
   onCancel: () => void
-  onSelect: (account: UiWalletAccount) => void
+  onError: (error: unknown, attempt: number | null) => void
   visible: boolean
   wallets: UiWallet[]
 }) {
@@ -355,9 +495,11 @@ function WalletPicker({
           <Text style={styles.title}>Connect a wallet</Text>
           {wallets.map((wallet) => (
             <WalletPickerRow
+              attempt={attempt}
               autoConnect={visible && wallets.length === 1}
-              key={wallet.name}
-              onSelect={onSelect}
+              key={`${wallet.name}:${attempt}`}
+              onAccounts={onAccounts}
+              onError={onError}
               wallet={wallet}
             />
           ))}
@@ -369,12 +511,16 @@ function WalletPicker({
 }
 
 function WalletPickerRow({
+  attempt,
   autoConnect,
-  onSelect,
+  onAccounts,
+  onError,
   wallet,
 }: {
+  attempt: number | null
   autoConnect: boolean
-  onSelect: (account: UiWalletAccount) => void
+  onAccounts: (accounts: readonly UiWalletAccount[], attempt: number | null) => void
+  onError: (error: unknown, attempt: number | null) => void
   wallet: UiWallet
 }) {
   const [isConnecting, connect] = useConnect(wallet)
@@ -384,16 +530,19 @@ function WalletPickerRow({
     if (requested.current) return
     requested.current = true
     try {
-      const accounts = await connect()
-      if (accounts.length > 0) {
-        onSelect(accounts[0])
-      }
-    } catch (e) {
-      console.log(`Error connecting to ${wallet.name}: ${e}`)
+      // The bridge owns the outcome: it validates the returned accounts
+      // (empty or incompatible lists reject) and applies the selection only
+      // if this attempt is still current — a response landing after cancel
+      // is dropped there, not here.
+      onAccounts(await connect(), attempt)
+    } catch (error) {
+      // Wallet-side failures (declined authorization, extension errors)
+      // must reject the pending connect(), not disappear into the console.
+      onError(error, attempt)
     } finally {
       requested.current = false
     }
-  }, [connect, onSelect, wallet.name])
+  }, [attempt, connect, onAccounts, onError])
 
   // With exactly one compatible wallet there is nothing to pick: connect()
   // auto-selects it, matching MWA's argument-less connect UX.
