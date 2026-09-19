@@ -8,6 +8,7 @@ import { AccountFeatureSignTransaction } from '@/features/account/account-featur
 import { AccountFeatureSignIn } from '@/features/account/account-feature-sign-in'
 import { AccountFeatureDisconnect } from '@/features/account/account-feature-disconnect'
 import { AccountFeatureConnect } from '@/features/account/account-feature-connect'
+import { ellipsify } from '@/utils/ellipsify'
 
 export function AccountFeatureIndex() {
   const { account } = useWallet()
@@ -18,7 +19,7 @@ export function AccountFeatureIndex() {
       {account ? (
         <View style={appStyles.stack}>
           <View style={appStyles.card}>
-            <Text>Connected to {account.label}</Text>
+            <Text>Connected to {account.label ?? ellipsify(account.address)}</Text>
             <AccountFeatureGetBalance address={account.address} />
           </View>
           <AccountFeatureSignIn account={account} />

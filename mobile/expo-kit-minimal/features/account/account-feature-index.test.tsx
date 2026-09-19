@@ -22,6 +22,16 @@ describe('AccountFeatureIndex', () => {
       expect(screen.getByText(/Connected to Test Wallet/)).toBeTruthy()
     })
 
+    it('falls back to the ellipsified address when the account has no label', async () => {
+      // Browser wallets may not set the optional wallet-standard account label; the card must
+      // still identify the account (MWA always provides a label, so this is a web-only case).
+      wallet.current = createMobileWalletMock({ account: { address: TEST_ADDRESS } })
+
+      const screen = await renderWithProviders(<AccountFeatureIndex />)
+
+      expect(screen.getByText('Connected to Gsbw..ZoP1')).toBeTruthy()
+    })
+
     it('renders the balance returned by the RPC client', async () => {
       wallet.current = createMobileWalletMock({ balance: 2_250_000_000n })
 

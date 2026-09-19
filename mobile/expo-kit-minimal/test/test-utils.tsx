@@ -30,8 +30,8 @@ export async function renderWithProviders(ui: ReactElement) {
 export interface MobileWalletMockOptions {
   /** Lamports returned by `client.rpc.getBalance`. */
   balance?: bigint
-  /** Pass `null` to simulate a disconnected wallet. */
-  account?: { address: Address; label: string } | null
+  /** Pass `null` to simulate a disconnected wallet; omit `label` for a wallet-standard-style account. */
+  account?: { address: Address; label?: string } | null
   /**
    * Reject RPC reads once this many sends have succeeded. `0` fails the first read, `1` lets the
    * first read succeed and fails every refetch after it.
