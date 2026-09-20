@@ -1,0 +1,35 @@
+name: Template change
+description: Propose adding, changing, or removing something in a template.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Templates stay minimal on purpose. Anything added to one becomes something every new project carries, so please explain who needs this and why it belongs in a template rather than in a sample or in documentation.
+  - type: input
+    id: template
+    attributes:
+      label: Template(s)
+      description: Which template(s) the change affects, or "new template".
+      placeholder: expo-kit-uniwind, expo-kit-minimal
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or wrong today for someone who generates this template?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: What the template should do instead. Link to upstream docs or a reference implementation if you have one.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Could this live in a sample, in documentation, or in the generated project instead?

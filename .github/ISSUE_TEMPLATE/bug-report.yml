@@ -1,0 +1,52 @@
+name: Bug report
+description: A generated template doesn't build, run, or behave as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Bugs in Mobile Wallet Adapter or other SDKs belong in their own repositories; this tracker is for the templates themselves.
+  - type: input
+    id: template
+    attributes:
+      label: Template
+      description: The template name as passed to `npx solana-mobile@latest create -t <name>`.
+      placeholder: expo-kit-uniwind
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Start from generating the template. Be specific and include commands.
+      placeholder: |
+        1. npx solana-mobile@latest create -t expo-kit-uniwind
+        2. pnpm install
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include the full error output if there is any.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, package manager, device or emulator, wallet app.
+      placeholder: |
+        macOS 15, Node 22, pnpm 10, Seeker, Solflare
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else, such as what you already tried or why you think it happens.

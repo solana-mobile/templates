@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Mobile Wallet Adapter bug
+    url: https://github.com/solana-mobile/mobile-wallet-adapter/issues
+    about: Bugs in Mobile Wallet Adapter belong in its own repository.
+  - name: Solana Mobile Discord
+    url: https://discord.gg/solanamobile
+    about: Chat with the team and other developers.
+  - name: Usage question
+    url: https://solana.stackexchange.com/questions/ask
+    about: Ask how-to questions on Solana Stack Exchange with the solana-mobile tag.
