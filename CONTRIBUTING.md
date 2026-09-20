@@ -3,30 +3,28 @@
 Thanks for your interest in improving the Solana Mobile templates! This document explains how we work so that your
 contribution lands quickly.
 
-## Issues first, then pull requests
+## Issues first
 
-**Open an issue before you open a pull request.**
+**Every change starts as an issue.**
 
 The templates in this repository are deliberately small and opinionated. Every template is a starting point that
-developers generate and then own, so anything we add to one becomes something every new project carries. When the issue
-comes first we can agree on whether a change belongs in a template, and in which one, before anyone writes code. That
-saves your time as well as ours.
+developers generate and then own, so anything we add to one becomes something every new project carries. Discussing a
+change in an issue lets us agree on whether it belongs in a template, and in which one, before anyone writes code.
+
+Pull requests can only be opened by repository collaborators. Maintainers implement the issues that are filed here,
+so the issue is your contribution: a clear report or proposal is what gets a change made.
 
 The workflow is:
 
 1. **Search existing issues.** Someone may already have reported it.
-2. **File an issue** at https://github.com/solana-mobile/templates/issues/new. Describe the problem or the change you
-   want to make and which template(s) it affects.
-3. **Wait for a maintainer to accept it.** If you'd like to work on it, say so in a comment.
-4. **Open a pull request** that references the issue with a closing keyword such as `Fixes #123`.
+2. **File an issue** at https://github.com/solana-mobile/templates/issues/new/choose. Pick the form that fits: a bug, a
+   template change, or a documentation fix. Describe the problem or the change you want and which template(s) it
+   affects.
+3. **Follow along.** A maintainer picks the issue up and opens a pull request that references it. You can help by
+   answering questions, adding reproduction steps, or trying out the branch once it's up.
 
-Pull requests that don't reference an accepted issue may be closed without review. We'd rather point you to the right
-place than let your work sit unreviewed, so we'll always leave a comment explaining why.
-
-### Exceptions
-
-You don't need an issue for trivial changes: typos, broken links, comment-only fixes, or small documentation
-corrections. Write "trivial" in the linked-issue field of the PR template.
+This applies to small fixes too. Typos, broken links, and comment-only corrections are quick to report and quick for a
+maintainer to apply, so file them as issues as well.
 
 ### What belongs here
 
@@ -41,17 +39,20 @@ This repository is for the templates themselves. The issue tracker is **not** th
 
 ## Pull request guidelines
 
+These apply to maintainers opening pull requests.
+
+- **Link the issue.** Reference it with a closing keyword such as `Fixes #123`. A PR without a linked issue gets the
+  `needs-issue` label until one is added.
 - **Keep it scoped.** One issue per pull request. Refactors, formatting changes, and unrelated fixes go in their own
   PRs.
 - **Respect the template's scope.** A `minimal` template stays minimal. Adding platforms, providers, or abstractions to
   a template needs to be agreed in the issue first.
 - **Describe how to verify it.** The PR template asks which template(s) you generated and what you checked. This is what
-  lets a maintainer confirm the change without re-deriving your setup.
+  lets a reviewer confirm the change without re-deriving your setup.
 - **Regenerate metadata.** Run `pnpm generate` and commit the result whenever you change a template. CI fails the PR
   when the committed metadata is out of date.
 - **Prefix your branch with your GitHub username**, for example `beeman/fix-anchor-issue` and not `fix/anchor-issue`.
-- **Expect review turnaround to vary.** This is a small team. Linking an accepted issue is the best way to get to the
-  front of the queue.
+- **Expect review turnaround to vary.** This is a small team.
 
 ## Any contributions you make will be under the Apache 2.0 Software License
 
@@ -61,7 +62,7 @@ In short, when you submit code changes, your submissions are understood to be un
 ## Report bugs using GitHub's [issues](https://github.com/solana-mobile/templates/issues)
 
 We use GitHub issues to track public bugs. Report a bug by
-[opening a new issue](https://github.com/solana-mobile/templates/issues/new).
+[opening a new issue](https://github.com/solana-mobile/templates/issues/new/choose).
 
 **Great Bug Reports** tend to have:
 

@@ -1,0 +1,19 @@
+name: Documentation fix
+description: A typo, broken link, or wrong instruction in a README or comment.
+labels: [documentation]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Where
+      description: File path or URL of the text that is wrong.
+      placeholder: mobile/expo-kit-uniwind/README.md
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change
+      description: Quote the current text and give the corrected version.
+    validations:
+      required: true

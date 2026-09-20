@@ -36,9 +36,9 @@ See [TEMPLATES.md](TEMPLATES.md) for the complete list.
 
 ## Contributing
 
-We welcome contributions! Found a bug or have an idea? [Open an issue](https://github.com/solana-mobile/templates/issues/new)
-first. Pull requests need to reference an accepted issue; the templates are deliberately small and opinionated, so we
-agree on a change before code is written. Trivial fixes such as typos and broken links are exempt.
+Found a bug, or have an idea for a template? [Open an issue](https://github.com/solana-mobile/templates/issues/new/choose).
+The templates are deliberately small and opinionated, so every change starts as an issue where we agree on it first.
+Maintainers then implement it; pull requests are limited to repository collaborators.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
