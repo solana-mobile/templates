@@ -1,0 +1,37 @@
+FROM oven/bun:1.4.0 AS base
+WORKDIR /app
+
+COPY bun.lock package.json turbo.json tsconfig.json ./
+COPY apps ./apps
+COPY packages ./packages
+COPY scripts ./scripts
+COPY turbo ./turbo
+
+RUN bun install --frozen-lockfile --ignore-scripts
+
+FROM base AS builder
+# VITE_ prefixed env vars must be present at build time for Vite to embed them
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+COPY . .
+RUN bun run build --filter web
+# Archive all workspace package.json files for production install in runner stage
+RUN find . -name "package.json" -not -path "*/node_modules/*" -print0 | tar -cf /tmp/package-jsons.tar --null -T -
+
+FROM oven/bun:1.4.0 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/apps/web/dist ./apps/web/dist
+COPY --from=builder /app/apps/web/server.ts ./apps/web/server.ts
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=builder /app/bun.lock ./bun.lock
+COPY --from=builder /tmp/package-jsons.tar .
+RUN tar -xf package-jsons.tar && rm package-jsons.tar
+
+RUN bun install --production --ignore-scripts
+
+EXPOSE 3001
+CMD ["bun", "apps/web/server.ts"]

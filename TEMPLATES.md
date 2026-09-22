@@ -82,6 +82,14 @@ Solana Mobile Templates
 
 `anchor` `expo` `mobile-wallet-adapter` `react-native` `sample` `solana-kit` `tailwind` `uniwind`
 
+### [sample-expo-kit-fullstack](mobile/sample-expo-kit-fullstack)
+
+`gh:solana-mobile/templates/mobile/sample-expo-kit-fullstack`
+
+> A sample Bun-only full-stack Solana app with Better Auth, Expo, Hono, Solana Kit, TanStack Start, and Turborepo.
+
+`better-auth` `bun` `expo` `hono` `mobile-wallet-adapter` `monorepo` `react-native` `sample` `solana-kit` `tanstack-start` `turborepo` `wallet-ui`
+
 ### [sample-expo-kit-privy](mobile/sample-expo-kit-privy)
 
 `gh:solana-mobile/templates/mobile/sample-expo-kit-privy`

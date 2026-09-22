@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "@repo/config": "workspace:*",
+    "typescript": "catalog:"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "name": "@repo/{{ dashCase name }}",
+  "private": false,
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "type": "module",
+  "version": "0.0.0"
+}
