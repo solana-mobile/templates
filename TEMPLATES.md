@@ -82,6 +82,14 @@ Solana Mobile Templates
 
 `anchor` `expo` `mobile-wallet-adapter` `react-native` `sample` `solana-kit` `tailwind` `uniwind`
 
+### [sample-expo-kit-farming-idle](mobile/sample-expo-kit-farming-idle)
+
+`gh:solana-mobile/templates/mobile/sample-expo-kit-farming-idle`
+
+> A sample idle farming game with a burner player wallet, on-chain upgrades, and a global leaderboard, built with Expo, React Native, Solana Kit, Anchor, and Uniwind.
+
+`anchor` `expo` `mobile-wallet-adapter` `react-native` `sample` `solana-kit` `tailwind` `uniwind`
+
 ### [sample-expo-kit-privy](mobile/sample-expo-kit-privy)
 
 `gh:solana-mobile/templates/mobile/sample-expo-kit-privy`
