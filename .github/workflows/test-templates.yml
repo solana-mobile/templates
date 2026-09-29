@@ -123,6 +123,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - template: mobile/sample-expo-kit-fullstack
         node: [22]
         template: ${{ fromJson(needs.setup-templates.outputs.templates) }}
     steps:
@@ -144,6 +146,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - template: mobile/sample-expo-kit-fullstack
         node: [22]
         template: ${{ fromJson(needs.setup-templates.outputs.templates) }}
     steps:
@@ -165,6 +169,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - template: mobile/sample-expo-kit-fullstack
         node: [22]
         template: ${{ fromJson(needs.setup-templates.outputs.templates) }}
     steps:

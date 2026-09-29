@@ -1,0 +1,44 @@
+# Generators
+
+This repo uses [turbo gen](https://turborepo.com/docs/guides/generating-code) to
+generate new packages.
+
+> [!WARNING]
+> Generators are expected to run with Bun (not Node). If you hit issues, use an agent to adjust the setup.
+
+## Usage
+
+You can run the generator in interactive mode:
+
+```shell
+bun turbo gen
+```
+
+### Generating a package
+
+Or you can pass the parameters and automate the generation:
+
+```shell
+bun turbo gen pkg --args base i18n
+#             ^          ^    ^
+#             |          |    |
+#             |          |    + - - the name of the package
+#             |          |
+#             |          + - - the type of package you want to generate
+#             |
+#             + - - the generator you want to invoke
+```
+
+## Generators
+
+- `pkg`: generates a package in `packages/` (types: `base`, `react-ui`)
+
+## Adding a new generator
+
+Take these steps to add a new generator:
+
+- copy `turbo/generators/generator-pkg.ts` to
+  `turbo/generators/generator-<name>.ts`
+- add template files in `turbo/generators/templates/<name>`
+- update references from `pkg` to `<name>`
+- update `turbo/generators/config.ts` and register the new generator

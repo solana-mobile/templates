@@ -14,6 +14,9 @@ templates.json
 TEMPLATES.md
 uniwind-types.d.ts
 
+# Templates using other formatters
+/mobile/sample-expo-kit-fullstack
+
 # Ignore any dist, tmp, or node_modules directories
 mobile/**/.expo
 mobile/**/anchor/.anchor
