@@ -28,6 +28,6 @@ export function registerSeekerConnectWallet(): void {
       name: 'React Kit Shadcn',
       uri: window.location.origin,
     },
-    relayDomain: 'relay.primal.net',
+    relayDomain: 'relay.solanamobile.com',
   })
 }
