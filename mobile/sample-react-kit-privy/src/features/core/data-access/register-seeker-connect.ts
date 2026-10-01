@@ -28,6 +28,6 @@ export function registerSeekerConnectWallet(): void {
       name: 'React Kit Privy',
       uri: window.location.origin,
     },
-    relayDomain: 'relay.primal.net',
+    relayDomain: 'relay.solanamobile.com',
   })
 }

@@ -13,6 +13,9 @@
   ],
   "create-solana-dapp": {
     "instructions": [
+      "Accept the terms for the Solana Mobile relay this app uses:",
+      "+https://docs.solanamobile.com/solana-mobile-stack/seeker-connect-quickstart",
+      "",
       "Start the development server:",
       "+{pm} run dev"
     ],
