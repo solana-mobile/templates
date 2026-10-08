@@ -45,14 +45,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@solana-mobile/seeker-connect-ui": "^0.1.0",
-    "@solana-mobile/seeker-connect-wallet-standard": "^0.1.0",
-    "@solana-mobile/wallet-standard-mobile": "0.0.0-canary-20260828231154",
+    "@solana-mobile/seeker-connect-ui": "^0.1.2",
+    "@solana-mobile/seeker-connect-wallet-standard": "^0.1.2",
+    "@solana-mobile/wallet-standard-mobile": "^0.7.0",
     "@solana-program/memo": "^0.13.1",
     "@solana/kit": "^8.2.0",
     "@solana/kit-plugin-rpc": "^0.19.0",
     "@solana/wallet-standard-chains": "^1.1.2",
-    "@solana/wallet-standard-features": "^1.4.0",
+    "@solana/wallet-standard-features": "^1.5.0",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",
     "@wallet-standard/features": "^1.1.1"
