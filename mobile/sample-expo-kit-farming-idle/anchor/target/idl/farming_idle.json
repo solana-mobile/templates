@@ -1,0 +1,463 @@
+{
+  "address": "Hyfitmh1dAkw852R3DrXtWmLcmVoVkiR4H6D9DAMytH7",
+  "metadata": {
+    "name": "farming_idle",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "harvest",
+      "discriminator": [
+        228,
+        241,
+        31,
+        182,
+        53,
+        169,
+        59,
+        199
+      ],
+      "accounts": [
+        {
+          "name": "farm",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  114,
+                  109
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "farm.player",
+                "account": "Farm"
+              },
+              {
+                "kind": "account",
+                "path": "farm.owner",
+                "account": "Farm"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "signer": true,
+          "relations": [
+            "farm"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_farm",
+      "discriminator": [
+        252,
+        28,
+        185,
+        172,
+        244,
+        74,
+        117,
+        165
+      ],
+      "accounts": [
+        {
+          "name": "farm",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  114,
+                  109
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_leaderboard",
+      "discriminator": [
+        47,
+        23,
+        34,
+        39,
+        46,
+        108,
+        91,
+        176
+      ],
+      "accounts": [
+        {
+          "name": "leaderboard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  97,
+                  100,
+                  101,
+                  114,
+                  98,
+                  111,
+                  97,
+                  114,
+                  100
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "submit_farm",
+      "discriminator": [
+        8,
+        195,
+        198,
+        253,
+        255,
+        190,
+        96,
+        102
+      ],
+      "accounts": [
+        {
+          "name": "farm",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  114,
+                  109
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "farm.player",
+                "account": "Farm"
+              },
+              {
+                "kind": "account",
+                "path": "farm.owner",
+                "account": "Farm"
+              }
+            ]
+          }
+        },
+        {
+          "name": "leaderboard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  97,
+                  100,
+                  101,
+                  114,
+                  98,
+                  111,
+                  97,
+                  114,
+                  100
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "farm"
+          ]
+        },
+        {
+          "name": "player",
+          "signer": true,
+          "relations": [
+            "farm"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "upgrade_farm",
+      "discriminator": [
+        110,
+        239,
+        193,
+        1,
+        165,
+        101,
+        54,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "farm",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  114,
+                  109
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "farm.player",
+                "account": "Farm"
+              },
+              {
+                "kind": "account",
+                "path": "farm.owner",
+                "account": "Farm"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "signer": true,
+          "relations": [
+            "farm"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "crop_index",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Farm",
+      "discriminator": [
+        161,
+        156,
+        211,
+        253,
+        250,
+        64,
+        53,
+        250
+      ]
+    },
+    {
+      "name": "Leaderboard",
+      "discriminator": [
+        247,
+        186,
+        238,
+        243,
+        194,
+        30,
+        9,
+        36
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InsufficientHarvestPoints",
+      "msg": "Not enough harvest points to fund the upgrade"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidCrop",
+      "msg": "Not a valid crop index"
+    },
+    {
+      "code": 6003,
+      "name": "Overflow",
+      "msg": "Overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "Farm",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "docs": [
+              "The wallet that created the farm and holds the funds (signs via MWA)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "docs": [
+              "The local burner wallet that signs gameplay transactions without approval prompts."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_harvested",
+            "type": "i64"
+          },
+          {
+            "name": "harvest_points",
+            "type": "u64"
+          },
+          {
+            "name": "crops",
+            "docs": [
+              "Plots owned per crop, indexed like CROP_POINTS and CROP_COSTS."
+            ],
+            "type": {
+              "array": [
+                "u16",
+                8
+              ]
+            }
+          },
+          {
+            "name": "high_score",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Leaderboard",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "LeaderboardEntry"
+                  }
+                },
+                5
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "LeaderboardEntry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "docs": [
+              "The owner wallet behind the farm, not the burner player wallet."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "points",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "FARM_SEED",
+      "type": "bytes",
+      "value": "[102, 97, 114, 109]"
+    },
+    {
+      "name": "LEADERBOARD_SEED",
+      "type": "bytes",
+      "value": "[108, 101, 97, 100, 101, 114, 98, 111, 97, 114, 100]"
+    }
+  ]
+}
