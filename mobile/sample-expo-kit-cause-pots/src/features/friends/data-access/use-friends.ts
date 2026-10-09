@@ -1,7 +1,7 @@
-import { assertIsAddress, type Address } from '@solana/kit'
+import type { Address } from '@solana/kit'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Storage from 'expo-sqlite/kv-store'
-import { isSkrDomain, resolveSkrDomain } from '../../domains/resolve-skr-domain'
+import { isSkrDomain, resolveAddressOrDomain } from '../../domains/resolve-address-or-domain'
 
 // Friends are an address book for picking contributors and recipients. They
 // live on this device only; there is no backend.
@@ -30,17 +30,10 @@ export function useAddFriendMutation() {
   return useMutation({
     mutationFn: async ({ addressOrDomain, displayName }: { addressOrDomain: string; displayName?: string }) => {
       const input = addressOrDomain.trim()
-      let friend: Friend
-      if (isSkrDomain(input)) {
-        const domain = input.toLowerCase()
-        const resolved = await resolveSkrDomain(domain)
-        if (!resolved) {
-          throw new Error(`Could not resolve ${domain}. Check the spelling, or add the wallet address instead.`)
-        }
-        friend = { address: resolved, displayName, domain }
-      } else {
-        assertIsAddress(input)
-        friend = { address: input, displayName }
+      const friend: Friend = {
+        address: await resolveAddressOrDomain(input),
+        displayName,
+        domain: isSkrDomain(input) ? input.toLowerCase() : undefined,
       }
 
       const friends = await readFriends()
