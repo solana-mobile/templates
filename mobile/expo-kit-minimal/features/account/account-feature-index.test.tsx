@@ -1,3 +1,4 @@
+import { MEMO_PROGRAM_ADDRESS } from '@solana-program/memo'
 import { act, fireEvent } from '@testing-library/react-native'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AccountFeatureIndex } from '@/features/account/account-feature-index'
@@ -66,7 +67,7 @@ describe('AccountFeatureIndex', () => {
       expect(wallet.current!.sendTransactions).toHaveBeenCalledOnce()
       const [instructions] = wallet.current!.sendTransactions.mock.calls[0]
       expect(instructions).toHaveLength(1)
-      expect(instructions[0].programAddress).toBe('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr')
+      expect(instructions[0].programAddress).toBe(MEMO_PROGRAM_ADDRESS)
       expect(new TextDecoder().decode(instructions[0].data)).toBe(`gm from Mobile Wallet Adapter - ${TEST_ADDRESS}`)
     })
 

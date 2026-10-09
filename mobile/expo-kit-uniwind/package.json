@@ -53,8 +53,8 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.5",
-    "@solana/kit": "^7.0.0",
-    "@wallet-ui/react-native-kit": "^4.2.1",
+    "@solana/kit": "^8.4.0",
+    "@wallet-ui/react-native-kit": "^4.4.1",
     "expo": "~57.0.6",
     "expo-constants": "~57.0.5",
     "expo-dev-client": "^57.0.6",
