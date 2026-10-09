@@ -69,3 +69,5 @@ Run `pnpm generate` when changing:
 - The pinned `solana-mobile` version.
 
 Then review generated output for accidental unrelated changes.
+
+Do not run it for dependency, script, or other template `package.json` changes: the renderer reads only the inputs above, so the output cannot change.

@@ -49,8 +49,9 @@ These apply to maintainers opening pull requests.
   a template needs to be agreed in the issue first.
 - **Describe how to verify it.** The PR template asks which template(s) you generated and what you checked. This is what
   lets a reviewer confirm the change without re-deriving your setup.
-- **Regenerate metadata.** Run `pnpm generate` and commit the result whenever you change a template. CI fails the PR
-  when the committed metadata is out of date.
+- **Regenerate metadata.** Run `pnpm generate` and commit the result when you add, remove, or rename a template, or
+  change its metadata fields. Template dependency bumps and other code changes don't need it. CI fails the PR when the committed
+  metadata is out of date.
 - **Prefix your branch with your GitHub username**, for example `beeman/fix-anchor-issue` and not `fix/anchor-issue`.
 - **Expect review turnaround to vary.** This is a small team.
 
@@ -113,7 +114,9 @@ pnpm run
 
 `templates.json`, `TEMPLATES.md`, `README.md`, and `.github/workflows/templates.json` are
 generated from the templates and their `package.json` files. They are committed to the
-repository, so regenerate and commit them whenever you change a template:
+repository, so regenerate and commit them when you add, remove, or rename a template, or change its `name`,
+`description`, `keywords`, `displayName`, or `usecase`. No other template `package.json` field, including
+dependencies, affects them:
 
 ```shell
 pnpm generate

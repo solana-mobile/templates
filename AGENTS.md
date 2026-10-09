@@ -20,7 +20,7 @@ This file gives AI coding agents the minimum context needed to work safely in th
 
 - Read `docs/agents/repository-map.md` before assuming current directory layout.
 - Do not manually edit generated files unless you are updating the generator and intentionally checking output.
-- If you change a template `package.json`, add/remove a template, or change metadata, run `pnpm generate`.
+- Run `pnpm generate` only when you add, remove, or rename a template, change a template's `name`, `description`, `keywords`, `displayName`, or `usecase`, or change root `package.json` `repokit.groups`, `repository.name`, or the pinned `solana-mobile` version. Dependency, script, and other template `package.json` changes do not affect the generated files and need no regeneration.
 - Every template directory listed in root `package.json` `repokit.groups` must contain a `package.json` and `og-image.png`.
 - Never add secrets, private keys, personal wallet data, local RPC credentials, or real API tokens.
 - Keep `.env` files out of templates. Use `.env.example` when configuration is needed, with placeholders for sensitive values and safe defaults for non-sensitive values.
