@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.5",
+    "@solana-mobile/skr-domain": "1.0.0-canary-20261009200337",
     "@solana/kit": "^8.4.0",
     "@tanstack/react-query": "^5.90.7",
     "@wallet-ui/react-native-kit": "^4.4.1",
