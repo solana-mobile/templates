@@ -13,6 +13,7 @@ import { ShellUiPage } from '@/features/shell/ui/shell-ui-page'
 import { useGetTransactionSignatures } from '@/features/wallet/data-access/use-get-transaction-signatures'
 import { WalletUiConnectButton } from '@/features/wallet/ui/wallet-ui-connect-button'
 import { WalletUiStatusAlert } from '@/features/wallet/ui/wallet-ui-status-alert'
+import { ellipsify } from '@/features/wallet/util/ellipsify'
 import { formatError } from '@/features/wallet/util/format-error'
 
 type WalletActivityGroup = {
@@ -33,10 +34,6 @@ const timeFormatter = new Intl.DateTimeFormat(undefined, {
   hour: 'numeric',
   minute: '2-digit',
 })
-
-function ellipsify(value: string, length = 6) {
-  return value.length > length * 2 ? `${value.slice(0, length)}...${value.slice(-length)}` : value
-}
 
 function formatDate(blockTime: WalletActivityTransaction['blockTime']) {
   if (blockTime === null) {

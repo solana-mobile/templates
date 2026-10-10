@@ -16,6 +16,7 @@ mobile wallet, read account state, and run example wallet actions.
 
 - Connect and disconnect a mobile wallet.
 - Read the connected account balance and recent activity for the selected cluster.
+- Show the connected wallet's primary `.skr` domain and a "Seeker verified" badge when it holds a Seeker Genesis Token.
 - Sign a message with the connected account.
 - Sign a memo transaction.
 - Sign a Solana Sign-In payload.
@@ -44,6 +45,8 @@ feature code lives in `src/features`.
 
 - Devnet and Testnet have default RPC URLs. Localhost and Mainnet are disabled until you add an RPC URL in
   Settings > Cluster.
+- The `.skr` domain and Seeker Genesis Token lookups always read from mainnet through the public
+  `https://api.mainnet-beta.solana.com` RPC, whichever cluster is selected.
 - The app asks the selected mobile wallet to approve connection, message signing, sign-in, transaction signing, and
   transaction submission requests.
 - The sign-and-send demo creates a Memo Program transaction with the text entered in the app. It checks the wallet
