@@ -1,11 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Account } from '@wallet-ui/react-native-kit'
 import { Card } from 'heroui-native/card'
+import { Chip } from 'heroui-native/chip'
 import { useToast } from 'heroui-native/toast'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 
 import { useTheme } from '@/features/shell/data-access/use-theme'
+import { useGetPrimarySkrDomain } from '@/features/wallet/data-access/use-get-primary-skr-domain'
+import { useHasSeekerGenesisToken } from '@/features/wallet/data-access/use-has-seeker-genesis-token'
+import { ellipsify } from '@/features/wallet/util/ellipsify'
 import { formatError } from '@/features/wallet/util/format-error'
 
 const WALLET_DISCONNECT_TOAST_ID = 'wallet-disconnect-error'
@@ -15,6 +19,8 @@ export function WalletFeatureAccount({ account, disconnect }: { account: Account
   const { tintColor } = useTheme()
   const { toast } = useToast()
   const [isDisconnecting, setIsDisconnecting] = useState(false)
+  const { data: skrDomain } = useGetPrimarySkrDomain(account.address)
+  const { data: isSeekerVerified } = useHasSeekerGenesisToken(account.address)
 
   async function handleDisconnect() {
     if (isDisconnecting) {
@@ -53,7 +59,12 @@ export function WalletFeatureAccount({ account, disconnect }: { account: Account
           <Ionicons color={tintColor} name="power" size={18} />
         </Pressable>
       </View>
-      <Card.Description className="leading-relaxed">{account.address.toString()}</Card.Description>
+      <Card.Description className="leading-relaxed">{skrDomain ?? ellipsify(account.address)}</Card.Description>
+      {isSeekerVerified ? (
+        <Chip className="self-start" color="success" size="sm" variant="soft">
+          Seeker verified
+        </Chip>
+      ) : null}
     </Card>
   )
 }
