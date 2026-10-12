@@ -1,8 +1,8 @@
 import type { Address } from '@solana/kit'
 import { Text, View } from 'react-native'
+import { SkrNameOrAddress } from '../../domains/skr-name-or-address'
 import { findFriendLabel, useFriendsQuery } from '../../friends/data-access/use-friends'
 import { formatSol } from '../../../utils/currency'
-import { ellipsify } from '../../../utils/ellipsify'
 import type { PotContributor } from '../data-access/use-pot-contributors-query'
 
 // Who is in the pot, what they contributed, and whether they signed the release.
@@ -23,7 +23,10 @@ export function PotUiContributors({
     <View className="w-full border border-gray-200 dark:border-gray-800 rounded-2xl p-4 gap-3">
       <Text className="text-lg font-bold text-gray-800 dark:text-white">Contributors</Text>
       {contributors.map(({ account, address }) => {
-        const label = address === viewer ? 'You' : (findFriendLabel(friendsQuery.data, address) ?? ellipsify(address))
+        const label =
+          address === viewer
+            ? 'You'
+            : (findFriendLabel(friendsQuery.data, address) ?? <SkrNameOrAddress address={address} />)
         return (
           <View key={address} className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-2 shrink">

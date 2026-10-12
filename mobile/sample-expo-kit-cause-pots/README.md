@@ -7,7 +7,7 @@ Cause Pots is a **sample**, not a template: a complete reference app to read, ru
 - Time-locked collaborative savings pots with an on-chain vault per pot
 - Multi-signature release approval (M-of-N contributors)
 - SOL amounts with an optional USD display currency (chain transfers are always SOL)
-- Friend management by wallet address or `.skr` domain, resolved on mainnet with `@solana/kit`
+- Friend management by wallet address or `.skr` domain, resolved on mainnet with `@solana-mobile/skr-domain`
 - Activity feed derived entirely from on-chain transaction history — no backend anywhere
 
 ## Technologies
@@ -107,7 +107,7 @@ Add hand-written wrappers around the generated code in `anchor/src/client/js/ind
 Everything the original three-tier version of this app kept on a server lives on chain or on the device here:
 
 - **Pots** (`src/features/pots`) are read straight from the chain: the list is a `getProgramAccounts` scan decoded with the generated client (`use-pots-query.ts`), and every write is a generated instruction builder sent through Mobile Wallet Adapter (`use-pot-program.ts`). Pot metadata like the category and display currency are fields on the pot account.
-- **Friends** (`src/features/friends`) are a local address book in `expo-sqlite`'s key-value store. Adding a friend by `.skr` domain resolves the AllDomains name record on mainnet using nothing but `@solana/kit` PDA derivation and account fetches (`src/features/domains/resolve-skr-domain.ts`).
+- **Friends** (`src/features/friends`) are a local address book in `expo-sqlite`'s key-value store. Adding a friend by `.skr` domain resolves it on mainnet with `@solana-mobile/skr-domain` (`src/features/domains/resolve-address-or-domain.ts`), and friends and pot contributors show a wallet's primary `.skr` name in place of its address when it has one.
 - **Activity** (`src/features/activity`) is reconstructed from each pot's transaction history: `getSignaturesForAddress` gives the timeline and the generated `identifyCausePotsInstruction` and instruction data decoders identify what happened in each transaction.
 - **USD display** (`src/features/price`) converts at the current CoinGecko rate. Contributions always move SOL on chain; a pot created in USD only renders its amounts differently.
 

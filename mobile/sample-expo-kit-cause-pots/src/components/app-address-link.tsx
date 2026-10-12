@@ -1,13 +1,13 @@
 import * as Clipboard from 'expo-clipboard'
 import { openURL } from 'expo-linking'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useNetwork } from '../features/network/use-network'
 import { ellipsify } from '../utils/ellipsify'
 
 // A labeled address with an explorer link and a copy button. Tapping the
-// address also copies it.
-export function AppAddressLink({ address, label }: { address: string; label: string }) {
+// address also copies it. `name` replaces the shortened address on screen.
+export function AppAddressLink({ address, label, name }: { address: string; label: string; name?: ReactNode }) {
   const { getExplorerUrl } = useNetwork()
   const [copied, setCopied] = useState(false)
 
@@ -21,7 +21,7 @@ export function AppAddressLink({ address, label }: { address: string; label: str
     <View className="flex-row items-center gap-1">
       <Pressable onPress={() => void copy()}>
         <Text className="text-gray-600 dark:text-gray-400">
-          {label}: {ellipsify(address)}
+          {label}: {name ?? ellipsify(address)}
         </Text>
       </Pressable>
       <Pressable

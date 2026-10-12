@@ -11,6 +11,7 @@ import { formatAmount, parseAmountInput, solToLamports } from '../../utils/curre
 import { ellipsify } from '../../utils/ellipsify'
 import { formatError } from '../../utils/format-error'
 import { resolveAddressOrDomain } from '../domains/resolve-address-or-domain'
+import { SkrNameOrAddress } from '../domains/skr-name-or-address'
 import { useFriendsQuery } from '../friends/data-access/use-friends'
 import { useNetwork } from '../network/use-network'
 import { useSolPriceQuery } from '../price/data-access/use-sol-price-query'
@@ -219,7 +220,7 @@ function PotUiRelease({ disabled, onRelease }: { disabled: boolean; onRelease: (
               className="px-3 py-1 rounded-full border border-gray-200 dark:border-gray-800"
             >
               <Text className="text-gray-600 dark:text-gray-400 text-sm">
-                {friend.displayName ?? friend.domain ?? ellipsify(friend.address)}
+                {friend.displayName ?? friend.domain ?? <SkrNameOrAddress address={friend.address} />}
               </Text>
             </Pressable>
           ))}
@@ -282,7 +283,7 @@ function PotUiAddContributor({
               className="px-3 py-1 rounded-full border border-gray-200 dark:border-gray-800"
             >
               <Text className="text-gray-600 dark:text-gray-400 text-sm">
-                {friend.displayName ?? friend.domain ?? ellipsify(friend.address)}
+                {friend.displayName ?? friend.domain ?? <SkrNameOrAddress address={friend.address} />}
               </Text>
             </Pressable>
           ))}

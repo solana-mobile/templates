@@ -3,6 +3,7 @@ import { FlatList, Pressable, Text, View } from 'react-native'
 import { AppAddressLink } from '../../components/app-address-link'
 import { AppButton } from '../../components/app-button'
 import { AppTextInput } from '../../components/app-text-input'
+import { SkrNameOrAddress } from '../../features/domains/skr-name-or-address'
 import {
   useAddFriendMutation,
   useFriendsQuery,
@@ -70,7 +71,11 @@ export default function FriendsScreen() {
                   <Text className="text-gray-500 dark:text-gray-500"> · {item.domain}</Text>
                 ) : null}
               </Text>
-              <AppAddressLink address={item.address} label="Wallet" />
+              <AppAddressLink
+                address={item.address}
+                label="Wallet"
+                name={<SkrNameOrAddress address={item.address} />}
+              />
             </View>
             <Pressable onPress={() => removeFriendMutation.mutate(item.address)} hitSlop={8}>
               <Text className="text-base">🗑️</Text>
