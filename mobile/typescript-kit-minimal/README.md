@@ -178,8 +178,8 @@ a full network picker to copy from, including detecting an RPC URL pasted into t
 
 ## Mobile Wallet Adapter
 
-With no configuration, Mobile Wallet Adapter appears in the wallet list only in Chrome on Android,
-where it connects to a wallet installed on the same device. Other Android browsers and iOS do not
+With no configuration, Mobile Wallet Adapter appears in the wallet list only in Chrome on Android and in a
+Solana Mobile web shell, where it connects to a wallet installed on the same device. Other Android browsers and iOS do not
 support it, and everywhere else it is silently absent — which is why a desktop browser with no
 extension wallet sees an empty wallet list.
 
