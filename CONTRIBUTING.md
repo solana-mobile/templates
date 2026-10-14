@@ -41,9 +41,8 @@ This repository is for the templates themselves. The issue tracker is **not** th
 
 These apply to maintainers opening pull requests.
 
-- **Link the issue.** Reference it with a closing keyword such as `Fixes #123`. A PR without a linked issue gets the
-  `needs-issue` label until one is added.
-- **Keep it scoped.** One issue per pull request. Refactors, formatting changes, and unrelated fixes go in their own
+- **Link the issue when there is one.** Reference it with a closing keyword such as `Fixes #123`.
+- **Keep it scoped.** One concern per pull request. Refactors, formatting changes, and unrelated fixes go in their own
   PRs.
 - **Respect the template's scope.** A `minimal` template stays minimal. Adding platforms, providers, or abstractions to
   a template needs to be agreed in the issue first.
