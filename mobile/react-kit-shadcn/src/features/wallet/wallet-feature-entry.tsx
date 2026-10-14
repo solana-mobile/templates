@@ -29,8 +29,8 @@ export function WalletFeatureEntry() {
             No wallet connected
           </CardTitle>
           <CardDescription>
-            Connect a wallet to read your balance and run the examples below it. In Chrome on Android the list includes
-            any wallet installed on this device, over Mobile Wallet Adapter.
+            Connect a wallet to read your balance and run the examples below it. In Chrome on Android, or in a Solana
+            Mobile web shell, the list includes any wallet installed on this device, over Mobile Wallet Adapter.
           </CardDescription>
         </CardHeader>
         {/*

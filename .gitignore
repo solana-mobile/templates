@@ -4,6 +4,7 @@ node_modules
 .pnpm-store/
 
 # We only want a top-level `pnpm-lock.yaml` file.
+mobile/**/bun.lock
 mobile/**/package-lock.json
 mobile/**/pnpm-lock.yaml
 mobile/**/yarn.lock

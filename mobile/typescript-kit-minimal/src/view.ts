@@ -167,7 +167,7 @@ export function render(state: AppState): void {
     status === 'reconnecting'
       ? 'Reconnecting to the wallet you used last time…'
       : wallets.length === 0
-        ? `No wallet found that supports ${CLUSTER_LABEL}. Install a browser wallet, or open this page in Chrome on Android to reach a wallet installed on the device over Mobile Wallet Adapter.`
+        ? `No wallet found that supports ${CLUSTER_LABEL}. Install a browser wallet, or open this page in Chrome on Android or a Solana Mobile web shell to reach a wallet installed on the device over Mobile Wallet Adapter.`
         : DEFAULT_CONNECT_DESCRIPTION
 
   // Account card

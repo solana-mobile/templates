@@ -30,8 +30,8 @@ export function WalletFeatureEntry() {
             No wallet connected
           </CardTitle>
           <CardDescription>
-            Connect a wallet to sign in with Privy and run the examples below it. In Chrome on Android the list includes
-            any wallet installed on this device, over Mobile Wallet Adapter.
+            Connect a wallet to sign in with Privy and run the examples below it. In Chrome on Android, or in a Solana
+            Mobile web shell, the list includes any wallet installed on this device, over Mobile Wallet Adapter.
           </CardDescription>
         </CardHeader>
         {/*
