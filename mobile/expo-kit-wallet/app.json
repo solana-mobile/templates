@@ -39,7 +39,8 @@
           "backgroundColor": "#208AEF"
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-font"
     ],
     "scheme": "expo-kit-wallet",
     "slug": "expo-kit-wallet",
