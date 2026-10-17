@@ -272,7 +272,7 @@ async function readNetwork(pkg) {
   }
 
   const cluster = /(create(Solana\w+)\(\{[^}]*\}\))/.exec(source)
-  const identity = /static identity:\s*AppIdentity\s*=\s*(\{[^}]*\})/.exec(source)
+  const identity = /static identity:\s*\w+\s*=\s*(\{[^}]*\})/.exec(source)
 
   if (!cluster || !identity) {
     console.log('ℹ️  constants/app-config.ts was not in its original shape, writing a devnet config.')
