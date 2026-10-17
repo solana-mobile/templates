@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
 
 export function useNetworkGetGenesisHash() {
-  const { chain, client } = useMobileWallet()
+  const { chain, client } = useSeekerWallet()
   return useQuery({
     queryKey: ['getGenesisHash', chain],
     queryFn: () => client.rpc.getGenesisHash().send(),

@@ -1,9 +1,9 @@
 import React from 'react'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
 import { AppActionButton } from '@/components/app-action-button'
 
 export function AccountFeatureDisconnect() {
-  const { account, disconnect } = useMobileWallet()
+  const { account, disconnect } = useSeekerWallet()
 
   return (
     <AppActionButton

@@ -3,13 +3,13 @@ import { createSolanaDevnet, createSolanaTestnet } from '@wallet-ui/react-native
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { NetworkFeatureIndex } from '@/features/network/network-feature-index'
 import { NetworkProvider } from '@/features/network/network-provider'
-import { createMobileWalletMock, renderWithProviders } from '@/test/test-utils'
+import { createSeekerWalletMock, renderWithProviders } from '@/test/test-utils'
 
-const wallet = vi.hoisted(() => ({ current: null as ReturnType<typeof createMobileWalletMock> | null }))
+const wallet = vi.hoisted(() => ({ current: null as ReturnType<typeof createSeekerWalletMock> | null }))
 
-vi.mock('@wallet-ui/react-native-kit', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@wallet-ui/react-native-kit')>()),
-  useMobileWallet: () => wallet.current,
+vi.mock('@/components/seeker-wallet-provider', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/components/seeker-wallet-provider')>()),
+  useSeekerWallet: () => wallet.current,
 }))
 
 const devnet = createSolanaDevnet({ url: 'https://api.devnet.solana.com' })
@@ -21,7 +21,7 @@ function renderNetworkFeature() {
 
 describe('NetworkFeatureIndex', () => {
   beforeEach(() => {
-    wallet.current = createMobileWalletMock()
+    wallet.current = createSeekerWalletMock()
   })
 
   it('shows the selected network', async () => {
@@ -44,7 +44,7 @@ describe('NetworkFeatureIndex', () => {
   })
 
   it('reports failed cluster reads instead of rendering undefined', async () => {
-    wallet.current = createMobileWalletMock({ failRpcAfter: 0 })
+    wallet.current = createSeekerWalletMock({ failRpcAfter: 0 })
 
     const screen = await renderNetworkFeature()
 
@@ -54,7 +54,7 @@ describe('NetworkFeatureIndex', () => {
   })
 
   it('flags cluster values as stale when a refetch fails', async () => {
-    wallet.current = createMobileWalletMock({ failRpcAfter: 1 })
+    wallet.current = createSeekerWalletMock({ failRpcAfter: 1 })
 
     const screen = await renderNetworkFeature()
     // Both reads have to settle before the refetch, or the one still in flight never gets a second

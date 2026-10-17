@@ -2,20 +2,20 @@ import { MEMO_PROGRAM_ADDRESS } from '@solana-program/memo'
 import { act, fireEvent } from '@testing-library/react-native'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AccountFeatureIndex } from '@/features/account/account-feature-index'
-import { createMobileWalletMock, renderWithProviders, TEST_ADDRESS } from '@/test/test-utils'
+import { createSeekerWalletMock, renderWithProviders, TEST_ADDRESS } from '@/test/test-utils'
 
 // `vi.mock` is hoisted above the imports, so the mock value lives in a mutable holder that each test
 // reassigns before rendering.
-const wallet = vi.hoisted(() => ({ current: null as ReturnType<typeof createMobileWalletMock> | null }))
+const wallet = vi.hoisted(() => ({ current: null as ReturnType<typeof createSeekerWalletMock> | null }))
 
-vi.mock('@wallet-ui/react-native-kit', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@wallet-ui/react-native-kit')>()),
-  useMobileWallet: () => wallet.current,
+vi.mock('@/components/seeker-wallet-provider', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/components/seeker-wallet-provider')>()),
+  useSeekerWallet: () => wallet.current,
 }))
 
 describe('AccountFeatureIndex', () => {
   beforeEach(() => {
-    wallet.current = createMobileWalletMock()
+    wallet.current = createSeekerWalletMock()
   })
 
   describe('when a wallet is connected', () => {
@@ -26,7 +26,7 @@ describe('AccountFeatureIndex', () => {
     })
 
     it('renders the balance returned by the RPC client', async () => {
-      wallet.current = createMobileWalletMock({ balance: 2_250_000_000n })
+      wallet.current = createSeekerWalletMock({ balance: 2_250_000_000n })
 
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
@@ -35,7 +35,7 @@ describe('AccountFeatureIndex', () => {
     })
 
     it('reports a failed balance read instead of rendering it as zero', async () => {
-      wallet.current = createMobileWalletMock({ failRpcAfter: 0 })
+      wallet.current = createSeekerWalletMock({ failRpcAfter: 0 })
 
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
@@ -44,7 +44,7 @@ describe('AccountFeatureIndex', () => {
     })
 
     it('flags the balance as stale when a refetch fails', async () => {
-      wallet.current = createMobileWalletMock({ balance: 2_250_000_000n, failRpcAfter: 1 })
+      wallet.current = createSeekerWalletMock({ balance: 2_250_000_000n, failRpcAfter: 1 })
 
       const screen = await renderWithProviders(<AccountFeatureIndex />)
       expect(await screen.findByText(/Balance: 2\.25 SOL/)).toBeTruthy()
@@ -82,7 +82,7 @@ describe('AccountFeatureIndex', () => {
     })
 
     it('reports the reason when signing a message is rejected', async () => {
-      wallet.current = createMobileWalletMock()
+      wallet.current = createSeekerWalletMock()
       wallet.current.signMessages.mockRejectedValueOnce(new Error('User rejected the request'))
 
       const screen = await renderWithProviders(<AccountFeatureIndex />)
@@ -105,13 +105,13 @@ describe('AccountFeatureIndex', () => {
 
   describe('when no wallet is connected', () => {
     beforeEach(() => {
-      wallet.current = createMobileWalletMock({ account: null })
+      wallet.current = createSeekerWalletMock({ account: null })
     })
 
     it('offers to connect instead of showing account actions', async () => {
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
-      expect(screen.getByRole('button', { name: /^connect$/i })).toBeTruthy()
+      expect(screen.getByTestId('connect-with-seeker')).toBeTruthy()
       expect(screen.queryByRole('button', { name: /send transaction/i })).toBeNull()
       expect(screen.queryByText(/Connected to/)).toBeNull()
     })
@@ -119,7 +119,7 @@ describe('AccountFeatureIndex', () => {
     it('connects the wallet', async () => {
       const screen = await renderWithProviders(<AccountFeatureIndex />)
 
-      await fireEvent.press(screen.getByRole('button', { name: /^connect$/i }))
+      await fireEvent(screen.getByTestId('connect-with-seeker'), 'press')
 
       expect(wallet.current!.connect).toHaveBeenCalledOnce()
     })

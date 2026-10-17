@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
 import { Address } from '@solana/kit'
 
 export function useAccountGetBalance({ address }: { address: Address }) {
-  const { chain, client } = useMobileWallet()
+  const { chain, client } = useSeekerWallet()
   return useQuery({
     queryKey: ['get-balance', chain, address],
     queryFn: () => client.rpc.getBalance(address).send(),

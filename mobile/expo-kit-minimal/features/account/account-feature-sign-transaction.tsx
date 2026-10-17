@@ -1,10 +1,10 @@
 import { getAddMemoInstruction } from '@solana-program/memo'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
 import { Address, Instruction } from '@solana/kit'
 import { AppActionButton } from '@/components/app-action-button'
 
 export function AccountFeatureSignTransaction({ address }: { address: Address }) {
-  const { sendTransactions } = useMobileWallet()
+  const { sendTransactions } = useSeekerWallet()
 
   return (
     <AppActionButton

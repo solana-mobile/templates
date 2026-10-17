@@ -1,17 +1,16 @@
 import React from 'react'
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
-import { AppActionButton } from '@/components/app-action-button'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
+import { SeekerConnectButton } from '@solana-mobile/seeker-connect-react-native'
 
 export function AccountFeatureConnect() {
-  const { account, connect } = useMobileWallet()
+  const { account, connect } = useSeekerWallet()
 
   return (
-    <AppActionButton
-      disabled={!!account}
-      onPress={async () => {
-        await connect()
-      }}
-      title="Connect"
+    <SeekerConnectButton
+      enabled={!account}
+      onPress={() => connect().catch(console.warn)}
+      style={{ height: 56 }}
+      testID="connect-with-seeker"
     />
   )
 }

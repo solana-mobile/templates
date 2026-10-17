@@ -27,7 +27,7 @@ export async function renderWithProviders(ui: ReactElement) {
   return Object.assign(screen, { queryClient })
 }
 
-export interface MobileWalletMockOptions {
+export interface SeekerWalletMockOptions {
   /** Lamports returned by `client.rpc.getBalance`. */
   balance?: bigint
   /** Pass `null` to simulate a disconnected wallet. */
@@ -40,17 +40,17 @@ export interface MobileWalletMockOptions {
 }
 
 /**
- * Build a stand-in for `useMobileWallet()`.
+ * Build a stand-in for `useSeekerWallet()`.
  *
- * This is the seam that replaces the Mobile Wallet Adapter transport: no wallet app, no device and
+ * This is the seam that replaces the Seeker Connect transport: no wallet app, no device and
  * no RPC calls are involved, so the tests stay fast and deterministic while still driving the real
  * components.
  */
-export function createMobileWalletMock({
+export function createSeekerWalletMock({
   account,
   balance = 1_500_000_000n,
   failRpcAfter,
-}: MobileWalletMockOptions = {}) {
+}: SeekerWalletMockOptions = {}) {
   const sends: Record<string, number> = {}
 
   /** Resolve with `value`, unless this read is past the configured failure point. */
@@ -76,7 +76,7 @@ export function createMobileWalletMock({
         })),
       },
     },
-    connect: vi.fn(),
+    connect: vi.fn(() => Promise.resolve({ address: TEST_ADDRESS, label: 'Test Wallet' })),
     disconnect: vi.fn(),
     identity: { name: 'expo-kit-minimal', uri: 'https://example.com' },
     sendTransactions: vi.fn((_instructions: Instruction[]) => Promise.resolve('SignatureFromMockedWallet')),
