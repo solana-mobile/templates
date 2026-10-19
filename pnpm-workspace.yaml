@@ -15,6 +15,5 @@ onlyBuiltDependencies:
   - bigint-buffer
   - bufferutil
   - esbuild
-  - sharp
   - unrs-resolver
   - utf-8-validate
