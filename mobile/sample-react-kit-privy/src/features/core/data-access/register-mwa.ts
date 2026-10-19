@@ -1,9 +1,4 @@
-import {
-  createDefaultAuthorizationCache,
-  createDefaultChainSelector,
-  createDefaultWalletNotFoundHandler,
-  registerMwa,
-} from '@solana-mobile/wallet-standard-mobile'
+import { registerMwa } from '@solana-mobile/wallet-standard-mobile'
 
 /**
  * Registers Mobile Wallet Adapter as a wallet-standard wallet.
@@ -32,10 +27,7 @@ export function registerMobileWalletAdapter(): void {
       name: 'React Kit Privy',
       uri: window.location.origin,
     },
-    authorizationCache: createDefaultAuthorizationCache(),
-    chainSelector: createDefaultChainSelector(),
     chains: ['solana:devnet', 'solana:testnet', 'solana:mainnet'],
-    onWalletNotFound: createDefaultWalletNotFoundHandler(),
     ...(remoteHostAuthority ? { remoteHostAuthority } : {}),
   })
 }

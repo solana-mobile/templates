@@ -1,9 +1,4 @@
-import {
-  createDefaultAuthorizationCache,
-  createDefaultChainSelector,
-  createDefaultWalletNotFoundHandler,
-  registerMwa,
-} from '@solana-mobile/wallet-standard-mobile'
+import { registerMwa } from '@solana-mobile/wallet-standard-mobile'
 
 import { CHAIN } from './cluster'
 
@@ -30,10 +25,7 @@ export function registerMobileWalletAdapter(): void {
       name: 'TypeScript Kit Minimal',
       uri: window.location.origin,
     },
-    authorizationCache: createDefaultAuthorizationCache(),
-    chainSelector: createDefaultChainSelector(),
     chains: [CHAIN],
-    onWalletNotFound: createDefaultWalletNotFoundHandler(),
     ...(remoteHostAuthority ? { remoteHostAuthority } : {}),
   })
 }
