@@ -175,6 +175,25 @@
         "usecase": "Mobile"
       },
       {
+        "description": "A sample idle farming game with a burner player wallet, on-chain upgrades, and a global leaderboard, built with Expo, React Native, Solana Kit, Anchor, and Uniwind.",
+        "id": "gh:solana-mobile/templates/mobile/sample-expo-kit-farming-idle",
+        "image": "mobile/sample-expo-kit-farming-idle/og-image.png",
+        "keywords": [
+          "anchor",
+          "expo",
+          "mobile-wallet-adapter",
+          "react-native",
+          "sample",
+          "solana-kit",
+          "tailwind",
+          "uniwind"
+        ],
+        "name": "sample-expo-kit-farming-idle",
+        "path": "mobile/sample-expo-kit-farming-idle",
+        "displayName": "Farming Idle sample",
+        "usecase": "Mobile"
+      },
+      {
         "description": "A sample Solana mobile app with Expo, Privy auth, Solana Kit, and Uniwind.",
         "id": "gh:solana-mobile/templates/mobile/sample-expo-kit-privy",
         "image": "mobile/sample-expo-kit-privy/og-image.png",
