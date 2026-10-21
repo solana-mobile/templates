@@ -16,13 +16,14 @@
       "adb": "33.0.0"
     }
   },
-  "description": "A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Mobile Wallet Adapter.",
+  "description": "A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Seeker Connect.",
   "displayName": "Kotlin Compose Minimal example",
   "keywords": [
     "android",
     "jetpack-compose",
     "kotlin",
     "mobile-wallet-adapter",
+    "seeker-connect",
     "solana"
   ],
   "name": "kotlin-compose-minimal",

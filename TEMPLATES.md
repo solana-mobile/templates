@@ -62,9 +62,9 @@ Solana Mobile Templates
 
 `gh:solana-mobile/templates/mobile/kotlin-compose-minimal`
 
-> A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Mobile Wallet Adapter.
+> A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Seeker Connect.
 
-`android` `jetpack-compose` `kotlin` `mobile-wallet-adapter` `solana`
+`android` `jetpack-compose` `kotlin` `mobile-wallet-adapter` `seeker-connect` `solana`
 
 ### [react-kit-shadcn](mobile/react-kit-shadcn)
 
