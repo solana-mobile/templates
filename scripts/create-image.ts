@@ -20,6 +20,8 @@ const FONT_FILE = ['/Library/Fonts', join(homedir(), 'Library/Fonts')]
   .map((dir) => join(dir, 'PPMori-Semibold.otf'))
   .find(existsSync)
 const WORDMARK = readFileSync(join(ROOT_DIR, 'assets/seeker-wordmark.svg'), 'base64')
+const LOGO_HEIGHT = 120
+const LOGO_GAP = 60
 
 // Layout is authored at the 1920x1080 size of the Paper design and sliced to 1200x630.
 const FONT = `font-family="PP Mori" font-weight="600" font-size="176" letter-spacing="-5.28"`
@@ -51,9 +53,35 @@ const headline = (line1: string, line2: string) => {
   </g>`
 }
 
+// Logos are wordmarks of varying aspect ratio, scaled to one height and stacked top-down, right-aligned to the margin.
+const logoStack = (logos: string[]) =>
+  logos
+    .map((file, index) => {
+      const svg = readFileSync(file, 'utf-8')
+      const [, viewBox] = /viewBox=["']([^"']+)["']/.exec(svg) ?? []
+      if (!viewBox) throw new Error(`${file} has no viewBox`)
+      const [vbWidth, vbHeight] = viewBox
+        .trim()
+        .split(/[\s,]+/)
+        .map(Number)
+        .slice(2)
+      const width = (LOGO_HEIGHT * vbWidth) / vbHeight
+      const y = 100 + (101 - LOGO_HEIGHT) / 2 + index * (LOGO_HEIGHT + LOGO_GAP)
+      // Inlined rather than embedded as <image> so logos set in PP Mori text get the font; the root <svg> keeps its own attributes and only has its placement replaced.
+      return svg
+        .replace(
+          /^[\s\S]*?<svg\b([^>]*)>/,
+          (_, attrs: string) =>
+            `<svg x="${1920 - MARGIN - width}" y="${y}" width="${width}" height="${LOGO_HEIGHT}"${attrs.replace(/\s(x|y|width|height)=("[^"]*"|'[^']*')/g, '')}>`,
+        )
+        .trim()
+    })
+    .join('\n  ')
+
 const image = (
   line1: string,
   line2: string,
+  logos: string[],
 ) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1200" height="630" preserveAspectRatio="xMidYMid slice">
   <rect width="1920" height="1080" fill="#000000"/>
   <defs><filter id="blur" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="200"/></filter></defs>
@@ -64,6 +92,7 @@ const image = (
     <path filter="url(#blur)" fill="#FFEA00" transform="translate(615.407 1261.048)" d="M481.346 0C747.186 0 962.693 171.945 962.693 384.051C962.693 596.156 747.186 768.102 481.346 768.102C215.506 768.102 0 596.156 0 384.051C0 171.945 215.506 0 481.346 0Z"/>
   </g>
   <image x="${MARGIN}" y="100" width="413" height="101" href="data:image/svg+xml;base64,${WORDMARK}"/>
+  ${logoStack(logos)}
   ${headline(line1, line2)}
 </svg>`
 
@@ -92,9 +121,20 @@ const main = () => {
     const title: string = displayName ?? name
     const kind = title.endsWith(' sample') ? 'Sample' : 'Template'
     const subject = title.replace(/ (example|sample)$/, '')
-    const png = render(image(kind, subject)).render().asPng()
+    // Template directory names are hyphenated tokens like expo-kit-privy; each with a logo file gets a logo.
+    const logos = templatePath
+      .split('/')
+      .pop()!
+      .split('-')
+      .map((token) => join(ROOT_DIR, 'assets/logos', `${token}.svg`))
+      .filter(existsSync)
+    const png = render(image(kind, subject, logos))
+      .render()
+      .asPng()
     writeFileSync(join(ROOT_DIR, templatePath, 'og-image.png'), png)
-    console.log(`${templatePath}/og-image.png (${Math.round(png.length / 1024)}KB): ${kind} / ${subject}`)
+    console.log(
+      `${templatePath}/og-image.png (${Math.round(png.length / 1024)}KB): ${kind} / ${subject} [${logos.length} logos]`,
+    )
   }
 }
 
