@@ -10,7 +10,7 @@ The generator and the check scan direct children of each root `repokit.groups` p
 
 ## Open Graph Images
 
-Every template needs `og-image.png` at `1200x630` and under the enforced size limit. Use `pnpm create-image` when a quick generated image is enough.
+Every template needs `og-image.png` at `1200x630` and under the enforced size limit. Run `pnpm create-image <group>/<template-directory>` to generate it in the Solana Mobile thumbnail style (needs PP Mori Semibold installed locally).
 
 ## Formatting
 
