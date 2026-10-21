@@ -1,18 +1,23 @@
 package com.kotlin_compose_minimal
 
-import android.net.Uri
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.funkatronics.encoders.Base58
-import com.solana.mobilewalletadapter.clientlib.ActivityResultSender
-import com.solana.mobilewalletadapter.clientlib.ConnectionIdentity
-import com.solana.mobilewalletadapter.clientlib.MobileWalletAdapter
-import com.solana.mobilewalletadapter.clientlib.Solana
-import com.solana.mobilewalletadapter.clientlib.TransactionResult
-import com.solana.publickey.SolanaPublicKey
+import com.solanamobile.seekerconnect.DappIdentity
+import com.solanamobile.seekerconnect.SeekerConnect
+import com.solanamobile.seekerconnect.SeekerConnectConfig
+import com.solanamobile.seekerconnect.SeekerConnectException
+import com.solanamobile.seekerconnect.android.MwaSeekerLink
+import com.solanamobile.seekerconnect.android.SharedPreferencesAuthorizationCache
+import com.solanamobile.seekerconnect.compose.SeekerConnectDialogState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -22,82 +27,57 @@ data class WalletUiState(
     val message: String? = null,
 )
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    val dialogs = SeekerConnectDialogState()
 
     // Replace with your app's own domain and host a Digital Asset Links file there so
     // wallets can verify your app identity: https://docs.solanamobile.com/android-native/using_mobile_wallet_adapter
-    private val walletAdapter = MobileWalletAdapter(
-        connectionIdentity = ConnectionIdentity(
-            identityUri = Uri.parse("https://yourdapp.com"),
-            iconUri = Uri.parse("favicon.ico"),
-            identityName = "Kotlin Compose Minimal",
-        )
-    ).apply {
-        blockchain = Solana.Devnet
-    }
+    private val seekerConnect = SeekerConnect(
+        SeekerConnectConfig(
+            identity = DappIdentity("Kotlin Compose Minimal", "https://yourdapp.com", "favicon.ico"),
+            chain = "solana:devnet",
+        ),
+        MwaSeekerLink(application),
+        SharedPreferencesAuthorizationCache(application),
+        dialogs,
+    )
 
     private val _uiState = MutableStateFlow(WalletUiState())
     val uiState: StateFlow<WalletUiState> = _uiState.asStateFlow()
 
-    fun connect(sender: ActivityResultSender) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, message = null) }
-            when (val result = walletAdapter.connect(sender)) {
-                is TransactionResult.Success -> _uiState.update {
-                    it.copy(
-                        address = SolanaPublicKey(result.authResult.accounts.first().publicKey).base58(),
-                        isLoading = false,
-                    )
-                }
-                is TransactionResult.NoWalletFound -> _uiState.update {
-                    it.copy(isLoading = false, message = result.message)
-                }
-                is TransactionResult.Failure -> _uiState.update {
-                    it.copy(isLoading = false, message = result.message)
-                }
-            }
+    init {
+        seekerConnect.authorization
+            .onEach { authorization -> _uiState.update { it.copy(address = authorization?.accounts?.first()?.address) } }
+            .launchIn(viewModelScope)
+        viewModelScope.launch { seekerConnect.restore() }
+    }
+
+    fun connect(host: ComponentActivity) = host.lifecycleScope.launch {
+        perform { seekerConnect.connect(host); null }
+    }
+
+    fun signMessage(host: ComponentActivity, message: String) = host.lifecycleScope.launch {
+        perform {
+            val address = checkNotNull(_uiState.value.address)
+            val signature = seekerConnect.signMessages(host, listOf(address), listOf(message.encodeToByteArray())).single()
+            "Signature: ${Base58.encodeToString(signature)}"
         }
     }
 
-    fun signMessage(sender: ActivityResultSender, message: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, message = null) }
-            val result = walletAdapter.transact(sender) { authResult ->
-                signMessagesDetached(
-                    arrayOf(message.encodeToByteArray()),
-                    arrayOf(authResult.accounts.first().publicKey),
-                ).messages.first().signatures.first()
-            }
-            when (result) {
-                is TransactionResult.Success -> _uiState.update {
-                    it.copy(
-                        address = SolanaPublicKey(result.authResult.accounts.first().publicKey).base58(),
-                        isLoading = false,
-                        message = "Signature: ${Base58.encodeToString(result.payload)}",
-                    )
-                }
-                is TransactionResult.NoWalletFound -> _uiState.update {
-                    it.copy(isLoading = false, message = result.message)
-                }
-                is TransactionResult.Failure -> _uiState.update {
-                    it.copy(isLoading = false, message = result.message)
-                }
-            }
-        }
+    fun disconnect() = viewModelScope.launch {
+        perform { seekerConnect.disconnect(); null }
     }
 
-    fun disconnect(sender: ActivityResultSender) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, message = null) }
-            when (val result = walletAdapter.disconnect(sender)) {
-                is TransactionResult.Success -> _uiState.value = WalletUiState()
-                is TransactionResult.NoWalletFound -> _uiState.update {
-                    it.copy(isLoading = false, message = result.message)
-                }
-                is TransactionResult.Failure -> _uiState.update {
-                    it.copy(isLoading = false, message = result.message)
-                }
-            }
+    private suspend fun perform(action: suspend () -> String?) {
+        _uiState.update { it.copy(isLoading = true, message = null) }
+        try {
+            val message = action()
+            _uiState.update { it.copy(message = message) }
+        } catch (e: SeekerConnectException) {
+            _uiState.update { it.copy(message = "Failed: ${e.code}") }
+        } finally {
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }

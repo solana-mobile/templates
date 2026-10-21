@@ -122,7 +122,7 @@
         "usecase": "Mobile"
       },
       {
-        "description": "A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Mobile Wallet Adapter.",
+        "description": "A minimal native Android template for building a Solana mobile app with Kotlin, Jetpack Compose, and Seeker Connect.",
         "id": "gh:solana-mobile/templates/mobile/kotlin-compose-minimal",
         "image": "mobile/kotlin-compose-minimal/og-image.png",
         "keywords": [
@@ -130,6 +130,7 @@
           "jetpack-compose",
           "kotlin",
           "mobile-wallet-adapter",
+          "seeker-connect",
           "solana"
         ],
         "name": "kotlin-compose-minimal",

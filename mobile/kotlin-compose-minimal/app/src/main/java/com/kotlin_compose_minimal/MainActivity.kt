@@ -23,14 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kotlin_compose_minimal.ui.theme.KotlinComposeMinimalTheme
-import com.solana.mobilewalletadapter.clientlib.ActivityResultSender
+import com.solanamobile.seekerconnect.compose.SeekerConnectButton
+import com.solanamobile.seekerconnect.compose.SeekerConnectDialogs
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        val sender = ActivityResultSender(this)
 
         setContent {
             KotlinComposeMinimalTheme {
@@ -40,12 +39,13 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     WalletScreen(
                         state = state,
-                        onConnect = { viewModel.connect(sender) },
-                        onSignMessage = { viewModel.signMessage(sender, "Hello from Kotlin Compose Minimal!") },
-                        onDisconnect = { viewModel.disconnect(sender) },
+                        onConnect = { viewModel.connect(this) },
+                        onSignMessage = { viewModel.signMessage(this, "Hello from Kotlin Compose Minimal!") },
+                        onDisconnect = { viewModel.disconnect() },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
+                SeekerConnectDialogs(viewModel.dialogs)
             }
         }
     }
@@ -67,14 +67,12 @@ fun WalletScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Kotlin Compose Minimal + Mobile Wallet Adapter",
+            text = "Kotlin Compose Minimal + Seeker Connect",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
         )
         if (state.address == null) {
-            Button(onClick = onConnect, enabled = !state.isLoading) {
-                Text("Connect wallet")
-            }
+            SeekerConnectButton(onClick = onConnect, enabled = !state.isLoading)
         } else {
             Text(
                 text = "Connected: ${state.address.take(4)}…${state.address.takeLast(4)}",
