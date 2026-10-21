@@ -1,5 +1,5 @@
+import { DappIdentity } from '@solana-mobile/seeker-connect-react-native'
 import {
-  AppIdentity,
   createSolanaDevnet,
   createSolanaLocalnet,
   createSolanaTestnet,
@@ -7,7 +7,7 @@ import {
 } from '@wallet-ui/react-native-kit'
 
 export class AppConfig {
-  static identity: AppIdentity = { name: 'expo-kit-minimal' }
+  static identity: DappIdentity = { name: 'expo-kit-minimal', uri: 'https://expo-kit-minimal.example.com' }
   static networks: SolanaCluster[] = [
     createSolanaDevnet({ url: 'https://api.devnet.solana.com' }),
     createSolanaLocalnet({ url: 'http://localhost:8899' }),

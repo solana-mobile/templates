@@ -7,7 +7,7 @@
  * and deletes the demo built on top of it: the account screens, the network switcher and its read
  * queries, the formatting helpers and the tests that cover them.
  *
- * The switcher goes because `MobileWalletProvider` takes a single cluster, so the reset app holds one
+ * The switcher goes because `SeekerWalletProvider` takes a single cluster, so the reset app holds one
  * in `constants/app-config.ts` instead of a list to pick from.
  *
  * Usage:
@@ -32,12 +32,13 @@ const root = path.join(__dirname, '..')
  * Demo code, relative to the project root. Directories are deleted whole.
  *
  * `features` goes entirely: the account screens are a demo, and so is the network switcher, because
- * `MobileWalletProvider` takes a single cluster and the app config holds one after the reset.
+ * `SeekerWalletProvider` takes a single cluster and the app config holds one after the reset.
  *
  * `components` goes the same way and is rebuilt from `writtenPaths` below, rather than naming the
  * demo's own components here. Everything in it exists to serve the demo screens except the providers,
- * which the reset writes anyway — so deleting the directory keeps this list correct as the demo grows
- * instead of leaving a new component behind importing something that is gone.
+ * which the reset writes anyway, and the Seeker wallet provider, which is read before the delete and
+ * written back — so deleting the directory keeps this list correct as the demo grows instead of
+ * leaving a new component behind importing something that is gone.
  *
  * `e2e` goes because it drives the demo screens: it presses Connect and Sign Message and asserts on
  * their labels, none of which survive the reset.
@@ -56,6 +57,7 @@ const writtenPaths = [
   'constants/app-config.ts',
   'components/app-providers.tsx',
   'components/app-providers.test.tsx',
+  'components/seeker-wallet-provider.tsx',
   'app/index.tsx',
   'README.md',
 ]
@@ -73,18 +75,19 @@ const lockfiles = {
 }
 
 function appConfigContent({ cluster, creator, identity }) {
-  return `import { AppIdentity, ${creator}, SolanaCluster } from '@wallet-ui/react-native-kit'
+  return `import { DappIdentity } from '@solana-mobile/seeker-connect-react-native'
+import { ${creator}, SolanaCluster } from '@wallet-ui/react-native-kit'
 
 export class AppConfig {
   static cluster: SolanaCluster = ${cluster}
-  static identity: AppIdentity = ${identity}
+  static identity: DappIdentity = ${identity}
 }
 `
 }
 
 const appProvidersContent = `import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PropsWithChildren } from 'react'
-import { MobileWalletProvider } from '@wallet-ui/react-native-kit'
+import { SeekerWalletProvider } from '@/components/seeker-wallet-provider'
 import { AppConfig } from '@/constants/app-config'
 
 const queryClient = new QueryClient()
@@ -92,9 +95,9 @@ const queryClient = new QueryClient()
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
-      <MobileWalletProvider cluster={AppConfig.cluster} identity={AppConfig.identity}>
+      <SeekerWalletProvider cluster={AppConfig.cluster} identity={AppConfig.identity}>
         {children}
-      </MobileWalletProvider>
+      </SeekerWalletProvider>
     </QueryClientProvider>
   )
 }
@@ -124,7 +127,7 @@ import { AppConfig } from '@/constants/app-config'
 import { appStyles } from '@/constants/app-styles'
 
 export default function HomeScreen() {
-  // Anywhere below \`AppProviders\`, \`useMobileWallet()\` from '@wallet-ui/react-native-kit' gives you
+  // Anywhere below \`AppProviders\`, \`useSeekerWallet()\` from '@/components/seeker-wallet-provider' gives you
   // the connected account, the RPC client and the sign and send methods.
   return (
     <SafeAreaView style={appStyles.screen}>
@@ -140,11 +143,11 @@ export default function HomeScreen() {
 function readmeContent({ name, pm }) {
   return `# ${name}
 
-An [Expo](https://expo.dev) app wired up to the Solana Mobile Wallet Adapter with
-[\`@wallet-ui/react-native-kit\`](https://www.npmjs.com/package/@wallet-ui/react-native-kit).
+An [Expo](https://expo.dev) app wired up to the Seeker's wallet with
+[\`@solana-mobile/seeker-connect-react-native\`](https://www.npmjs.com/package/@solana-mobile/seeker-connect-react-native).
 
-Mobile Wallet Adapter is Android only, so connecting a wallet needs an Android device or emulator
-with a wallet app installed.
+Seeker Connect is Android only, so connecting a wallet needs an Android device or emulator with a
+wallet app installed, and a development build: the native module cannot run in Expo Go.
 
 ## Getting started
 
@@ -158,17 +161,18 @@ ${pm} run android
 - \`index.js\` installs the crypto polyfill, then hands off to \`expo-router\`.
 - \`constants/app-config.ts\` holds the cluster the app talks to and the identity wallets show on
   approval. Change the cluster there to point somewhere else.
-- \`components/app-providers.tsx\` sets up React Query and \`MobileWalletProvider\`.
+- \`components/app-providers.tsx\` sets up React Query and \`SeekerWalletProvider\`, the wrapper in
+  \`components/seeker-wallet-provider.tsx\` that keeps the Seeker Connect authorization in React state.
 - \`app/index.tsx\` is the home screen — empty, ready for your own code.
 
 ## Using the wallet
 
-\`useMobileWallet()\` works anywhere below \`AppProviders\`:
+\`useSeekerWallet()\` works anywhere below \`AppProviders\`:
 
 \`\`\`tsx
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
 
-const { account, chain, client, connect, disconnect, sendTransactions, signIn, signMessages } = useMobileWallet()
+const { account, chain, client, connect, disconnect, sendTransactions, signIn, signMessages } = useSeekerWallet()
 \`\`\`
 
 \`account\` is \`null\` until a wallet is connected, and \`client.rpc\` is a
@@ -215,6 +219,8 @@ async function main() {
 
   console.log()
 
+  const seekerWalletProvider = await fs.readFile(path.join(root, 'components/seeker-wallet-provider.tsx'), 'utf8')
+
   for (const target of present) {
     await fs.rm(path.join(root, target), { force: true, recursive: true })
     console.log(`❌ ${target} deleted.`)
@@ -227,6 +233,7 @@ async function main() {
   await write('constants/app-config.ts', appConfigContent(await readNetwork(pkg)))
   await write('components/app-providers.tsx', appProvidersContent)
   await write('components/app-providers.test.tsx', appProvidersTestContent)
+  await write('components/seeker-wallet-provider.tsx', seekerWalletProvider)
   await write('app/index.tsx', indexContent)
   await write('README.md', readmeContent({ name: pkg.name ?? path.basename(root), pm }))
 
@@ -235,7 +242,7 @@ async function main() {
 
   1. Run \`${pm} install\` so the dependencies match the trimmed package.json.
   2. Edit app/index.tsx to build your first screen.
-  3. Reach for the wallet with \`useMobileWallet()\`, and change the cluster in
+  3. Reach for the wallet with \`useSeekerWallet()\`, and change the cluster in
      constants/app-config.ts.
 `)
 }
@@ -260,7 +267,7 @@ async function readNetwork(pkg) {
   const fallback = {
     cluster: `createSolanaDevnet({ url: 'https://api.devnet.solana.com' })`,
     creator: 'createSolanaDevnet',
-    identity: `{ name: '${pkg.name ?? path.basename(root)}' }`,
+    identity: `{ name: '${pkg.name ?? path.basename(root)}', uri: 'https://example.com' }`,
   }
 
   let source
@@ -272,7 +279,7 @@ async function readNetwork(pkg) {
   }
 
   const cluster = /(create(Solana\w+)\(\{[^}]*\}\))/.exec(source)
-  const identity = /static identity:\s*AppIdentity\s*=\s*(\{[^}]*\})/.exec(source)
+  const identity = /static identity:\s*\w+\s*=\s*(\{[^}]*\})/.exec(source)
 
   if (!cluster || !identity) {
     console.log('ℹ️  constants/app-config.ts was not in its original shape, writing a devnet config.')

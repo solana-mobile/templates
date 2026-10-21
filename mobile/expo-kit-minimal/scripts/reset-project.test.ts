@@ -156,10 +156,11 @@ describe('reset-project', () => {
       await fs.writeFile(
         path.join(project, 'constants/app-config.ts'),
         [
-          "import { AppIdentity, createSolanaMainnet, SolanaCluster } from '@wallet-ui/react-native-kit'",
+          "import { DappIdentity } from '@solana-mobile/seeker-connect-react-native'",
+          "import { createSolanaMainnet, SolanaCluster } from '@wallet-ui/react-native-kit'",
           '',
           'export class AppConfig {',
-          "  static identity: AppIdentity = { name: 'my-app', uri: 'https://example.com' }",
+          "  static identity: DappIdentity = { name: 'my-app', uri: 'https://example.com' }",
           "  static networks: SolanaCluster[] = [createSolanaMainnet({ url: 'https://example.com/rpc' })]",
           '}',
           '',
@@ -172,8 +173,8 @@ describe('reset-project', () => {
       expect(appConfig).toContain(
         "static cluster: SolanaCluster = createSolanaMainnet({ url: 'https://example.com/rpc' })",
       )
-      expect(appConfig).toContain("static identity: AppIdentity = { name: 'my-app', uri: 'https://example.com' }")
-      expect(appConfig).toContain('import { AppIdentity, createSolanaMainnet, SolanaCluster } from')
+      expect(appConfig).toContain("static identity: DappIdentity = { name: 'my-app', uri: 'https://example.com' }")
+      expect(appConfig).toContain('import { createSolanaMainnet, SolanaCluster } from')
     })
 
     it('leaves a test suite that still covers the wiring', async () => {
@@ -182,6 +183,17 @@ describe('reset-project', () => {
       await reset(project)
 
       expect(await exists(path.join(project, 'components/app-providers.test.tsx'))).toBe(true)
+    })
+
+    it('keeps the Seeker wallet provider', async () => {
+      const project = await copyProject()
+      const before = await fs.readFile(path.join(project, 'components/seeker-wallet-provider.tsx'), 'utf8')
+
+      await reset(project)
+
+      expect(await fs.readFile(path.join(project, 'components/seeker-wallet-provider.tsx'), 'utf8')).toBe(before)
+      const after = await readPackageJson(project)
+      expect(after.dependencies['@solana-mobile/seeker-connect-react-native']).toBeDefined()
     })
 
     it('leaves an empty home screen behind', async () => {

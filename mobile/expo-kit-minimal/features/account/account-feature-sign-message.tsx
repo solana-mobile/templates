@@ -1,9 +1,9 @@
-import { useMobileWallet } from '@wallet-ui/react-native-kit'
+import { useSeekerWallet } from '@/components/seeker-wallet-provider'
 import { Address } from '@solana/kit'
 import { AppActionButton } from '@/components/app-action-button'
 
 export function AccountFeatureSignMessage({ address }: { address: Address }) {
-  const { signMessages } = useMobileWallet()
+  const { signMessages } = useSeekerWallet()
 
   return (
     <AppActionButton

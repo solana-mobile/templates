@@ -70,10 +70,23 @@ bad() { echo "  FAIL   $1 -- $2"; FAIL=$((FAIL+1)); FAILED+=("$1"); }
 CONNECTED='text="Connected to fakewallet account 0"'
 DISCONNECTED='text="SIGN IN AND CONNECT"'
 
+# Seeker Connect draws its own error card over the app after a failed wallet flow. It is the
+# failure the user sees, and it has to be closed before the screen underneath can be read. The
+# card's title is the one node that carries the same string as both text and content-desc, which
+# keeps the message apart from the app's own text in the same dump.
+sc_card()  { hasg 'content-desc="Solana Mobile"' && hasg 'text="Close"'; }
+sc_card_text() {
+  local t
+  grep -oE 'content-desc="[^"]+"' "$SNAP" | sed 's/content-desc=//' | grep -v '"Close"\|"Solana Mobile"' \
+    | while read -r t; do if hasg "text=$t"; then echo "text=$t"; break; fi; done
+}
+sc_close() { tap 'text="Close"' >/dev/null 2>&1; sleep 2; }
+
 ensure_disconnected() {
   app_front
   for _ in 1 2 3 4; do
     snap
+    if sc_card;                  then sc_close; continue; fi
     if hasg "$DISCONNECTED" && ! hasg "$CONNECTED"; then return 0; fi
     if in_wallet;                then tap 'id/btn_decline"'   >/dev/null 2>&1; sleep 2; app_front; continue; fi
     if hasg 'text="DISCONNECT"'; then tap 'text="DISCONNECT"' >/dev/null 2>&1; sleep 3; app_front; continue; fi
@@ -97,12 +110,14 @@ injection_test() {  # <label> <wallet-button-id>
   local label="$1" btn="$2" base e shown
   ensure_disconnected || { bad "$label" "could not reach a disconnected baseline"; return; }
   snap; base=$(rn_err_id)
-  drive CONNECT authorize "$btn" || { bad "$label" "flow did not execute"; return; }
+  drive 'Connect with Seeker' authorize "$btn" || { bad "$label" "flow did not execute"; return; }
   snap
+  shown=""
+  if sc_card; then shown=$(sc_card_text); sc_close; snap; fi
   hasg "$CONNECTED"     && { bad "$label" "an account was bound despite $btn"; return; }
   hasg "$DISCONNECTED"  || { bad "$label" "app left in an unknown state"; return; }
   e=$(rn_err_new "$base")
-  shown=$(grep -oE 'text="[^"]*[Ff]ailed[^"]*"' "$SNAP" | head -1)
+  [ -z "$shown" ] && shown=$(grep -oE 'text="[^"]*[Ff]ailed[^"]*"' "$SNAP" | head -1)
   if   [ -n "$e" ];     then bad "$label" "unhandled rejection leaked: $e"
   elif [ -z "$shown" ]; then bad "$label" "the failure was swallowed, nothing shown to the user"
   else ok "$label ($shown)"; fi
@@ -122,7 +137,7 @@ echo "  baseline: disconnected"
 echo
 echo "=== flows ==="
 
-if drive CONNECT authorize btn_authorize && wait_for "$CONNECTED" 20; then
+if drive 'Connect with Seeker' authorize btn_authorize && wait_for "$CONNECTED" 20; then
   ok "connect binds an account"
   snap; hasg 'text="Balance: 0 SOL"' && ok "balance is read" || bad "balance is read" "no balance rendered"
 else
@@ -172,12 +187,13 @@ injection_test "declined authorization" btn_decline
 injection_test "wallet internal error"  btn_simulate_internal_error
 injection_test "unsupported cluster"    btn_simulate_cluster_not_supported
 
-if ensure_disconnected && drive CONNECT authorize btn_authorize && wait_for "$CONNECTED" 20; then
+if ensure_disconnected && drive 'Connect with Seeker' authorize btn_authorize && wait_for "$CONNECTED" 20; then
   snap; IP_BASE=$(rn_err_id)
   if drive "SIGN MESSAGE" sign_payloads btn_simulate_invalid_payloads; then
     snap
     e=$(rn_err_new "$IP_BASE")
     shown=$(grep -oiE 'text="[^"]*sign message failed[^"]*"' "$SNAP" | head -1)
+    if [ -z "$shown" ] && sc_card; then shown=$(sc_card_text); sc_close; fi
     if   [ -n "$e" ];     then bad "invalid payload" "unhandled rejection leaked: $e"
     elif [ -z "$shown" ]; then bad "invalid payload" "the failure was swallowed"
     else ok "invalid payload ($shown)"; fi

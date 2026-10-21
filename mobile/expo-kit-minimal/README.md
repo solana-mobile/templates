@@ -1,6 +1,6 @@
-# Example Expo app with @wallet-ui/react-native-kit
+# Example Expo app with Seeker Connect
 
-This is an example of how to use [`@wallet-ui/react-native-kit`](https://www.npmjs.com/package/@wallet-ui/react-native-kit) with Expo.
+This is an example of how to use [`@solana-mobile/seeker-connect-react-native`](https://www.npmjs.com/package/@solana-mobile/seeker-connect-react-native) with Expo. `components/seeker-wallet-provider.tsx` wraps it in a React provider and builds transactions with [`@solana/kit`](https://www.npmjs.com/package/@solana/kit); the RPC client and the cluster definitions come from [`@wallet-ui/react-native-kit`](https://www.npmjs.com/package/@wallet-ui/react-native-kit).
 
 ## Reset the project
 
@@ -17,7 +17,7 @@ Run it with the package manager you created the app with. The script writes the 
 
 It lists what it is about to delete and asks before touching anything. What it keeps is the wiring — the crypto polyfill, the providers and the app config. What it deletes is everything built on top: the account screens, the network switcher and its read queries, the formatting helpers and the tests covering them.
 
-The switcher goes because [`MobileWalletProvider`](https://www.npmjs.com/package/@wallet-ui/react-native-kit) takes a single cluster, so a blank app has no use for a list to pick from. `constants/app-config.ts` is rewritten to hold one cluster — carried over from whichever network was configured first, so a project already pointed at mainnet stays there — and `components/app-providers.tsx` passes it straight to the provider.
+The switcher goes because `SeekerWalletProvider` takes a single cluster, so a blank app has no use for a list to pick from. `constants/app-config.ts` is rewritten to hold one cluster — carried over from whichever network was configured first, so a project already pointed at mainnet stays there — and `components/app-providers.tsx` passes it straight to the provider.
 
 `app/index.tsx` becomes an empty screen, `components/app-providers.test.tsx` is left behind so the suite still covers the wiring, the demo-only dependency is dropped from `package.json`, and the README is replaced with one describing what is left.
 
@@ -67,16 +67,16 @@ Transaction building is deliberately _not_ tested at L1. Building the memo instr
 npm run e2e
 ```
 
-**L2** tests render real components and press real buttons. The only thing replaced is the Mobile Wallet Adapter transport — `useMobileWallet()` is mocked so that no wallet app is launched and no RPC request leaves the process:
+**L2** tests render real components and press real buttons. The only thing replaced is the Seeker Connect transport — `useSeekerWallet()` is mocked so that no wallet app is launched and no RPC request leaves the process:
 
 ```tsx
-vi.mock('@wallet-ui/react-native-kit', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@wallet-ui/react-native-kit')>()),
-  useMobileWallet: () => wallet.current,
+vi.mock('@/components/seeker-wallet-provider', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/components/seeker-wallet-provider')>()),
+  useSeekerWallet: () => wallet.current,
 }))
 ```
 
-Everything else — `View`, `Text`, `Button`, React Query, the network provider — is the real implementation. Shared helpers live in [`test/test-utils.tsx`](test/test-utils.tsx): `renderWithProviders` wraps a tree in a fresh React Query client, and `createMobileWalletMock` builds the stand-in wallet.
+Everything else — `View`, `Text`, `Button`, React Query, the network provider — is the real implementation. Shared helpers live in [`test/test-utils.tsx`](test/test-utils.tsx): `renderWithProviders` wraps a tree in a fresh React Query client, and `createSeekerWalletMock` builds the stand-in wallet.
 
 ### Writing tests
 

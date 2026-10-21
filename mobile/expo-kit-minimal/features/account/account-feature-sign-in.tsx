@@ -1,19 +1,19 @@
-import { Account, useMobileWallet } from '@wallet-ui/react-native-kit'
+import { SeekerWalletAccount, useSeekerWallet } from '@/components/seeker-wallet-provider'
 import { AppActionButton } from '@/components/app-action-button'
 
-export function AccountFeatureSignIn({ account }: { account?: Account }) {
-  const { chain, identity, signIn } = useMobileWallet()
+export function AccountFeatureSignIn({ account }: { account?: SeekerWalletAccount }) {
+  const { chain, identity, signIn } = useSeekerWallet()
 
   return (
     <AppActionButton
       onPress={async () => {
         const result = await signIn({
-          address: account?.address.toString(),
+          address: account?.address,
           chainId: chain,
           uri: identity.uri,
         })
         return {
-          description: `Signed in with ${result.account.address}`,
+          description: `Signed in with ${result.address}`,
           status: 'success',
           title: 'Sign In',
         } as const
