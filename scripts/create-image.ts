@@ -5,6 +5,7 @@
  * Usage:
  *   pnpm create-image                           # every template in repokit.groups
  *   pnpm create-image mobile/expo-kit-minimal   # one or more template paths
+ *   pnpm create-image --site <output.png>       # the templates site's Open Graph image
  *
  * Requires PP Mori Semibold installed locally (licensed font, not committed).
  */
@@ -109,6 +110,17 @@ const main = () => {
   if (!FONT_FILE) {
     console.error('Error: PPMori-Semibold.otf not found in /Library/Fonts or ~/Library/Fonts')
     process.exit(1)
+  }
+  if (process.argv[2] === '--site') {
+    const logos = ['expo', 'react', 'kotlin'].map((token) => join(ROOT_DIR, 'assets/logos', `${token}.svg`))
+    const png = render(image('Solana Mobile', 'Templates', logos))
+      .render()
+      .asPng()
+    writeFileSync(process.argv[3], png)
+    console.log(
+      `${process.argv[3]} (${Math.round(png.length / 1024)}KB): Solana Mobile / Templates [${logos.length} logos]`,
+    )
+    return
   }
   const paths = process.argv.length > 2 ? process.argv.slice(2) : templatePaths()
   for (const templatePath of paths) {
