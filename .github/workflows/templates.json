@@ -1,6 +1,7 @@
 [
   "mobile/expo-kit-anchor",
   "mobile/expo-kit-minimal",
+  "mobile/expo-kit-pinocchio",
   "mobile/expo-kit-uniwind",
   "mobile/expo-kit-wallet",
   "mobile/expo-web3js-minimal",

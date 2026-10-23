@@ -18,6 +18,14 @@ Solana Mobile Templates
 
 `expo` `mobile-wallet-adapter` `react-native` `solana-kit`
 
+### [expo-kit-pinocchio](mobile/expo-kit-pinocchio)
+
+`gh:solana-mobile/templates/mobile/expo-kit-pinocchio`
+
+> A template for building a Solana mobile app with Expo, React Native, Solana Kit, Pinocchio, and Uniwind.
+
+`expo` `mobile-wallet-adapter` `pinocchio` `react-native` `solana-kit` `tailwind` `uniwind`
+
 ### [expo-kit-uniwind](mobile/expo-kit-uniwind)
 
 `gh:solana-mobile/templates/mobile/expo-kit-uniwind`
