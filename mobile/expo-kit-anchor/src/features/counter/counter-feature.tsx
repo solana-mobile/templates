@@ -20,11 +20,11 @@ export function CounterFeature() {
   const count = counterQuery.data?.count
   const counterAddress = counterQuery.data?.address
   const isBusy =
-    airdropMutation.isPending || counterQuery.isLoading || incrementMutation.isPending || initializeMutation.isPending
+    airdropMutation.isPending || counterQuery.isFetching || incrementMutation.isPending || initializeMutation.isPending
   const error = airdropMutation.error ?? counterQuery.error ?? incrementMutation.error ?? initializeMutation.error
   const mutation = count === null ? initializeMutation : incrementMutation
   const lastSignature = incrementMutation.data ?? initializeMutation.data
-  const label = count === null ? 'Initialize Counter' : 'Increment Counter'
+  const label = counterQuery.isError ? 'Retry' : count === null ? 'Initialize Counter' : 'Increment Counter'
   const hasNoSol = balanceQuery.data === 0n
   const isLocalnet = chain === 'solana:localnet'
 
@@ -40,7 +40,7 @@ export function CounterFeature() {
       ) : null}
       <Pressable
         disabled={isBusy}
-        onPress={() => mutation.mutate()}
+        onPress={() => (counterQuery.isError ? void counterQuery.refetch() : mutation.mutate())}
         className={`bg-green-600 px-6 py-3 rounded-xl active:bg-green-700 ${isBusy ? 'opacity-50' : ''}`}
       >
         <Text className="text-white font-bold">{isBusy ? 'Working...' : label}</Text>
