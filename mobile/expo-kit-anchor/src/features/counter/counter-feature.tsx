@@ -1,6 +1,4 @@
-import type { Signature } from '@solana/kit'
 import { openURL } from 'expo-linking'
-import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useMobileWallet } from '@wallet-ui/react-native-kit'
 import { AppAddressLink } from '../../components/app-address-link'
@@ -18,7 +16,6 @@ export function CounterFeature() {
   const balanceQuery = useBalanceQuery()
   const counterQuery = useCounterQuery()
   const { incrementMutation, initializeMutation } = useCounterProgram()
-  const [lastSignature, setLastSignature] = useState<Signature | undefined>()
 
   const count = counterQuery.data?.count
   const counterAddress = counterQuery.data?.address
@@ -26,6 +23,7 @@ export function CounterFeature() {
     airdropMutation.isPending || counterQuery.isLoading || incrementMutation.isPending || initializeMutation.isPending
   const error = airdropMutation.error ?? counterQuery.error ?? incrementMutation.error ?? initializeMutation.error
   const mutation = count === null ? initializeMutation : incrementMutation
+  const lastSignature = incrementMutation.data ?? initializeMutation.data
   const label = count === null ? 'Initialize Counter' : 'Increment Counter'
   const hasNoSol = balanceQuery.data === 0n
   const isLocalnet = chain === 'solana:localnet'
@@ -42,7 +40,7 @@ export function CounterFeature() {
       ) : null}
       <Pressable
         disabled={isBusy}
-        onPress={() => mutation.mutate(undefined, { onSuccess: setLastSignature })}
+        onPress={() => mutation.mutate()}
         className={`bg-green-600 px-6 py-3 rounded-xl active:bg-green-700 ${isBusy ? 'opacity-50' : ''}`}
       >
         <Text className="text-white font-bold">{isBusy ? 'Working...' : label}</Text>

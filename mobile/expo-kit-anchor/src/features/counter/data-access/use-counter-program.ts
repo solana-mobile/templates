@@ -14,7 +14,12 @@ import {
 } from '@solana/kit'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMobileWallet } from '@wallet-ui/react-native-kit'
-import { waitForConfirmation } from '../../../utils/wait-for-confirmation'
+import { AppState } from 'react-native'
+import {
+  createRecentSignatureConfirmationPromiseFactory,
+  getTimeoutPromise,
+  waitForRecentTransactionConfirmationUntilTimeout,
+} from '@solana/transaction-confirmation'
 
 // Sends instructions from the generated program client through the wallet with
 // Mobile Wallet Adapter. The wallet's sending signer must be the only signer in
@@ -47,8 +52,24 @@ export function useCounterProgram() {
     const signatureBytes = await signAndSendTransactionMessageWithSigners(message)
     const transactionSignature = signature(getBase58Decoder().decode(signatureBytes))
 
-    // The wallet submits the transaction, so poll until the cluster confirms it.
-    await waitForConfirmation(client.rpc, transactionSignature)
+    // Android blocks network access while the wallet is in front, so wait until this app is back.
+    if (AppState.currentState !== 'active') {
+      await new Promise<void>((resolve) => {
+        const subscription = AppState.addEventListener('change', (state) => {
+          if (state === 'active') {
+            subscription.remove()
+            resolve()
+          }
+        })
+      })
+    }
+    // The wallet submits the transaction, so wait until the cluster confirms it.
+    await waitForRecentTransactionConfirmationUntilTimeout({
+      commitment: 'confirmed',
+      getRecentSignatureConfirmationPromise: createRecentSignatureConfirmationPromiseFactory(client),
+      getTimeoutPromise,
+      signature: transactionSignature,
+    })
     return transactionSignature
   }
 
