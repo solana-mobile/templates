@@ -38,6 +38,24 @@
         "usecase": "Mobile"
       },
       {
+        "description": "A template for building a Solana mobile app with Expo, React Native, Solana Kit, Pinocchio, and Uniwind.",
+        "id": "gh:solana-mobile/templates/mobile/expo-kit-pinocchio",
+        "image": "mobile/expo-kit-pinocchio/og-image.png",
+        "keywords": [
+          "expo",
+          "mobile-wallet-adapter",
+          "pinocchio",
+          "react-native",
+          "solana-kit",
+          "tailwind",
+          "uniwind"
+        ],
+        "name": "expo-kit-pinocchio",
+        "path": "mobile/expo-kit-pinocchio",
+        "displayName": "Expo Kit Pinocchio example",
+        "usecase": "Mobile"
+      },
+      {
         "description": "A template for building a Solana mobile app with Expo, React Native, Solana Kit, and Uniwind.",
         "id": "gh:solana-mobile/templates/mobile/expo-kit-uniwind",
         "image": "mobile/expo-kit-uniwind/og-image.png",
