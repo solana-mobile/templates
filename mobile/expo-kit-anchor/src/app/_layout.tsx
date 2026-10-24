@@ -10,9 +10,9 @@ import {
 } from '@wallet-ui/react-native-kit'
 import { NetworkProvider } from '../features/network/network-provider'
 
-// Localnet: run `npx solana-mobile localnet` to start it and forward it to the device.
+// Localnet: run `npx solana-mobile@latest localnet` to start it and forward it to the device.
 const networks = [createSolanaDevnet(), createSolanaLocalnet({ url: 'http://localhost:8899' })]
-const identity: AppIdentity = { name: 'Expo Kit Anchor' }
+export const identity: AppIdentity = { name: 'Expo Kit Anchor' }
 const queryClient = new QueryClient()
 
 export default function Layout() {
