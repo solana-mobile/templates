@@ -1,6 +1,6 @@
-import { Text, TextProps } from 'react-native-paper'
-import { Text as NativeText } from 'react-native'
+import { ComponentProps } from 'react'
+import { Text } from 'react-native-paper'
 
-export function AppText({ ...rest }: TextProps<NativeText>) {
+export function AppText({ ...rest }: ComponentProps<typeof Text>) {
   return <Text {...rest} />
 }

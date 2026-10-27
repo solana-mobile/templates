@@ -19,7 +19,7 @@ export function AppButton({
   ...props
 }: AppButtonProps) {
   const { colors, fonts } = useTheme()
-  const color = customColor ?? colors.primary
+  const color = customColor ?? (colors.primary as string)
   const backgroundColor =
     variant === 'plain' ? 'transparent' : variant === 'filled' ? color : Color(color).fade(0.85).string()
   const textColor =
