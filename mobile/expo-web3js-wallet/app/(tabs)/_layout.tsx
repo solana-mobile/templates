@@ -11,21 +11,21 @@ export default function TabLayout() {
         name="account"
         options={{
           title: 'Account',
-          tabBarIcon: ({ color }) => <UiIconSymbol size={28} name="wallet.pass.fill" color={color} />,
+          tabBarIcon: ({ color }) => <UiIconSymbol size={28} name="wallet.pass.fill" color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color }) => <UiIconSymbol size={28} name="gearshape.fill" color={color} />,
+          tabBarIcon: ({ color }) => <UiIconSymbol size={28} name="gearshape.fill" color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="demo"
         options={{
           title: 'Demo',
-          tabBarIcon: ({ color }) => <UiIconSymbol size={28} name="ladybug.fill" color={color} />,
+          tabBarIcon: ({ color }) => <UiIconSymbol size={28} name="ladybug.fill" color={color as string} />,
         }}
       />
     </Tabs>

@@ -34,7 +34,7 @@ function AppTabs() {
         name="(wallet)"
         options={{
           tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons color={color} name={focused ? 'wallet' : 'wallet-outline'} size={size} />
+            <Ionicons color={color as string} name={focused ? 'wallet' : 'wallet-outline'} size={size} />
           ),
           title: 'Wallet',
         }}
@@ -43,7 +43,7 @@ function AppTabs() {
         name="tools"
         options={{
           tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons color={color} name={focused ? 'construct' : 'construct-outline'} size={size} />
+            <Ionicons color={color as string} name={focused ? 'construct' : 'construct-outline'} size={size} />
           ),
           title: 'Tools',
         }}
@@ -52,7 +52,7 @@ function AppTabs() {
         name="settings"
         options={{
           tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons color={color} name={focused ? 'settings' : 'settings-outline'} size={size} />
+            <Ionicons color={color as string} name={focused ? 'settings' : 'settings-outline'} size={size} />
           ),
           title: 'Settings',
         }}

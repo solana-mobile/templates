@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PropsWithChildren } from 'react'
+import { useEffect, useRef, useState, type ComponentRef, type PropsWithChildren } from 'react'
 import { Keyboard, View } from 'react-native'
 
 // Shrinks its content by the keyboard overlap, so the ScrollView inside gets
@@ -8,7 +8,7 @@ import { Keyboard, View } from 'react-native'
 // coordinates, which is wrong under a native header — so this measures the
 // real overlap in window coordinates instead.
 export function AppKeyboardView({ children }: PropsWithChildren) {
-  const ref = useRef<View>(null)
+  const ref = useRef<ComponentRef<typeof View>>(null)
   const [overlap, setOverlap] = useState(0)
 
   useEffect(() => {
