@@ -65,10 +65,13 @@ async function getPotActivity(rpc: SolanaRpc, pot: PotAccount): Promise<Activity
         // each selected friend in the same transaction), so the index keeps
         // every activity item unique.
         return instructions.flatMap((instruction, instructionIndex) => {
+          // Every instruction takes its pot as the first account; a transaction touching two pots
+          // appears in both pots' histories, so each keeps only its own instructions.
           if (
             instruction.programId !== CAUSE_POTS_PROGRAM_ADDRESS ||
             !('data' in instruction) ||
-            !('accounts' in instruction)
+            !('accounts' in instruction) ||
+            instruction.accounts[0] !== pot.address
           ) {
             return []
           }
