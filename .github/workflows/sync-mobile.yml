@@ -1,0 +1,68 @@
+name: Sync Mobile
+
+concurrency:
+  cancel-in-progress: false
+  group: ${{ github.workflow }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        default: main
+        description: Ref to mirror into solana-foundation/templates
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  token:
+    name: Check FOUNDATION_TEMPLATES_TOKEN
+    environment: foundation-sync
+    runs-on: ubuntu-latest
+    outputs:
+      set: ${{ steps.check.outputs.set }}
+    steps:
+      - name: Check
+        id: check
+        env:
+          SET: ${{ secrets.FOUNDATION_TEMPLATES_TOKEN != '' }}
+        run: |
+          echo "set=$SET" >> "$GITHUB_OUTPUT"
+          if [[ $SET != true ]]; then
+            echo "::notice::FOUNDATION_TEMPLATES_TOKEN is not set, so the sync is skipped. Run scripts/sync-mobile.sh --push locally instead."
+          fi
+
+  sync:
+    name: Sync mobile/ to solana-foundation/templates
+    environment: foundation-sync
+    needs: token
+    if: needs.token.outputs.set == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          version: 10.5.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Sync
+        env:
+          GH_TOKEN: ${{ secrets.FOUNDATION_TEMPLATES_TOKEN }}
+          REF: ${{ inputs.ref }}
+        run: |
+          git fetch --quiet --depth 1 origin "$REF"
+          gh auth setup-git
+          LOGIN=$(gh api user --jq .login)
+          git config --global user.name "$LOGIN"
+          git config --global user.email "$(gh api user --jq .id)+$LOGIN@users.noreply.github.com"
+          scripts/sync-mobile.sh --ref FETCH_HEAD --push

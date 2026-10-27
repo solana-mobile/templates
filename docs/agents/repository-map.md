@@ -34,11 +34,13 @@ Template roots are configured in root `package.json` under `repokit.groups`. Use
 - `solana-mobile templates check` validates template package metadata, duplicate names, and `og-image.png` requirements, then compares the generated artifacts without writing them. This is the whole of `pnpm lint` apart from Prettier.
 - `scripts/generate.ts` writes `templates.json`, `TEMPLATES.md`, and `.github/workflows/templates.json` using `renderTemplateRepository` from `solana-mobile/templates` — the same renderer the check compares against, so the two cannot disagree.
 - `scripts/create-image.ts` creates template `og-image.png` assets.
+- `scripts/sync-mobile.sh` mirrors `mobile/` into `solana-foundation/templates` as a pull request; run it without `--push` for a dry run.
 - `scripts/clean.ts` removes `templates.json` and `TEMPLATES.md`.
 
 ## CI
 
 - `.github/workflows/validate-templates.yml` validates generated metadata.
+- `.github/workflows/sync-mobile.yml` runs `scripts/sync-mobile.sh --push` on demand.
 - `.github/workflows/test-templates.yml` runs template creation and install checks across package managers.
 - `.github/actions/solana-mobile-create/action.yml` defines the per-template create/install/CI flow.
 - `.github/actions/setup/action.yml` installs runtime tooling used by workflows.

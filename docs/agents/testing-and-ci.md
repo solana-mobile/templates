@@ -19,6 +19,7 @@ Templates tested by CI need a `ci` script.
 ## CI Files
 
 - `.github/workflows/validate-templates.yml` regenerates metadata and then runs `pnpm lint`. It regenerates first on purpose, so a PR does not fail merely because generated files are stale on the branch.
+- `.github/workflows/sync-mobile.yml` is triggered by hand and opens or updates the Mobile sync pull request in `solana-foundation/templates`. It reads `FOUNDATION_TEMPLATES_TOKEN` from the `foundation-sync` environment, which only `main` can deploy to, and skips the sync when that secret is not set.
 - `.github/workflows/test-templates.yml` runs template tests across package managers and template paths.
 - `.github/actions/solana-mobile-create/action.yml` contains the shared template creation and install flow.
 - `.github/actions/setup/action.yml` controls Node, package manager, Solana, Anchor, Rust, and other tool setup.
