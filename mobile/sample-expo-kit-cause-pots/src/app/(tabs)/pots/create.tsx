@@ -1,5 +1,5 @@
 import { Currency } from '@project/anchor'
-import type { Address } from '@solana/kit'
+import { getUtf8Encoder, type Address } from '@solana/kit'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
@@ -13,6 +13,17 @@ import { useSolPriceQuery } from '../../../features/price/data-access/use-sol-pr
 import { parseAmountInput, solToLamports } from '../../../utils/currency'
 import { ellipsify } from '../../../utils/ellipsify'
 import { formatError } from '../../../utils/format-error'
+
+// Mirrors the program's limits, which measure name and description in UTF-8 bytes.
+const MAX_DESCRIPTION_BYTES = 200
+const MAX_NAME_BYTES = 32
+// Each friend adds an instruction to the create transaction; 15 is the most that fits at the longest
+// name and description. More can be added from the pot afterwards.
+const MAX_FRIENDS_AT_CREATION = 15
+
+function byteLength(value: string): number {
+  return getUtf8Encoder().encode(value).length
+}
 
 export default function CreatePotScreen() {
   const router = useRouter()
@@ -39,10 +50,13 @@ export default function CreatePotScreen() {
   const days = Number.parseInt(unlockDays, 10)
   const signers = Number.parseInt(signersRequired, 10)
   const unlockDate = new Date(now + (Number.isFinite(days) ? days : 0) * 86_400_000)
+  const isContributorLimitReached = contributors.length >= MAX_FRIENDS_AT_CREATION
+  const nameBytes = byteLength(name.trim())
+  const descriptionBytes = byteLength(description.trim())
   const isValid =
-    name.trim().length > 0 &&
-    name.trim().length <= 32 &&
-    description.length <= 200 &&
+    nameBytes > 0 &&
+    nameBytes <= MAX_NAME_BYTES &&
+    descriptionBytes <= MAX_DESCRIPTION_BYTES &&
     !!targetSol &&
     Number.isFinite(targetSol) &&
     targetSol > 0 &&
@@ -50,12 +64,16 @@ export default function CreatePotScreen() {
     days >= 0 &&
     Number.isInteger(signers) &&
     signers > 0 &&
-    signers <= contributors.length + 1
+    signers <= contributors.length + 1 &&
+    contributors.length <= MAX_FRIENDS_AT_CREATION
 
   function toggleContributor(address: Address) {
-    setContributors((current) =>
-      current.includes(address) ? current.filter((entry) => entry !== address) : [...current, address],
-    )
+    setContributors((current) => {
+      if (current.includes(address)) {
+        return current.filter((entry) => entry !== address)
+      }
+      return current.length >= MAX_FRIENDS_AT_CREATION ? current : [...current, address]
+    })
   }
 
   function onCreate() {
@@ -88,14 +106,29 @@ export default function CreatePotScreen() {
         contentContainerClassName="gap-4 p-4 pb-12"
         keyboardShouldPersistTaps="handled"
       >
-        <AppTextInput label="Name" onChangeText={setName} placeholder="Vacation Fund" value={name} />
-        <AppTextInput
-          label="Description"
-          multiline
-          onChangeText={setDescription}
-          placeholder="What are you saving for?"
-          value={description}
-        />
+        <View className="gap-1">
+          <AppTextInput label="Name" onChangeText={setName} placeholder="Vacation Fund" value={name} />
+          {nameBytes > MAX_NAME_BYTES ? (
+            <Text className="text-xs text-red-500">
+              Too long: {nameBytes} of {MAX_NAME_BYTES} bytes. Emoji and accented letters take more than one.
+            </Text>
+          ) : null}
+        </View>
+        <View className="gap-1">
+          <AppTextInput
+            label="Description"
+            multiline
+            onChangeText={setDescription}
+            placeholder="What are you saving for?"
+            value={description}
+          />
+          {descriptionBytes > MAX_DESCRIPTION_BYTES ? (
+            <Text className="text-xs text-red-500">
+              Too long: {descriptionBytes} of {MAX_DESCRIPTION_BYTES} bytes. Emoji and accented letters take more than
+              one.
+            </Text>
+          ) : null}
+        </View>
 
         <View>
           <Text className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Category</Text>
@@ -191,10 +224,11 @@ export default function CreatePotScreen() {
                 return (
                   <Pressable
                     key={friend.address}
+                    disabled={!isSelected && isContributorLimitReached}
                     onPress={() => toggleContributor(friend.address)}
                     className={`px-4 py-2 rounded-full border ${
                       isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-200 dark:border-gray-800'
-                    }`}
+                    } ${!isSelected && isContributorLimitReached ? 'opacity-40' : ''}`}
                   >
                     <Text className={isSelected ? 'text-white font-semibold' : 'text-gray-600 dark:text-gray-400'}>
                       {friend.displayName ?? friend.domain ?? ellipsify(friend.address)}
@@ -208,6 +242,11 @@ export default function CreatePotScreen() {
               You are the first contributor. Add friends in the Friends tab to invite them here.
             </Text>
           )}
+          {isContributorLimitReached ? (
+            <Text className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+              That is the most friends one transaction can add. Add more from the pot after creating it.
+            </Text>
+          ) : null}
         </View>
 
         <AppButton

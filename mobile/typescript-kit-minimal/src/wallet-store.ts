@@ -65,6 +65,10 @@ function isSolanaWallet(wallet: Wallet): wallet is SolanaWallet {
   return wallet.chains.includes(CHAIN) && StandardConnect in wallet.features
 }
 
+function supportsChain(account: WalletAccount): boolean {
+  return account.chains.includes(CHAIN)
+}
+
 function byName(a: Wallet, b: Wallet) {
   return a.name.localeCompare(b.name)
 }
@@ -121,6 +125,12 @@ export function createWalletStore(): WalletStore {
    */
   let reconnectStarted = false
 
+  /**
+   * Bumped by every connection attempt and by the reconnect deadline, so a request that has been
+   * overtaken — a silent reconnect that answers after the user picked a wallet — changes nothing.
+   */
+  let attempt = 0
+
   function setState(changes: Partial<WalletState>): void {
     state = { ...state, ...changes }
     for (const listener of listeners) {
@@ -129,10 +139,11 @@ export function createWalletStore(): WalletStore {
   }
 
   function setConnected(wallet: SolanaWallet, accounts: readonly WalletAccount[]): void {
-    const account = accounts[0]
+    // A multi-chain wallet can authorize accounts for other chains first; only one for CHAIN can sign here.
+    const account = accounts.find(supportsChain)
     if (!account) {
       // A wallet can resolve `connect` having authorized nothing, which is a refusal in all but name.
-      throw new Error(`${wallet.name} authorized no accounts.`)
+      throw new Error(`${wallet.name} authorized no ${CHAIN} accounts.`)
     }
     saveWalletName(wallet.name)
     watchWallet(wallet)
@@ -161,7 +172,8 @@ export function createWalletStore(): WalletStore {
         return
       }
       const active = state.connected.account
-      const account = accounts.find((candidate) => candidate.address === active.address) ?? accounts[0]
+      const usable = accounts.filter(supportsChain)
+      const account = usable.find((candidate) => candidate.address === active.address) ?? usable[0]
       if (account) {
         setState({ connected: { account, wallet } })
       } else {
@@ -171,11 +183,17 @@ export function createWalletStore(): WalletStore {
   }
 
   async function connect(wallet: SolanaWallet): Promise<void> {
+    const current = ++attempt
     setState({ status: 'connecting' })
     try {
       const { accounts } = await wallet.features[StandardConnect].connect()
-      setConnected(wallet, accounts)
+      if (current === attempt) {
+        setConnected(wallet, accounts)
+      }
     } catch (error) {
+      if (current !== attempt) {
+        return
+      }
       // Leave any existing connection in place: a declined prompt on a second wallet should not
       // throw away a working one.
       setState({ status: state.connected ? 'connected' : 'disconnected' })
@@ -212,11 +230,16 @@ export function createWalletStore(): WalletStore {
       return
     }
     reconnectStarted = true
+    const current = ++attempt
     try {
       const { accounts } = await wallet.features[StandardConnect].connect({ silent: true })
-      setConnected(wallet, accounts)
+      if (current === attempt) {
+        setConnected(wallet, accounts)
+      }
     } catch {
-      clearConnection()
+      if (current === attempt) {
+        clearConnection()
+      }
     }
   }
 
@@ -239,6 +262,7 @@ export function createWalletStore(): WalletStore {
   // still the one to reconnect to on the next page load.
   window.setTimeout(() => {
     if (state.status === 'reconnecting') {
+      attempt++
       setState({ status: 'disconnected' })
     }
   }, RECONNECT_TIMEOUT_MS)

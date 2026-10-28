@@ -43,18 +43,29 @@ function requireConnection(): NonNullable<WalletState['connected']> {
   return connected
 }
 
+/** Bumped whenever the connected account changes, so a result started for the previous one is dropped. */
+let accountGeneration = 0
+
 /**
  * Runs one action and reports its lifecycle into the state the render pass reads.
  *
  * This is the whole of what a mutation hook does for you: flip a flag, await, keep the result or
- * the error, render. Written out once it is eight lines, and every button shares it.
+ * the error, render. Written out once it is a dozen lines, and every button shares it. `connect` is
+ * the one action that changes the account itself, so it always reports.
  */
 async function run(name: ActionName, action: () => Promise<string | null>): Promise<void> {
+  const generation = accountGeneration
+  const isCurrent = () => name === 'connect' || generation === accountGeneration
   setAction(name, { error: null, isRunning: true, result: null })
   try {
-    setAction(name, { isRunning: false, result: await action() })
+    const result = await action()
+    if (isCurrent()) {
+      setAction(name, { isRunning: false, result })
+    }
   } catch (error) {
-    setAction(name, { error: formatError(error), isRunning: false })
+    if (isCurrent()) {
+      setAction(name, { error: formatError(error), isRunning: false })
+    }
   }
 }
 
@@ -90,6 +101,7 @@ store.subscribe((wallet) => {
     return
   }
   // A different account means a different balance, and a stale set of results from the old one.
+  accountGeneration++
   update({
     actions: { ...state.actions, airdrop: IDLE, 'send-memo': IDLE, 'sign-message': IDLE },
     balance: { error: null, lamports: null },
