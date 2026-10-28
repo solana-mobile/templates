@@ -33,7 +33,7 @@
           "Build the Android app locally:",
           "+{pm} run android",
           "Edit app/index.tsx to build your first screen.",
-          "Reach for the wallet with useMobileWallet() from @wallet-ui/react-native-kit."
+          "Reach for the wallet with useSeekerWallet() from @/components/seeker-wallet-provider."
         ],
         "run": "reset-project -- --yes"
       }
