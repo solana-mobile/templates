@@ -41,7 +41,7 @@
     ],
     "rename": {
       "React Kit Privy": {
-        "in": [
+        "paths": [
           "."
         ],
         "to": "{{name}}"

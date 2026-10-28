@@ -27,7 +27,7 @@
     ],
     "rename": {
       "Expo Kit Anchor": {
-        "in": [
+        "paths": [
           "src/app"
         ],
         "to": "{{name}}"
