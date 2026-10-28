@@ -205,6 +205,15 @@ describe('cause_pots', () => {
     await expectAnchorError(sendInstruction({ instruction, payer: authority }), 6008) // InsufficientSignatures
   })
 
+  it('rejects the pot as recipient', async () => {
+    // ARRANGE
+    const [potAddress] = await findPotPda({ authority: authority.address, name: potName })
+    const instruction = await getReleaseFundsInstructionAsync({ pot: potAddress, authority, recipient: potAddress })
+
+    // ACT + ASSERT
+    await expectAnchorError(sendInstruction({ instruction, payer: authority }), 6014) // RecipientIsPot
+  })
+
   it('releases the vault to the recipient once the threshold is met', async () => {
     // ARRANGE
     const [potAddress] = await findPotPda({ authority: authority.address, name: potName })
@@ -263,7 +272,7 @@ describe('cause_pots', () => {
         instruction: getSignReleaseInstruction({ pot: potAddress, signer: authority }),
         payer: authority,
       }),
-      6014, // TimeLockNotExpired
+      6015, // TimeLockNotExpired
     )
     await expectAnchorError(
       sendInstruction({
@@ -274,7 +283,7 @@ describe('cause_pots', () => {
         }),
         payer: authority,
       }),
-      6014, // TimeLockNotExpired
+      6015, // TimeLockNotExpired
     )
   })
 })

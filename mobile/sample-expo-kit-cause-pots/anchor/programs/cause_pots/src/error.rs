@@ -44,6 +44,9 @@ pub enum ErrorCode {
     #[msg("Pot has already been released")]
     PotAlreadyReleased,
 
+    #[msg("The pot cannot receive its own funds")]
+    RecipientIsPot,
+
     #[msg("Time-lock period has not expired yet")]
     TimeLockNotExpired,
 }

@@ -42,12 +42,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -104,9 +108,9 @@ export type Pot = {
 
 export type PotArgs = {
   /** Creator of the pot; the only account that can add contributors and release funds. */
-  authority: Address
+  authority: Address | HasAddress
   /** Vault PDA that holds the pooled SOL. */
-  vault: Address
+  vault: Address | HasAddress
   name: string
   description: string
   category: PotCategoryArgs
@@ -122,11 +126,11 @@ export type PotArgs = {
    * Contributors that have approved the release. Each contributor can sign
    * once, so this never grows past the contributor list.
    */
-  signatures: Array<Address>
-  contributors: Array<Address>
+  signatures: Array<Address | HasAddress>
+  contributors: Array<Address | HasAddress>
   isReleased: boolean
   releasedAt: OptionOrNullable<number | bigint>
-  recipient: OptionOrNullable<Address>
+  recipient: OptionOrNullable<Address | HasAddress>
   createdAt: number | bigint
   bump: number
   vaultBump: number
@@ -203,8 +207,8 @@ export function decodePot<TAddress extends string = string>(
 }
 
 export async function fetchPot<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc: Parameters<typeof fetchEncodedAccount>[0] | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Pot, TAddress>> {
   const maybeAccount = await fetchMaybePot(rpc, address, config)
@@ -213,17 +217,21 @@ export async function fetchPot<TAddress extends string = string>(
 }
 
 export async function fetchMaybePot<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc: Parameters<typeof fetchEncodedAccount>[0] | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Pot, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config)
+  const maybeAccount = await fetchEncodedAccount(
+    'rpc' in rpc ? rpc.rpc : rpc,
+    typeof address === 'string' ? address : address.address,
+    config,
+  )
   return decodePot(maybeAccount)
 }
 
 export async function fetchAllPot(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc: Parameters<typeof fetchEncodedAccounts>[0] | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Pot>[]> {
   const maybeAccounts = await fetchAllMaybePot(rpc, addresses, config)
@@ -232,10 +240,14 @@ export async function fetchAllPot(
 }
 
 export async function fetchAllMaybePot(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc: Parameters<typeof fetchEncodedAccounts>[0] | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Pot>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config)
+  const maybeAccounts = await fetchEncodedAccounts(
+    'rpc' in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === 'string' ? a : a.address)),
+    config,
+  )
   return maybeAccounts.map((maybeAccount) => decodePot(maybeAccount))
 }

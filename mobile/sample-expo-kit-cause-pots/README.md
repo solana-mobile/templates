@@ -38,7 +38,7 @@ The app connects to devnet by default, where the program is already deployed —
 
 ## The Anchor program
 
-The `anchor` directory contains the `cause_pots` program, deployed on devnet at [`EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN`](https://explorer.solana.com/address/EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN?cluster=devnet). Five instructions cover the whole lifecycle:
+The `anchor` directory contains the `cause_pots` program, deployed on devnet at [`potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW`](https://explorer.solana.com/address/potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW?cluster=devnet). Five instructions cover the whole lifecycle:
 
 | Instruction       | Behavior                                                                                            |
 | ----------------- | --------------------------------------------------------------------------------------------------- |

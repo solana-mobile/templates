@@ -9,6 +9,7 @@
 import {
   isProgramError,
   type Address,
+  type HasAddress,
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from '@solana/kit'
@@ -42,8 +43,10 @@ export const CAUSE_POTS_ERROR__NOT_A_CONTRIBUTOR = 0x177b // 6011
 export const CAUSE_POTS_ERROR__OVERFLOW = 0x177c // 6012
 /** PotAlreadyReleased: Pot has already been released */
 export const CAUSE_POTS_ERROR__POT_ALREADY_RELEASED = 0x177d // 6013
+/** RecipientIsPot: The pot cannot receive its own funds */
+export const CAUSE_POTS_ERROR__RECIPIENT_IS_POT = 0x177e // 6014
 /** TimeLockNotExpired: Time-lock period has not expired yet */
-export const CAUSE_POTS_ERROR__TIME_LOCK_NOT_EXPIRED = 0x177e // 6014
+export const CAUSE_POTS_ERROR__TIME_LOCK_NOT_EXPIRED = 0x177f // 6015
 
 export type CausePotsError =
   | typeof CAUSE_POTS_ERROR__ALREADY_A_CONTRIBUTOR
@@ -60,6 +63,7 @@ export type CausePotsError =
   | typeof CAUSE_POTS_ERROR__NOT_A_CONTRIBUTOR
   | typeof CAUSE_POTS_ERROR__OVERFLOW
   | typeof CAUSE_POTS_ERROR__POT_ALREADY_RELEASED
+  | typeof CAUSE_POTS_ERROR__RECIPIENT_IS_POT
   | typeof CAUSE_POTS_ERROR__TIME_LOCK_NOT_EXPIRED
 
 let causePotsErrorMessages: Record<CausePotsError, string> | undefined
@@ -79,6 +83,7 @@ if (process.env['NODE_ENV'] !== 'production') {
     [CAUSE_POTS_ERROR__NOT_A_CONTRIBUTOR]: `You are not a contributor to this pot`,
     [CAUSE_POTS_ERROR__OVERFLOW]: `Arithmetic overflow`,
     [CAUSE_POTS_ERROR__POT_ALREADY_RELEASED]: `Pot has already been released`,
+    [CAUSE_POTS_ERROR__RECIPIENT_IS_POT]: `The pot cannot receive its own funds`,
     [CAUSE_POTS_ERROR__TIME_LOCK_NOT_EXPIRED]: `Time-lock period has not expired yet`,
   }
 }
@@ -95,7 +100,10 @@ export function isCausePotsError<TProgramErrorCode extends CausePotsError>(
   error: unknown,
   transactionMessage: { instructions: Record<number, { programAddress: Address }> },
   code?: TProgramErrorCode,
+  config: { programAddress?: Address | HasAddress } = {},
 ): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> &
   Readonly<{ context: Readonly<{ code: TProgramErrorCode }> }> {
-  return isProgramError<TProgramErrorCode>(error, transactionMessage, CAUSE_POTS_PROGRAM_ADDRESS, code)
+  const programAddressInput = config.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
+  return isProgramError<TProgramErrorCode>(error, transactionMessage, programAddress, code)
 }

@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from '@solana/kit'
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from '@solana/kit/program-client-core'
 import { findVaultPda } from '../pdas'
 import { CAUSE_POTS_PROGRAM_ADDRESS } from '../programs'
@@ -92,25 +95,25 @@ export function getReleaseFundsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ReleaseFundsAsyncInput<
-  TAccountPot extends string = string,
-  TAccountVault extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountRecipient extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPot extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRecipient extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pot: Address<TAccountPot>
-  vault?: Address<TAccountVault>
-  authority: TransactionSigner<TAccountAuthority>
-  recipient: Address<TAccountRecipient>
-  systemProgram?: Address<TAccountSystemProgram>
+  pot: TAccountPot
+  vault?: TAccountVault
+  authority: TAccountAuthority
+  recipient: TAccountRecipient
+  systemProgram?: TAccountSystemProgram
 }
 
 export async function getReleaseFundsInstructionAsync<
-  TAccountPot extends string,
-  TAccountVault extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TAccountSystemProgram extends string,
+  TAccountPot extends InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountRecipient extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CAUSE_POTS_PROGRAM_ADDRESS,
 >(
   input: ReleaseFundsAsyncInput<
@@ -120,27 +123,31 @@ export async function getReleaseFundsInstructionAsync<
     TAccountRecipient,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
 ): Promise<
   ReleaseFundsInstruction<
     TProgramAddress,
-    TAccountPot,
-    TAccountVault,
-    TAccountAuthority,
-    TAccountRecipient,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+    ResolvedInstructionAccountMeta<TAccountVault, InstructionAccountInputAddress<TAccountVault>>,
+    ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>,
+    ResolvedInstructionAccountMeta<TAccountRecipient, InstructionAccountInputAddress<TAccountRecipient>>,
+    ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddressInput = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
 
   // Original accounts.
   const originalAccounts = {
-    pot: { value: input.pot ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    recipient: { value: input.recipient ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    pot: { value: input.pot ?? null, isSigner: false, isWritable: true },
+    vault: { value: input.vault ?? null, isSigner: false, isWritable: true },
+    authority: { value: input.authority ?? null, isSigner: true, isWritable: false },
+    recipient: { value: input.recipient ?? null, isSigner: false, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isSigner: false, isWritable: false },
   }
   const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>
 
@@ -155,7 +162,6 @@ export async function getReleaseFundsInstructionAsync<
     accounts.systemProgram.value = '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
   return Object.freeze({
     accounts: [
       getAccountMeta('pot', accounts.pot),
@@ -168,56 +174,60 @@ export async function getReleaseFundsInstructionAsync<
     programAddress,
   } as ReleaseFundsInstruction<
     TProgramAddress,
-    TAccountPot,
-    TAccountVault,
-    TAccountAuthority,
-    TAccountRecipient,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+    ResolvedInstructionAccountMeta<TAccountVault, InstructionAccountInputAddress<TAccountVault>>,
+    ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>,
+    ResolvedInstructionAccountMeta<TAccountRecipient, InstructionAccountInputAddress<TAccountRecipient>>,
+    ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>
   >)
 }
 
 export type ReleaseFundsInput<
-  TAccountPot extends string = string,
-  TAccountVault extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountRecipient extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPot extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRecipient extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pot: Address<TAccountPot>
-  vault: Address<TAccountVault>
-  authority: TransactionSigner<TAccountAuthority>
-  recipient: Address<TAccountRecipient>
-  systemProgram?: Address<TAccountSystemProgram>
+  pot: TAccountPot
+  vault: TAccountVault
+  authority: TAccountAuthority
+  recipient: TAccountRecipient
+  systemProgram?: TAccountSystemProgram
 }
 
 export function getReleaseFundsInstruction<
-  TAccountPot extends string,
-  TAccountVault extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TAccountSystemProgram extends string,
+  TAccountPot extends InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountRecipient extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CAUSE_POTS_PROGRAM_ADDRESS,
 >(
   input: ReleaseFundsInput<TAccountPot, TAccountVault, TAccountAuthority, TAccountRecipient, TAccountSystemProgram>,
-  config?: { programAddress?: TProgramAddress },
+  config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
 ): ReleaseFundsInstruction<
   TProgramAddress,
-  TAccountPot,
-  TAccountVault,
-  TAccountAuthority,
-  TAccountRecipient,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+  ResolvedInstructionAccountMeta<TAccountVault, InstructionAccountInputAddress<TAccountVault>>,
+  ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>,
+  ResolvedInstructionAccountMeta<TAccountRecipient, InstructionAccountInputAddress<TAccountRecipient>>,
+  ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddressInput = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
 
   // Original accounts.
   const originalAccounts = {
-    pot: { value: input.pot ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    recipient: { value: input.recipient ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    pot: { value: input.pot ?? null, isSigner: false, isWritable: true },
+    vault: { value: input.vault ?? null, isSigner: false, isWritable: true },
+    authority: { value: input.authority ?? null, isSigner: true, isWritable: false },
+    recipient: { value: input.recipient ?? null, isSigner: false, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isSigner: false, isWritable: false },
   }
   const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>
 
@@ -226,7 +236,6 @@ export function getReleaseFundsInstruction<
     accounts.systemProgram.value = '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
   return Object.freeze({
     accounts: [
       getAccountMeta('pot', accounts.pot),
@@ -239,11 +248,11 @@ export function getReleaseFundsInstruction<
     programAddress,
   } as ReleaseFundsInstruction<
     TProgramAddress,
-    TAccountPot,
-    TAccountVault,
-    TAccountAuthority,
-    TAccountRecipient,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+    ResolvedInstructionAccountMeta<TAccountVault, InstructionAccountInputAddress<TAccountVault>>,
+    ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>,
+    ResolvedInstructionAccountMeta<TAccountRecipient, InstructionAccountInputAddress<TAccountRecipient>>,
+    ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>
   >)
 }
 

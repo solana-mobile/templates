@@ -72,7 +72,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
     "@solana-mobile/skr-domain": "^1.0.0",
-    "@solana/kit": "^8.4.0",
+    "@solana/kit": "^8.5.0",
     "@tanstack/react-query": "^5.90.7",
     "@wallet-ui/react-native-kit": "^4.4.1",
     "expo": "~58.0.20",

@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN");
+declare_id!("potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW");
 
 #[program]
 pub mod cause_pots {

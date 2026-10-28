@@ -25,15 +25,22 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from '@solana/kit'
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core'
+import {
+  getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
+  type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core'
 import { CAUSE_POTS_PROGRAM_ADDRESS } from '../programs'
 
 export const ADD_CONTRIBUTOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([125, 221, 162, 182, 191, 26, 206, 219])
@@ -61,7 +68,7 @@ export type AddContributorInstruction<
 
 export type AddContributorInstructionData = { discriminator: ReadonlyUint8Array; newContributor: Address }
 
-export type AddContributorInstructionDataArgs = { newContributor: Address }
+export type AddContributorInstructionDataArgs = { newContributor: Address | HasAddress }
 
 export function getAddContributorInstructionDataEncoder(): FixedSizeEncoder<AddContributorInstructionDataArgs> {
   return transformEncoder(
@@ -87,39 +94,53 @@ export function getAddContributorInstructionDataCodec(): FixedSizeCodec<
   return combineCodec(getAddContributorInstructionDataEncoder(), getAddContributorInstructionDataDecoder())
 }
 
-export type AddContributorInput<TAccountPot extends string = string, TAccountAuthority extends string = string> = {
-  pot: Address<TAccountPot>
-  authority: TransactionSigner<TAccountAuthority>
+export type AddContributorInput<
+  TAccountPot extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+> = {
+  pot: TAccountPot
+  authority: TAccountAuthority
   newContributor: AddContributorInstructionDataArgs['newContributor']
 }
 
 export function getAddContributorInstruction<
-  TAccountPot extends string,
-  TAccountAuthority extends string,
+  TAccountPot extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof CAUSE_POTS_PROGRAM_ADDRESS,
 >(
   input: AddContributorInput<TAccountPot, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress },
-): AddContributorInstruction<TProgramAddress, TAccountPot, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
+): AddContributorInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+  ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>
+> {
   // Program address.
-  const programAddress = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddressInput = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
 
   // Original accounts.
   const originalAccounts = {
-    pot: { value: input.pot ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
+    pot: { value: input.pot ?? null, isSigner: false, isWritable: true },
+    authority: { value: input.authority ?? null, isSigner: true, isWritable: false },
   }
   const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>
 
   // Original args.
   const args = { ...input }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
   return Object.freeze({
     accounts: [getAccountMeta('pot', accounts.pot), getAccountMeta('authority', accounts.authority)],
     data: getAddContributorInstructionDataEncoder().encode(args as AddContributorInstructionDataArgs),
     programAddress,
-  } as AddContributorInstruction<TProgramAddress, TAccountPot, TAccountAuthority>)
+  } as AddContributorInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+    ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>
+  >)
 }
 
 export type ParsedAddContributorInstruction<

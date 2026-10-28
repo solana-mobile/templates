@@ -11,21 +11,24 @@ import {
   getBytesEncoder,
   getProgramDerivedAddress,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from '@solana/kit'
 
 export type ContributorAccountSeeds = {
-  pot: Address
-  contributor: Address
+  pot: Address | HasAddress
+  contributor: Address | HasAddress
 }
 
 export async function findContributorAccountPda(
   seeds: ContributorAccountSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = 'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN' as Address<'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN'>,
+    programAddress:
+      programAddressInput = 'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW' as Address<'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW'>,
   } = config
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

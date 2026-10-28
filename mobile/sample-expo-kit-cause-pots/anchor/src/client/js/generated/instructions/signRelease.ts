@@ -28,10 +28,16 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from '@solana/kit'
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core'
+import {
+  getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
+  type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core'
 import { CAUSE_POTS_PROGRAM_ADDRESS } from '../programs'
 
 export const SIGN_RELEASE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([111, 211, 85, 96, 119, 69, 197, 105])
@@ -79,35 +85,49 @@ export function getSignReleaseInstructionDataCodec(): FixedSizeCodec<
   return combineCodec(getSignReleaseInstructionDataEncoder(), getSignReleaseInstructionDataDecoder())
 }
 
-export type SignReleaseInput<TAccountPot extends string = string, TAccountSigner extends string = string> = {
-  pot: Address<TAccountPot>
-  signer: TransactionSigner<TAccountSigner>
+export type SignReleaseInput<
+  TAccountPot extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSigner extends InstructionSignerInput = InstructionSignerInput,
+> = {
+  pot: TAccountPot
+  signer: TAccountSigner
 }
 
 export function getSignReleaseInstruction<
-  TAccountPot extends string,
-  TAccountSigner extends string,
+  TAccountPot extends InstructionAccountInput,
+  TAccountSigner extends InstructionSignerInput,
   TProgramAddress extends Address = typeof CAUSE_POTS_PROGRAM_ADDRESS,
 >(
   input: SignReleaseInput<TAccountPot, TAccountSigner>,
-  config?: { programAddress?: TProgramAddress },
-): SignReleaseInstruction<TProgramAddress, TAccountPot, TAccountSigner> {
+  config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
+): SignReleaseInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+  ResolvedInstructionAccountMeta<TAccountSigner, InstructionAccountInputAddress<TAccountSigner>>
+> {
   // Program address.
-  const programAddress = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddressInput = config?.programAddress ?? CAUSE_POTS_PROGRAM_ADDRESS
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
 
   // Original accounts.
   const originalAccounts = {
-    pot: { value: input.pot ?? null, isWritable: true },
-    signer: { value: input.signer ?? null, isWritable: false },
+    pot: { value: input.pot ?? null, isSigner: false, isWritable: true },
+    signer: { value: input.signer ?? null, isSigner: true, isWritable: false },
   }
   const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId')
   return Object.freeze({
     accounts: [getAccountMeta('pot', accounts.pot), getAccountMeta('signer', accounts.signer)],
     data: getSignReleaseInstructionDataEncoder().encode({}),
     programAddress,
-  } as SignReleaseInstruction<TProgramAddress, TAccountPot, TAccountSigner>)
+  } as SignReleaseInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountPot, InstructionAccountInputAddress<TAccountPot>>,
+    ResolvedInstructionAccountMeta<TAccountSigner, InstructionAccountInputAddress<TAccountSigner>>
+  >)
 }
 
 export type ParsedSignReleaseInstruction<

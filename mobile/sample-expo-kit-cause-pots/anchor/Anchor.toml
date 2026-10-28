@@ -7,15 +7,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-cause_pots = "EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN"
+cause_pots = "potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW"
 
 [provider]
 cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-# The default 5s timeout is enough for Surfpool, but not for the slower validator
-# that `anchor test --validator legacy` starts, which warms up on first invoke.
 test = "npx vitest run --testTimeout=60000"
 
 [hooks]

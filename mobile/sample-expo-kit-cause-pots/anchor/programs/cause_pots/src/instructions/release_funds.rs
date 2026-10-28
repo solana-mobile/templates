@@ -9,8 +9,8 @@ pub struct ReleaseFunds<'info> {
     #[account(mut, seeds = [VAULT_SEED, pot.key().as_ref()], bump = pot.vault_bump)]
     pub vault: SystemAccount<'info>,
     pub authority: Signer<'info>,
-    /// CHECK: The recipient can be any account; it only receives lamports.
-    #[account(mut)]
+    /// CHECK: The recipient can be any account except the pot, which has no way to pay lamports out.
+    #[account(mut, constraint = recipient.key() != pot.key() @ ErrorCode::RecipientIsPot)]
     pub recipient: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
 }
