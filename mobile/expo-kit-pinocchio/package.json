@@ -28,7 +28,7 @@
     ],
     "rename": {
       "Expo Kit Pinocchio": {
-        "in": [
+        "paths": [
           "src/app"
         ],
         "to": "{{name}}"

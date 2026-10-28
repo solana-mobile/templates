@@ -22,7 +22,7 @@
     ],
     "rename": {
       "React Kit Shadcn": {
-        "in": [
+        "paths": [
           "."
         ],
         "to": "{{name}}"

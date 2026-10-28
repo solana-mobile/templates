@@ -28,7 +28,7 @@
     ],
     "rename": {
       "Cause Pots": {
-        "in": [
+        "paths": [
           "src/app"
         ],
         "to": "{{name}}"

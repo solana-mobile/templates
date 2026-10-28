@@ -6,7 +6,7 @@
     ],
     "rename": {
       "Kotlin Compose Minimal": {
-        "in": [
+        "paths": [
           "app"
         ],
         "to": "{{name}}"

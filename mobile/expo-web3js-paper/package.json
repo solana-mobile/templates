@@ -19,7 +19,7 @@
     ],
     "rename": {
       "Expo Web3js Paper": {
-        "in": [
+        "paths": [
           "components"
         ],
         "to": "{{name}}"

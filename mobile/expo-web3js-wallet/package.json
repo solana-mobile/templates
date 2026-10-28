@@ -20,7 +20,7 @@
     ],
     "rename": {
       "Expo Web3js Wallet": {
-        "in": [
+        "paths": [
           "components"
         ],
         "to": "{{name}}"

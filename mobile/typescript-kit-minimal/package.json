@@ -21,7 +21,7 @@
     ],
     "rename": {
       "TypeScript Kit Minimal": {
-        "in": [
+        "paths": [
           "."
         ],
         "to": "{{name}}"
