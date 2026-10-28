@@ -1,5 +1,6 @@
 import { Currency } from '@project/anchor'
 import { getUtf8Encoder, type Address } from '@solana/kit'
+import { useMobileWallet } from '@wallet-ui/react-native-kit'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
@@ -27,6 +28,7 @@ function byteLength(value: string): number {
 
 export default function CreatePotScreen() {
   const router = useRouter()
+  const { account } = useMobileWallet()
   const friendsQuery = useFriendsQuery()
   const solPriceQuery = useSolPriceQuery()
   const { createPotMutation } = usePotProgram()
@@ -50,7 +52,11 @@ export default function CreatePotScreen() {
   const days = Number.parseInt(unlockDays, 10)
   const signers = Number.parseInt(signersRequired, 10)
   const unlockDate = new Date(now + (Number.isFinite(days) ? days : 0) * 86_400_000)
-  const isContributorLimitReached = contributors.length >= MAX_FRIENDS_AT_CREATION
+  // The creator is already a contributor, and adding them again fails the whole transaction. A saved
+  // friend can be the connected wallet, for example after switching wallets.
+  const friends = friendsQuery.data?.filter((friend) => friend.address !== account?.address)
+  const selected = contributors.filter((address) => address !== account?.address)
+  const isContributorLimitReached = selected.length >= MAX_FRIENDS_AT_CREATION
   const nameBytes = byteLength(name.trim())
   const descriptionBytes = byteLength(description.trim())
   const isValid =
@@ -64,8 +70,8 @@ export default function CreatePotScreen() {
     days >= 0 &&
     Number.isInteger(signers) &&
     signers > 0 &&
-    signers <= contributors.length + 1 &&
-    contributors.length <= MAX_FRIENDS_AT_CREATION
+    signers <= selected.length + 1 &&
+    selected.length <= MAX_FRIENDS_AT_CREATION
 
   function toggleContributor(address: Address) {
     setContributors((current) => {
@@ -84,7 +90,7 @@ export default function CreatePotScreen() {
     createPotMutation.mutate(
       {
         category,
-        contributors,
+        contributors: selected,
         currency,
         description: description.trim(),
         name: name.trim(),
@@ -217,10 +223,10 @@ export default function CreatePotScreen() {
 
         <View>
           <Text className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Contributors</Text>
-          {friendsQuery.data?.length ? (
+          {friends?.length ? (
             <View className="flex-row flex-wrap gap-2">
-              {friendsQuery.data.map((friend) => {
-                const isSelected = contributors.includes(friend.address)
+              {friends.map((friend) => {
+                const isSelected = selected.includes(friend.address)
                 return (
                   <Pressable
                     key={friend.address}
