@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/cause_pots.json`.
  */
 export type CausePots = {
-  "address": "EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN",
+  "address": "potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW",
   "metadata": {
     "name": "causePots",
     "version": "0.1.0",
@@ -423,6 +423,11 @@ export type CausePots = {
     },
     {
       "code": 6014,
+      "name": "recipientIsPot",
+      "msg": "The pot cannot receive its own funds"
+    },
+    {
+      "code": 6015,
       "name": "timeLockNotExpired",
       "msg": "Time-lock period has not expired yet"
     }

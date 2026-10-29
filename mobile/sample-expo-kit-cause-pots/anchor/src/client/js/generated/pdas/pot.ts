@@ -12,21 +12,24 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from '@solana/kit'
 
 export type PotSeeds = {
-  authority: Address
+  authority: Address | HasAddress
   name: string
 }
 
 export async function findPotPda(
   seeds: PotSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = 'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN' as Address<'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN'>,
+    programAddress:
+      programAddressInput = 'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW' as Address<'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW'>,
   } = config
+  const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

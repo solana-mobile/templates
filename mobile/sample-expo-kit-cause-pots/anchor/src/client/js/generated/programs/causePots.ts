@@ -23,6 +23,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -66,7 +67,7 @@ import {
 import { findContributorAccountPda, findPotPda, findVaultPda } from '../pdas'
 
 export const CAUSE_POTS_PROGRAM_ADDRESS =
-  'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN' as Address<'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN'>
+  'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW' as Address<'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW'>
 
 export enum CausePotsAccount {
   Contributor,
@@ -162,7 +163,7 @@ export function identifyCausePotsInstruction(
   })
 }
 
-export type ParsedCausePotsInstruction<TProgram extends string = 'EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN'> =
+export type ParsedCausePotsInstruction<TProgram extends string = 'potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW'> =
   | ({ instructionType: CausePotsInstruction.AddContributor } & ParsedAddContributorInstruction<TProgram>)
   | ({ instructionType: CausePotsInstruction.Contribute } & ParsedContributeInstruction<TProgram>)
   | ({ instructionType: CausePotsInstruction.CreatePot } & ParsedCreatePotInstruction<TProgram>)
@@ -219,15 +220,24 @@ export type CausePotsPluginAccounts = {
 export type CausePotsPluginInstructions = {
   addContributor: (
     input: AddContributorInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddContributorInstruction> & SelfPlanAndSendFunctions
   contribute: (
     input: ContributeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getContributeInstructionAsync> & SelfPlanAndSendFunctions
-  createPot: (input: CreatePotAsyncInput) => ReturnType<typeof getCreatePotInstructionAsync> & SelfPlanAndSendFunctions
+  createPot: (
+    input: CreatePotAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
+  ) => ReturnType<typeof getCreatePotInstructionAsync> & SelfPlanAndSendFunctions
   releaseFunds: (
     input: ReleaseFundsAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getReleaseFundsInstructionAsync> & SelfPlanAndSendFunctions
-  signRelease: (input: SignReleaseInput) => ReturnType<typeof getSignReleaseInstruction> & SelfPlanAndSendFunctions
+  signRelease: (
+    input: SignReleaseInput,
+    config?: { programAddress?: Address | HasAddress },
+  ) => ReturnType<typeof getSignReleaseInstruction> & SelfPlanAndSendFunctions
 }
 
 export type CausePotsPluginPdas = {
@@ -240,7 +250,7 @@ export type CausePotsPluginRequirements = ClientWithRpc<GetAccountInfoApi & GetM
   ClientWithTransactionPlanning &
   ClientWithTransactionSending
 
-export function causePotsProgram() {
+export function causePotsProgram(config: { programAddress?: Address | HasAddress } = {}) {
   return <T extends CausePotsPluginRequirements>(client: T): ExtendedClient<T, { causePots: CausePotsPlugin }> => {
     return extendClient(client, {
       causePots: <CausePotsPlugin>{
@@ -249,13 +259,50 @@ export function causePotsProgram() {
           pot: addSelfFetchFunctions(client, getPotCodec()),
         },
         instructions: {
-          addContributor: (input) => addSelfPlanAndSendFunctions(client, getAddContributorInstruction(input)),
-          contribute: (input) => addSelfPlanAndSendFunctions(client, getContributeInstructionAsync(input)),
-          createPot: (input) => addSelfPlanAndSendFunctions(client, getCreatePotInstructionAsync(input)),
-          releaseFunds: (input) => addSelfPlanAndSendFunctions(client, getReleaseFundsInstructionAsync(input)),
-          signRelease: (input) => addSelfPlanAndSendFunctions(client, getSignReleaseInstruction(input)),
+          addContributor: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddContributorInstruction(input, {
+                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          contribute: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getContributeInstructionAsync(input, {
+                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          createPot: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreatePotInstructionAsync(input, {
+                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          releaseFunds: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getReleaseFundsInstructionAsync(input, {
+                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          signRelease: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSignReleaseInstruction(input, {
+                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
         },
-        pdas: { vault: findVaultPda, contributorAccount: findContributorAccountPda, pot: findPotPda },
+        pdas: {
+          vault: (seeds, pdaConfig) =>
+            findVaultPda(seeds, { programAddress: pdaConfig?.programAddress ?? config.programAddress }),
+          contributorAccount: (seeds, pdaConfig) =>
+            findContributorAccountPda(seeds, { programAddress: pdaConfig?.programAddress ?? config.programAddress }),
+          pot: (seeds, pdaConfig) =>
+            findPotPda(seeds, { programAddress: pdaConfig?.programAddress ?? config.programAddress }),
+        },
         identifyAccount: identifyCausePotsAccount,
         identifyInstruction: identifyCausePotsInstruction,
         parseInstruction: parseCausePotsInstruction,

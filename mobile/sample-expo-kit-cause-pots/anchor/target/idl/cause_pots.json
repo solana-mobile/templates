@@ -1,5 +1,5 @@
 {
-  "address": "EvUrRjL2ZowK58ai87ztHmVXyTRNvGb6HCWQ2Feo9bNN",
+  "address": "potsngHK65NFVwYXfSSJykdJ9WZfdQdsqeSFNk6fyMW",
   "metadata": {
     "name": "cause_pots",
     "version": "0.1.0",
@@ -417,6 +417,11 @@
     },
     {
       "code": 6014,
+      "name": "RecipientIsPot",
+      "msg": "The pot cannot receive its own funds"
+    },
+    {
+      "code": 6015,
       "name": "TimeLockNotExpired",
       "msg": "Time-lock period has not expired yet"
     }
