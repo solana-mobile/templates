@@ -30,10 +30,7 @@ pub fn handle_contribute(ctx: Context<Contribute>, amount: u64) -> Result<()> {
     let clock = Clock::get()?;
 
     require!(!pot.is_released, ErrorCode::PotAlreadyReleased);
-    if !pot.contributors.contains(&contributor) {
-        require!(pot.contributors.len() < MAX_CONTRIBUTORS, ErrorCode::MaxContributorsReached);
-        pot.contributors.push(contributor);
-    }
+    require!(pot.contributors.contains(&contributor), ErrorCode::NotAContributor);
 
     let ix = anchor_lang::solana_program::system_instruction::transfer(
         &contributor,
