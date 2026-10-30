@@ -165,6 +165,15 @@ describe('cause_pots', () => {
     expect(contributor.data.contributionCount).toEqual(1)
   })
 
+  it('rejects a contribution from a non-contributor', async () => {
+    // ARRANGE
+    const [potAddress] = await findPotPda({ authority: authority.address, name: potName })
+    const instruction = await getContributeInstructionAsync({ pot: potAddress, contributor: outsider, amount: 1n })
+
+    // ACT + ASSERT
+    await expectAnchorError(sendInstruction({ instruction, payer: outsider }), 6011) // NotAContributor
+  })
+
   it('rejects a release signature from a non-contributor', async () => {
     // ARRANGE
     const [potAddress] = await findPotPda({ authority: authority.address, name: potName })

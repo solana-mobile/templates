@@ -84,7 +84,7 @@ export function PotDetailFeature({ pot, potAddress, viewer }: { pot: Pot; potAdd
         </View>
 
         {/* Actions */}
-        {status !== 'released' ? (
+        {status !== 'released' && isContributor ? (
           <PotUiContribute
             currency={pot.currency}
             disabled={isBusy}
